@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "1061192153396",
+    "project_id": "hi-ma-9664f",
+    "storage_bucket": "hi-ma-9664f.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1061192153396:android:97b757cc09e70f8ba34d61",
+        "android_client_info": {
+          "package_name": "com.gmwapp.hi_dude"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBwnNtzFkn8Mu2qXWmBLVWOtrAYNwPfvgA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1061192153396:android:6fcd3e7df383bd96a34d61",
+        "android_client_info": {
+          "package_name": "com.gmwapp.hi_dude.dev"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBwnNtzFkn8Mu2qXWmBLVWOtrAYNwPfvgA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background_color"
+    tools:context=".activities.PaymentInitiatedActivity">
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/gl_left_margin"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.04" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/gl_right_margin"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.96" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/gl_top_margin"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.027" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/gl_bottom_margin"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.92" />
+
+    <ImageView
+        android:id="@+id/iv_back"
+        android:layout_width="15dp"
+        android:layout_height="15dp"
+        android:layout_marginStart="4dp"
+        android:layout_marginTop="8dp"
+        android:contentDescription="@string/edit"
+        android:rotation="180"
+        android:src="@drawable/right_arrow"
+        app:layout_constraintHeight_default="percent"
+        app:layout_constraintHeight_percent="0.02"
+        app:layout_constraintStart_toStartOf="@id/gl_left_margin"
+        app:layout_constraintTop_toTopOf="@id/gl_top_margin"
+        app:layout_constraintWidth_default="percent"
+        app:layout_constraintWidth_percent="0.05"
+        app:tint="@color/white"
+        tools:ignore="MissingConstraints" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/gl_withdraw_top_margin"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.11080711" />
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        app:cardBackgroundColor="@color/grey_extra_light"
+        app:layout_constraintEnd_toEndOf="@id/gl_right_margin"
+        app:layout_constraintStart_toStartOf="@id/gl_left_margin"
+        app:layout_constraintTop_toBottomOf="@+id/gl_withdraw_top_margin"
+        android:orientation="vertical"
+        android:gravity="center_vertical">
+
+        <ImageView
+            android:id="@+id/iv_success"
+            android:layout_width="@dimen/_100sdp"
+            android:layout_height="@dimen/_100sdp"
+            android:contentDescription="@string/edit"
+            android:src="@drawable/im_done"
+            app:layout_constraintStart_toStartOf="@id/gl_left_margin"
+            app:layout_constraintTop_toTopOf="@id/gl_top_margin"
+            app:layout_constraintWidth_default="percent"
+            app:layout_constraintWidth_percent="0.05"
+            app:tint="@color/green"
+            tools:ignore="MissingConstraints"
+            android:layout_gravity="center_horizontal" />
+
+    <TextView
+        android:id="@+id/tv_payment_initiated"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="20sp"
+        android:textColor="@color/black_light"
+        android:fontFamily="@font/poppins_semibold"
+        android:text="@string/payment_initiated"
+        android:layout_gravity="center_horizontal"/>
+
+    <TextView
+        android:visibility="invisible"
+        android:id="@+id/tv_payment_detail"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="15sp"
+        android:textColor="@color/text_light_grey"
+        android:fontFamily="@font/poppins_semibold"
+        android:text="@string/payment_of_33_was_initiated_to_nupi_account_123_okicici"
+        android:textAlignment="center"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="@dimen/_5sdp"/>
+
+    <TextView
+        android:id="@+id/tv_payment_instructions"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="15sp"
+        android:textColor="@color/text_light_grey"
+        android:fontFamily="@font/poppins_semibold"
+        android:text="@string/within_24_hours_amount_will_be_credited_to_your_account"
+        android:textAlignment="center"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="@dimen/_5sdp"/>
+
+        <com.google.android.material.button.MaterialButton
+            android:layout_marginTop="@dimen/_5sdp"
+            android:id="@+id/btn_go_back"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/_50sdp"
+            android:layout_marginBottom="24dp"
+            android:backgroundTint="@color/button_text_color"
+            android:fontFamily="@font/poppins_medium"
+            android:text="@string/go_back_home"
+            android:textAllCaps="false"
+            android:textColor="@color/white"
+            android:textSize="14sp"
+            app:cornerRadius="@dimen/_18sdp"
+            app:layout_constraintTop_toTopOf="@+id/tv_otp_mobile_number" />
+
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

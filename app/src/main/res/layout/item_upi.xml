@@ -1,0 +1,11 @@
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/upi_item"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:textSize="11sp"
+    android:textColor="@color/black_light"
+    android:fontFamily="@font/poppins_medium"
+    android:paddingVertical="5dp"
+    android:paddingHorizontal="15dp"
+    android:background="@drawable/round_border"
+    android:layout_marginRight="@dimen/_5sdp"/>

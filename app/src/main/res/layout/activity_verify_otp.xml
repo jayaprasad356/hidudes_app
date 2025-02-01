@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg_gradiend"
+    tools:context=".activities.LoginActivity">
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/gl_left_margin"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.04" />
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/gl_right_margin"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.96" />
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/gl_top_margin"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_begin="20dp"
+        app:layout_constraintGuide_percent="0.08" />
+
+    <TextView
+        android:id="@+id/tl_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/login_to_get_started"
+        android:textColor="@color/white"
+        android:fontFamily="@font/poppins_regular"
+        android:textSize="26sp"
+        android:layout_marginTop="4dp"
+        app:layout_constraintStart_toStartOf="@+id/gl_left_margin"
+        app:layout_constraintTop_toTopOf="@+id/gl_top_margin" />
+
+    <TextView
+        android:id="@+id/tv_otp_mobile_number_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/please_enter_otp_sent_to"
+        android:layout_marginTop="14dp"
+        android:textColor="@color/white"
+        android:textSize="14sp"
+        android:fontFamily="@font/poppins_regular"
+        app:layout_constraintStart_toStartOf="@+id/gl_left_margin"
+        app:layout_constraintTop_toBottomOf="@+id/tl_title" />
+
+    <TextView
+        android:id="@+id/tv_otp_mobile_number"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="14dp"
+        android:textColor="@color/white"
+        android:textSize="14sp"
+        app:layout_constraintStart_toEndOf="@+id/tv_otp_mobile_number_title"
+        app:layout_constraintTop_toBottomOf="@+id/tl_title" />
+
+    <ImageView
+        android:id="@+id/iv_edit"
+        android:layout_width="15dp"
+        android:layout_height="15dp"
+        android:layout_margin="4dp"
+        android:src="@drawable/edit"
+        app:layout_constraintStart_toEndOf="@+id/tv_otp_mobile_number"
+        app:layout_constraintTop_toTopOf="@+id/tv_otp_mobile_number"
+        app:layout_constraintBottom_toBottomOf="@+id/tv_otp_mobile_number"
+        app:tint="@color/white"
+        tools:ignore="MissingConstraints" />
+
+    <TextView
+        android:id="@+id/tv_enter_otp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/enter_otp"
+        android:layout_marginTop="14dp"
+        android:textColor="@color/white"
+        android:textSize="11sp"
+        app:layout_constraintStart_toStartOf="@+id/gl_left_margin"
+        app:layout_constraintTop_toBottomOf="@+id/tv_otp_mobile_number_title" />
+
+    <com.chaos.view.PinView
+        android:id="@+id/pv_otp"
+        app:itemCount="6"
+        app:itemWidth="45dp"
+        app:itemHeight="45dp"
+        app:itemSpacing="15dp"
+        android:gravity="center"
+        android:layout_marginTop="14dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:itemBackground="@color/white"
+        android:textColor="@color/colorPrimaryDark"
+        android:layout_gravity="center"
+        android:inputType="number"
+        android:cursorVisible="true"
+        app:hideLineWhenFilled="true"
+        app:itemRadius="13dp"
+        app:lineColor="@color/pin_color"
+        app:lineWidth="2dp"
+        style="@style/PinWidget.PinView"
+        app:layout_constraintStart_toStartOf="@+id/gl_left_margin"
+        app:layout_constraintEnd_toEndOf="@+id/gl_right_margin"
+        app:layout_constraintTop_toBottomOf="@+id/tv_enter_otp" />
+
+    <TextView
+        android:id="@+id/tv_didnt_received_otp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/didnt_receive_the_otp"
+        android:layout_marginTop="54dp"
+        android:textColor="@color/white"
+        android:textSize="12sp"
+        android:fontFamily="@font/poppins_semibold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/pv_otp" />
+
+    <TextView
+        android:id="@+id/tv_didnt_received_otp_timer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/retry_in"
+        android:textColor="@color/white"
+        android:textSize="12sp"
+        android:fontFamily="@font/poppins_semibold"
+        app:layout_constraintTop_toBottomOf="@+id/tv_didnt_received_otp"
+        app:layout_constraintEnd_toEndOf="@+id/gl_right_margin"
+        app:layout_constraintStart_toStartOf="@+id/gl_left_margin" />
+
+    <com.gmwapp.hi_dude.widgets.DButton
+        android:id="@+id/btn_resend_otp"
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:layout_marginTop="8dp"
+        android:textSize="12sp"
+        android:background="@drawable/d_button_bg_white"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:visibility="gone"
+        android:text="@string/resend_otp"
+        android:textAllCaps="false"
+        android:textColor="@color/black"
+        app:layout_constraintTop_toBottomOf="@+id/tv_didnt_received_otp"
+        app:layout_constraintEnd_toEndOf="@+id/gl_right_margin"
+        app:layout_constraintStart_toStartOf="@+id/gl_left_margin" />
+
+    <ProgressBar
+        android:id="@+id/pb_loader"
+        android:layout_width="0dp"
+        android:layout_height="20dp"
+        app:layout_constraintWidth_default="percent"
+        app:layout_constraintWidth_percent="0.05"
+        android:elevation="8dp"
+        android:indeterminate="true"
+        android:visibility="gone"
+        android:indeterminateTint="#321a56"
+        android:indeterminateTintMode="src_in"
+        app:layout_constraintTop_toTopOf="@+id/btn_resend_otp"
+        app:layout_constraintBottom_toBottomOf="@+id/btn_resend_otp"
+        app:layout_constraintStart_toStartOf="@+id/btn_resend_otp"
+        app:layout_constraintEnd_toEndOf="@+id/btn_resend_otp"/>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btn_verify_otp"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintHeight_default="percent"
+        app:layout_constraintHeight_percent="0.08"
+        android:layout_marginStart="2dp"
+        android:layout_marginTop="4dp"
+        android:layout_marginEnd="2dp"
+        android:layout_marginBottom="24dp"
+        android:enabled="false"
+        android:text="@string/verify_otp"
+        android:textAllCaps="false"
+        android:fontFamily="@font/poppins_medium"
+        android:textSize="14sp"
+        app:cornerRadius="@dimen/_18sdp"
+        android:textColor="@color/button_text_color"
+        android:backgroundTint="@color/button_background_tint"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/gl_right_margin"
+        app:layout_constraintStart_toStartOf="@+id/gl_left_margin" />
+
+    <ProgressBar
+        android:id="@+id/pb_verify_otp_loader"
+        android:layout_width="0dp"
+        android:layout_height="20dp"
+        app:layout_constraintWidth_default="percent"
+        app:layout_constraintWidth_percent="0.05"
+        android:elevation="8dp"
+        android:indeterminate="true"
+        android:visibility="gone"
+        android:indeterminateTint="#321a56"
+        android:indeterminateTintMode="src_in"
+        app:layout_constraintTop_toTopOf="@+id/btn_verify_otp"
+        app:layout_constraintBottom_toBottomOf="@+id/btn_verify_otp"
+        app:layout_constraintStart_toStartOf="@+id/btn_verify_otp"
+        app:layout_constraintEnd_toEndOf="@+id/btn_verify_otp"/>
+</androidx.constraintlayout.widget.ConstraintLayout>

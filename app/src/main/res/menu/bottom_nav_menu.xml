@@ -1,0 +1,24 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/home"
+        android:enabled="true"
+        android:icon="@drawable/nav_home"
+        android:iconTint="@color/white"
+        android:title="@string/home"
+        app:showAsAction="always" />
+    <item
+        android:id="@+id/recent"
+        android:enabled="true"
+        android:icon="@drawable/recent"
+        android:iconTint="@color/white"
+        android:title="@string/recent"
+        app:showAsAction="always" />
+    <item
+        android:id="@+id/profile"
+        android:enabled="true"
+        android:icon="@drawable/nav_profile"
+        android:iconTint="@color/white"
+        android:title="@string/profile"
+        app:showAsAction="always" />
+</menu>
