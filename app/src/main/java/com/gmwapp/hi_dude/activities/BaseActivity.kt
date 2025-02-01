@@ -214,7 +214,7 @@ open class BaseActivity : AppCompatActivity() {
 
     protected fun activateWakeLock(){
         val powerManager = context.getSystemService(POWER_SERVICE) as PowerManager
-        wakeLock = powerManager.newWakeLock(PowerManager.FULL_WAKE_LOCK, "Hima:Calling")
+        wakeLock = powerManager.newWakeLock(PowerManager.FULL_WAKE_LOCK, "Hidude:Calling")
         wakeLock?.acquire()
     }
 
@@ -260,8 +260,10 @@ open class BaseActivity : AppCompatActivity() {
     }
 
     fun setupZegoUIKit(Userid: Any, userName: String) {
-        val appID: Long = 364167780
-        val appSign = "3dd4f50fa22240d5943b75a843ef9711c7fa0424e80f8eb67c2bc0552cd1c2f3"
+        val appID: Long = 263451373
+//        val appID: Long = 364167780
+        val appSign = "9118ea8953bdde91c3f2a90c7f7aa39de956ff9d3a5756c8b4b036c95ab73e40"
+//        val appSign = "3dd4f50fa22240d5943b75a843ef9711c7fa0424e80f8eb67c2bc0552cd1c2f3"
         val userID: String = Userid.toString()
 
         val callInvitationConfig = ZegoUIKitPrebuiltCallInvitationConfig()

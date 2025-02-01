@@ -397,14 +397,16 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
                 android:background="@drawable/d_button_bg_user_name"
-                android:backgroundTint="@color/white"
+                android:backgroundTint="@color/button_background"
                 android:minHeight="75dp"
                 android:visibility="gone"
                 app:cardCornerRadius="10dp"
                 app:cardElevation="2dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/tv_description">
+                app:layout_constraintTop_toBottomOf="@+id/tv_description"
+                app:strokeWidth="@dimen/_1sdp"
+                app:strokeColor="@color/primary_blue">
 
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
@@ -422,9 +424,9 @@
                         android:hint="@string/tell_us_about_your_issue"
                         android:maxLength="250"
                         android:minHeight="75dp"
-                        android:textColor="@color/black"
+                        android:textColor="@color/white"
                         android:textColorHint="#98999d"
-                        android:textCursorDrawable="@color/colorPrimaryDark"
+                        android:textCursorDrawable="@color/primary_blue"
                         android:textSize="14sp"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
@@ -493,11 +495,13 @@
         android:text="@string/delete_account"
         android:textAllCaps="false"
         app:cornerRadius="@dimen/_18sdp"
-        android:textColor="@color/button_text_color"
+        android:textColor="@color/primary_blue"
         android:backgroundTint="@color/button_background_tint"
         android:textSize="14sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:strokeColor="@color/primary_blue"
+        app:strokeWidth="@dimen/_1sdp"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

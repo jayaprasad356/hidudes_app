@@ -35,7 +35,7 @@ class EarningsAdapter(
             }
             1 -> {
                 holder.binding.tvStatus.text = activity.getString(R.string.paid)
-                holder.binding.tvStatus.setTextColor(activity.getColor(android.R.color.holo_green_dark))
+                holder.binding.tvStatus.setTextColor(activity.getColor(R.color.green))
             }
             else -> {
                 holder.binding.tvStatus.text = activity.getString(R.string.cancelled)

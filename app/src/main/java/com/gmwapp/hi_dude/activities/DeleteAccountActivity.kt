@@ -169,10 +169,10 @@ class DeleteAccountActivity : BaseActivity(), OnButtonClickListener {
             }
         })
         var deleteReasonAdapter = DeleteReasonAdapter(this, arrayListOf(
-            Reason(getString(R.string.not_able_to_here_hima), false),
+            Reason(getString(R.string.not_able_to_here_hidude), false),
             Reason(getString(R.string.abusive_language), false),
-            Reason(getString(R.string.hima_not_polite), false),
-            Reason(getString(R.string.hima_not_interested), false),
+            Reason(getString(R.string.hidude_not_polite), false),
+            Reason(getString(R.string.hidude_not_interested), false),
             Reason(getString(R.string.ask_for_money), false),
             Reason(getString(R.string.other), false)
         ), false, object : OnItemSelectionListener<Reason> {

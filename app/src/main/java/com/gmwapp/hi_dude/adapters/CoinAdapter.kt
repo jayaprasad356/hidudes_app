@@ -45,8 +45,8 @@ class CoinAdapter(
         // Update the UI based on selection
         if (coin.isSelected == true) {
             holder.binding.cvCoin.strokeWidth = 4
-            holder.binding.cvCoin.strokeColor = activity.resources.getColor(R.color.yellow_dark)
-            holder.binding.llPrice.setBackgroundColor(activity.resources.getColor(R.color.yellow_dark))
+            holder.binding.cvCoin.strokeColor = activity.resources.getColor(R.color.primary_blue)
+            holder.binding.llPrice.setBackgroundColor(activity.resources.getColor(R.color.primary_blue))
         } else {
             holder.binding.cvCoin.strokeWidth = 0
             holder.binding.cvCoin.strokeColor = activity.resources.getColor(R.color.white)

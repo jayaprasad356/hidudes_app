@@ -35,17 +35,19 @@
         app:layout_constraintStart_toEndOf="@+id/iv_back"
         app:layout_constraintTop_toTopOf="@+id/iv_back" />
 
-    <androidx.cardview.widget.CardView
+    <com.google.android.material.card.MaterialCardView
         android:id="@+id/cv_privacy_policy"
         style="@style/CardViewStyle.Spacing"
         android:layout_height="0dp"
         android:layout_marginTop="40dp"
-        app:cardBackgroundColor="@color/white"
+        app:cardBackgroundColor="@color/button_background"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHeight_default="percent"
         app:layout_constraintHeight_percent="0.08"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/iv_back">
+        app:layout_constraintTop_toBottomOf="@+id/iv_back"
+        app:strokeWidth="@dimen/_1sdp"
+        app:strokeColor="@color/primary_blue">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -62,7 +64,7 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:tint="@color/black_light"
+                app:tint="@color/primary_blue"
                 tools:ignore="MissingConstraints" />
 
             <TextView
@@ -71,7 +73,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
                 android:text="@string/privacy_policy"
-                android:textColor="@color/black_light"
+                android:textColor="@color/primary_blue"
                 android:textSize="16sp"
                 android:fontFamily="@font/poppins_regular"
                 app:layout_constraintBottom_toBottomOf="@+id/iv_privacy_policy"
@@ -86,21 +88,23 @@
                 app:layout_constraintBottom_toBottomOf="@+id/iv_privacy_policy"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/iv_privacy_policy"
-                app:tint="@color/black_light" />
+                app:tint="@color/primary_blue" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
-    </androidx.cardview.widget.CardView>
-    <androidx.cardview.widget.CardView
+    </com.google.android.material.card.MaterialCardView>
+    <com.google.android.material.card.MaterialCardView
         android:id="@+id/cv_delete_account"
         style="@style/CardViewStyle.Spacing"
         android:layout_height="0dp"
         android:layout_marginTop="20dp"
-        app:cardBackgroundColor="@color/white"
+        app:cardBackgroundColor="@color/button_background"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHeight_default="percent"
         app:layout_constraintHeight_percent="0.08"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/cv_privacy_policy">
+        app:layout_constraintTop_toBottomOf="@+id/cv_privacy_policy"
+        app:strokeColor="@color/primary_blue"
+        app:strokeWidth="@dimen/_1sdp">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -117,7 +121,7 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:tint="@color/black_light"
+                app:tint="@color/primary_blue"
                 tools:ignore="MissingConstraints" />
 
             <TextView
@@ -126,7 +130,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
                 android:text="@string/delete_account"
-                android:textColor="@color/black_light"
+                android:textColor="@color/primary_blue"
                 android:textSize="16sp"
                 android:fontFamily="@font/poppins_regular"
                 app:layout_constraintBottom_toBottomOf="@+id/iv_delete_account"
@@ -141,8 +145,8 @@
                 app:layout_constraintBottom_toBottomOf="@+id/iv_delete_account"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/iv_delete_account"
-                app:tint="@color/black_light" />
+                app:tint="@color/primary_blue" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
-    </androidx.cardview.widget.CardView>
+    </com.google.android.material.card.MaterialCardView>
 </androidx.constraintlayout.widget.ConstraintLayout>

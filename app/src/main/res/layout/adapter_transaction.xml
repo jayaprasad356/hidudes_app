@@ -17,6 +17,7 @@
         app:layout_constraintStart_toStartOf="parent"
         android:layout_marginTop="@dimen/_6sdp"
         app:layout_constraintTop_toTopOf="parent"
+        app:tint="@color/green"
         tools:ignore="ContentDescription" />
 
     <TextView
@@ -29,7 +30,7 @@
         android:fontFamily="@font/poppins_semibold"
         app:layout_constraintStart_toEndOf="@+id/iv_Tick"
         app:layout_constraintTop_toTopOf="parent"
-        android:textColor="@color/black_light"/>
+        android:textColor="@color/white"/>
 
     <TextView
         android:id="@+id/tv_transaction_date"

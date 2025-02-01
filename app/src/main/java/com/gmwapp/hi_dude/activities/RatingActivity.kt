@@ -207,10 +207,10 @@ class RatingActivity : BaseActivity() {
                 // Change background and text color based on selection
                 if (position == selectedPosition) {
                     main.setBackgroundResource(R.drawable.d_button_bg_interest_selected)
-                    reviewTextView.setTextColor(ContextCompat.getColor(context, R.color.black))
+                    reviewTextView.setTextColor(ContextCompat.getColor(context, R.color.primary_blue))
                 } else {
                     main.setBackgroundResource(R.drawable.d_button_bg_interest_disabled)
-                    reviewTextView.setTextColor(ContextCompat.getColor(context, R.color.white))
+                    reviewTextView.setTextColor(ContextCompat.getColor(context, R.color.interest_disabled_text_color))
                 }
 
                 // Handle click event

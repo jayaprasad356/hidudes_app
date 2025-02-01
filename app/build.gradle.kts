@@ -34,16 +34,16 @@ android {
         }
     }
 
-    flavorDimensions += "hima"
+    flavorDimensions += "hidude"
     productFlavors {
         create("development") {
-            dimension = "hima"
+            dimension = "hidude"
           applicationIdSuffix = ".dev"
-            buildConfigField( "String", "BASE_URL",  "\"https://demo.himaapp.in/api/auth/\"")
+            buildConfigField( "String", "BASE_URL",  "\"https://demohidude.in/api/auth/\"")
         }
         create("production") {
-            dimension = "hima"
-            buildConfigField( "String", "BASE_URL",  "\"https://himaapp.in/api/auth/\"")
+            dimension = "hidude"
+            buildConfigField( "String", "BASE_URL",  "\"https://hidude.in/api/auth/\"")
         }
     }
     compileOptions {

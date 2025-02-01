@@ -96,6 +96,7 @@
                     android:layout_width="0dp"
                     android:layout_height="0dp"
                     android:src="@drawable/microphone"
+                    android:backgroundTint="@color/primary_blue"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintHeight_default="percent"
@@ -103,7 +104,8 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintWidth_default="percent"
-                    app:layout_constraintWidth_percent="0.5" />
+                    app:layout_constraintWidth_percent="0.5"
+                    app:tint="@color/primary_blue" />
             </androidx.constraintlayout.widget.ConstraintLayout>
         </androidx.constraintlayout.widget.ConstraintLayout>
     </com.skyfishjy.library.RippleBackground>

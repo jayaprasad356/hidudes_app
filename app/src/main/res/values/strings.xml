@@ -4,7 +4,7 @@
     <string name="login_to_get_started">Login to get started</string>
     <string name="you_will_receive_an_otp_on_this_number">You will receive an OTP on this number.</string>
     <string name="send_otp">Send OTP</string>
-    <string name="terms_and_conditions_text"><![CDATA[I accept terms & conditions of HI ma. I also agree to receiving updates on WhatsApp/SMS.]]></string>
+    <string name="terms_and_conditions_text"><![CDATA[I accept terms & conditions of HI dude. I also agree to receiving updates on WhatsApp/SMS.]]></string>
     <string name="please_enter_otp_sent_to">Please enter OTP sent to </string>
     <string name="enter_otp">Enter OTP</string>
     <string name="verify_otp">Verify OTP</string>
@@ -26,7 +26,7 @@
     <string name="audio_text">Audio 10/mins</string>
     <string name="no_sessions_yet">No Sessions yet</string>
     <string name="your_past_sessions_will_be_displayed_here">Your past sessions will be displayed here.</string>
-    <string name="connect_with_a_hima">Connect with a %s</string>
+    <string name="connect_with_a_hidude">Connect with a %s</string>
     <string name="edit">Edit Profile</string>
     <string name="wallet">Wallet</string>
     <string name="transactions">Transactions</string>
@@ -109,14 +109,14 @@
     <string name="view_more">View more</string>
     <string name="delete_warning_3">After the account is deleted, your personal data and account-related information (including but not limited to user name, transaction history, coins, etc.) will be permanently deleted and cannot be retrieved.</string>
     <string name="delete_warning_4">Before the account is deleted, coins must be consumed or withdrawn/ transferred.</string>
-    <string name="delete_warning_5">If account is deleted without using/ transferring coins, hima coins, they will be lost forever and cannot be recovered.</string>
+    <string name="delete_warning_5">If account is deleted without using/ transferring coins, hidude coins, they will be lost forever and cannot be recovered.</string>
     <string name="delete_warning_6">&appname; has the right to stop the deletion process if the account is subject to litigation and being investigated by a government body without seeking user approval.</string>
     <string name="delete_warning_7">Deleting your account does not constitue exemption or mitigation of responsibility for behaviour committed prior to account\'s deletion</string>
     <string name="view_less">View less</string>
-    <string name="not_able_to_here_hima">Not able to here &appname;</string>
+    <string name="not_able_to_here_hidude">Not able to here &appname;</string>
     <string name="abusive_language">Abusive language</string>
-    <string name="hima_not_polite">&appname; not polite</string>
-    <string name="hima_not_interested">&appname; not interested</string>
+    <string name="hidude_not_polite">&appname; not polite</string>
+    <string name="hidude_not_interested">&appname; not interested</string>
     <string name="ask_for_money">Ask for money</string>
     <string name="other">Other</string>
     <string name="tell_us_about_your_issue">Tell us about your issue</string>
@@ -129,9 +129,9 @@
     <string name="mail_body" translatable="false">Hi &appname; Team,\n\nMy registered details are as follows:\n1. Mobile number is: %s\n2. Device name: %s\n3. User language: %s\n4. App version code: %d\n\nI need help in the following issue:\n\n{<b>Describe your issue here</b>}\n\nYou can reach out to me at the above number for more information.\n\nThanks,\n</string>
     <string name="press_back_again_to_exit">Press back again to exit</string>
     <string name="tell_us_about_yourself">Tell us about yourself</string>
-    <string name="tell_us_about_yourself_hint">The information you share will be visible to all your hi mas</string>
+    <string name="tell_us_about_yourself_hint">The information you share will be visible to all your hi dudes</string>
     <string name="enter_your_age">Enter your Age</string>
-    <string name="enter_your_age_hint">This info will not be shared with Hi ma</string>
+    <string name="enter_your_age_hint">This info will not be shared with Hi dude</string>
     <string name="select_maximum_and_minimum">Select minimum 1 interest, maximum of 4</string>
     <string name="summary_text">Give us a quick summary about you</string>
     <string name="voice_identification">Voice Identification</string>
@@ -176,9 +176,9 @@
     <string name="enable_camera_and_microphone">Enable camera and microphone</string>
     <string name="permissions_hint">Allow &appname; to access your camera and microphone to join calls within the app</string>
     <string name="camera">Camera</string>
-    <string name="camera_hint"><![CDATA[Settings > Apps > App management > HI ma > Permission > Camera]]></string>
-    <string name="microphone_hint"><![CDATA[Settings > Apps > App management > HI ma > Permission > Microphone]]></string>
-    <string name="notofications_hint"><![CDATA[Settings > Apps > App management > HI ma > Permission > Notifications]]></string>
+    <string name="camera_hint"><![CDATA[Settings > Apps > App management > HI dude > Permission > Camera]]></string>
+    <string name="microphone_hint"><![CDATA[Settings > Apps > App management > HI dude > Permission > Microphone]]></string>
+    <string name="notofications_hint"><![CDATA[Settings > Apps > App management > HI dude > Permission > Notifications]]></string>
     <string name="microphone">Microphone</string>
     <string name="please_enter_the_valid_otp">Please enter the valid OTP</string>
     <string name="warning_end_call">Are you sure you want to end your call?</string>

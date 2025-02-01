@@ -5,7 +5,8 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".activities.LoginActivity">
+    tools:context=".activities.LoginActivity"
+    android:background="@color/background_color">
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/gl_left_margin"
@@ -50,7 +51,7 @@
         app:layout_constraintTop_toTopOf="@id/gl_top_margin"
         app:layout_constraintWidth_default="percent"
         app:layout_constraintWidth_percent="0.05"
-        app:tint="@color/pink"
+        app:tint="@color/white"
         tools:ignore="MissingConstraints" />
 
     <TextView
@@ -59,7 +60,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:text="@string/transactions"
-        android:textColor="@color/pink"
+        android:textColor="@color/white"
         android:fontFamily="@font/poppins_medium"
         android:textSize="20sp"
         app:layout_constraintBottom_toBottomOf="@+id/iv_back"
@@ -102,9 +103,11 @@
         android:text="@string/add_coins"
         android:textSize="14sp"
         app:cornerRadius="@dimen/_18sdp"
-        android:textColor="@color/white"
+        android:textColor="@color/primary_blue"
         app:layout_constraintBottom_toBottomOf="parent"
-        android:backgroundTint="@color/pink"/>
+        android:backgroundTint="@color/button_background"
+        app:strokeWidth="@dimen/_1sdp"
+        app:strokeColor="@color/primary_blue"/>
 
 
     <TextView

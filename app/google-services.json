@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "1061192153396",
-    "project_id": "hi-ma-9664f",
-    "storage_bucket": "hi-ma-9664f.firebasestorage.app"
+    "project_number": "277145572966",
+    "project_id": "hi-dude-3ffdd",
+    "storage_bucket": "hi-dude-3ffdd.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:1061192153396:android:97b757cc09e70f8ba34d61",
+        "mobilesdk_app_id": "1:277145572966:android:ce8b3c11733c1351917fa7",
         "android_client_info": {
           "package_name": "com.gmwapp.hi_dude"
         }
@@ -15,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyBwnNtzFkn8Mu2qXWmBLVWOtrAYNwPfvgA"
+          "current_key": "AIzaSyC4itrehfLg-UxDde_M8Vo7Zh-5zzYoU7g"
         }
       ],
       "services": {
@@ -26,7 +26,7 @@
     },
     {
       "client_info": {
-        "mobilesdk_app_id": "1:1061192153396:android:6fcd3e7df383bd96a34d61",
+        "mobilesdk_app_id": "1:277145572966:android:41b09da367c132b0917fa7",
         "android_client_info": {
           "package_name": "com.gmwapp.hi_dude.dev"
         }
@@ -34,7 +34,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyBwnNtzFkn8Mu2qXWmBLVWOtrAYNwPfvgA"
+          "current_key": "AIzaSyC4itrehfLg-UxDde_M8Vo7Zh-5zzYoU7g"
         }
       ],
       "services": {

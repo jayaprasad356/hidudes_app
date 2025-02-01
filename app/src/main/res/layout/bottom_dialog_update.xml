@@ -4,7 +4,8 @@
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
-    android:padding="16dp">
+    android:padding="16dp"
+    android:background="@color/background_color">
 
     <TextView
         android:layout_gravity="center"
@@ -12,7 +13,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Update Available"
-        android:textColor="@color/pink"
+        android:textColor="@color/white"
         android:fontFamily="@font/poppins_medium"
         android:textSize="18sp"
         android:textStyle="bold" />
@@ -32,7 +33,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:fontFamily="@font/poppins_regular"
-        android:textColor="@color/black"
+        android:textColor="@color/black_light"
         android:text="An update is available for the app. Please update to the latest version."
         android:textSize="16sp" />
 
@@ -43,10 +44,13 @@
         android:layout_marginTop="@dimen/_30sdp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:backgroundTint="@color/pink"
+        android:backgroundTint="@color/button_background"
         android:text="Update Now"
         android:textAllCaps="false"
         android:fontFamily="@font/poppins_medium"
+        app:strokeWidth="@dimen/_1sdp"
+        app:strokeColor="@color/primary_blue"
+        android:textColor="@color/primary_blue"
         />
 
 

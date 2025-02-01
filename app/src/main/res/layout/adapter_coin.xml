@@ -30,7 +30,7 @@
             android:layout_width="@dimen/_130sdp"
             android:layout_height="@dimen/_130sdp"
             android:background="@drawable/d_button_bg_coin"
-            android:backgroundTint="@color/white"
+            android:backgroundTint="@color/black_extra_light"
             android:gravity="center_horizontal"
             android:layout_gravity="center"
             android:orientation="vertical"
@@ -58,7 +58,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="xxx"
-                    android:textColor="@color/black"
+                    android:textColor="@color/white"
                     android:textSize="20dp"
                     android:textStyle="bold" />
 
@@ -68,7 +68,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/_2sdp"
                     android:text="@string/coins"
-                    android:textColor="@color/black"
+                    android:textColor="@color/white"
                     android:textSize="12sp" />
 
             </LinearLayout>
@@ -82,7 +82,7 @@
                 android:id="@+id/ll_price"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@color/pink_extra_light"
+                android:background="@drawable/border_coin_bg"
                 android:gravity="center"
                 android:orientation="vertical"
                 android:paddingVertical="@dimen/_6sdp">
@@ -94,7 +94,7 @@
                     android:fontFamily="@font/poppins_bold"
                     android:gravity="center"
                     android:text="xxx"
-                    android:textColor="@color/pink"
+                    android:textColor="@color/white"
                     android:textSize="12sp" />
             </LinearLayout>
 

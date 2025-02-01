@@ -46,7 +46,7 @@ class DeleteReasonAdapter(
                 if (reason.isSelected == true) {
                     holder.binding.main.isEnabled = true
                     holder.binding.main.setBackgroundResource(R.drawable.d_button_bg_interest_selected)
-                    holder.binding.tvReason.setTextColor(activity.getColor(R.color.black))
+                    holder.binding.tvReason.setTextColor(activity.getColor(R.color.primary_blue))
                 } else {
                     holder.binding.main.setBackgroundResource(R.drawable.d_button_bg_interest)
                     holder.binding.tvReason.setTextColor(activity.getColor(R.color.interest_text_color))
@@ -59,7 +59,7 @@ class DeleteReasonAdapter(
         } else if (reason.isSelected == true) {
             holder.binding.main.isEnabled = true
             holder.binding.main.setBackgroundResource(R.drawable.d_button_bg_interest_selected)
-            holder.binding.tvReason.setTextColor(activity.getColor(R.color.black))
+            holder.binding.tvReason.setTextColor(activity.getColor(R.color.primary_blue))
         } else {
             holder.binding.main.isEnabled = true
             holder.binding.main.setBackgroundResource(R.drawable.d_button_bg_interest)

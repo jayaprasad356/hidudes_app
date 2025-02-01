@@ -54,13 +54,13 @@ class FemaleUserAdapter(
         val  videoStatus = femaleUser.video_status
 
         if (audioStatus == 1) {
-            holder.binding.cvAudio.setCardBackgroundColor(ContextCompat.getColor(activity, R.color.purple))
+            holder.binding.cvAudio.setCardBackgroundColor(ContextCompat.getColor(activity, R.color.button_background))
             holder.binding.cvAudio.setOnSingleClickListener{
                 onAudioListener.onItemSelected(femaleUser)
             }
         }
         if (videoStatus == 1) {
-            holder.binding.cvVideo.setCardBackgroundColor(ContextCompat.getColor(activity, R.color.green))
+            holder.binding.cvVideo.setCardBackgroundColor(ContextCompat.getColor(activity, R.color.button_background))
             holder.binding.cvVideo.setOnSingleClickListener{
                 onVideoListener.onItemSelected(femaleUser)
             }

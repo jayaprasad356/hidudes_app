@@ -50,7 +50,7 @@
         android:layout_height="wrap_content"
         android:layout_marginEnd="4dp"
         android:text="xxx"
-        android:textColor="@color/black_light"
+        android:textColor="@color/green"
         android:textSize="20sp"
         android:textStyle="bold"
         android:visibility="gone"
@@ -76,7 +76,7 @@
         app:layout_constraintBottom_toBottomOf="@id/iv_audio_circle"
         app:layout_constraintEnd_toEndOf="@+id/iv_audio_circle"
         app:layout_constraintStart_toStartOf="@+id/iv_audio_circle"
-        app:layout_constraintTop_toTopOf="@id/iv_audio_circle" />
+        app:layout_constraintTop_toTopOf="@id/iv_audio_circle"/>
 
     <ImageView
         android:id="@+id/iv_video_circle"

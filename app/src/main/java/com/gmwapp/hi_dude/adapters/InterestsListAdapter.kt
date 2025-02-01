@@ -48,7 +48,7 @@ class InterestsListAdapter(
         if (interest.isSelected == true) {
             holder.binding.main.isEnabled = true
             holder.binding.main.setBackgroundResource(R.drawable.d_button_bg_interest_selected)
-            holder.binding.tvInterest.setTextColor(activity.getColor(R.color.black))
+            holder.binding.tvInterest.setTextColor(activity.getColor(R.color.primary_blue))
         } else if (isLimitreached) {
             holder.binding.main.isEnabled = false
             holder.binding.main.setBackgroundResource(R.drawable.d_button_bg_interest_disabled)

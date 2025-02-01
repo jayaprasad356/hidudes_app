@@ -34,6 +34,7 @@
     <color name="pink">#FF1381</color>
     <color name="pink_light">#FFA5CF</color>
     <color name="pink_extra_light">#FFC0D4</color>
+    <color name="black_extra_light">#51505C</color>
     <color name="pink_extra_light_100">#4EFFFFFF</color>
     <color name="purple">#9C1DF9</color>
     <color name="blue">#2388F2</color>

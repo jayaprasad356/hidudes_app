@@ -83,6 +83,6 @@ class DPreferences(context: Context) {
         private const val AUTHENTICATION_TOKEN: String = "authentication_token"
         private const val SETTINGS_DATA: String = "settings_data"
         private const val USER_DATA = "user_data"
-        private const val PREFS = "Hima"
+        private const val PREFS = "Hidude"
     }
 }
