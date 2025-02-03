@@ -85,7 +85,8 @@
                 android:background="@drawable/border_coin_bg"
                 android:gravity="center"
                 android:orientation="vertical"
-                android:paddingVertical="@dimen/_6sdp">
+                android:paddingVertical="@dimen/_6sdp"
+                android:layout_marginHorizontal="@dimen/_1sdp">
 
                 <TextView
                     android:id="@+id/tv_price"

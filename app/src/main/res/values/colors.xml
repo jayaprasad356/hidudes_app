@@ -52,6 +52,7 @@
     <color name="slide_indicator">#C4C4C4</color>
     <color name="inactive_call">#979797</color>
     <color name="Red">#FF0000</color>
+    <color name="Transparent">#00000000</color>
 
     <color name="Hindi">#563EE1</color>
     <color name="Telungu">#C69F00</color>

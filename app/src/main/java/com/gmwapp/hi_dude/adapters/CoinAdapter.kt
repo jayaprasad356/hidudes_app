@@ -47,10 +47,16 @@ class CoinAdapter(
             holder.binding.cvCoin.strokeWidth = 4
             holder.binding.cvCoin.strokeColor = activity.resources.getColor(R.color.primary_blue)
             holder.binding.llPrice.setBackgroundColor(activity.resources.getColor(R.color.primary_blue))
+            holder.binding.tvCoins.setTextColor(activity.resources.getColor(R.color.white))
+            holder.binding.tvCoinstxt.setTextColor(activity.resources.getColor(R.color.white))
+            holder.binding.tvPrice.setTextColor(activity.resources.getColor(R.color.white))
         } else {
             holder.binding.cvCoin.strokeWidth = 0
             holder.binding.cvCoin.strokeColor = activity.resources.getColor(R.color.white)
-            holder.binding.llPrice.setBackgroundColor(activity.resources.getColor(R.color.pink_extra_light))
+            holder.binding.llPrice.setBackground(activity.resources.getDrawable(R.drawable.border_coin_bg))
+            holder.binding.tvCoins.setTextColor(activity.resources.getColor(R.color.black_light))
+            holder.binding.tvCoinstxt.setTextColor(activity.resources.getColor(R.color.black_light))
+            holder.binding.tvPrice.setTextColor(activity.resources.getColor(R.color.primary_blue))
         }
 
         // Handle item click
