@@ -38,10 +38,14 @@ class LoginViewModel @Inject constructor(private val loginRepositories: LoginRep
                 ) {
                     loginResponseLiveData.postValue(response.body());
 
+                    Log.d("VerifyOTP", "Request URL: ${response.body()}")
+
                 }
 
                 override fun onFailure(call: Call<LoginResponse>, t: Throwable) {
                     loginErrorLiveData.postValue(DConstants.LOGIN_ERROR);
+                    Log.d("VerifyOTPError", "Request URL: ${t.message}")
+
                 }
 
                 override fun onNoNetwork() {
@@ -59,7 +63,7 @@ class LoginViewModel @Inject constructor(private val loginRepositories: LoginRep
                     response: Response<AppUpdateResponse>
                 ) {
                     appUpdateResponseLiveData.postValue(response.body());
-            }
+                }
                 override fun onFailure(call: Call<AppUpdateResponse>, t: Throwable) {
 
                 }
@@ -97,4 +101,3 @@ class LoginViewModel @Inject constructor(private val loginRepositories: LoginRep
     }
 
 }
-

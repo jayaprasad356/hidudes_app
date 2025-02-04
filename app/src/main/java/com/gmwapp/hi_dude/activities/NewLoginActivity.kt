@@ -4,12 +4,17 @@ import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.widget.ImageView
+import android.widget.RelativeLayout
+import androidx.appcompat.app.AppCompatActivity
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.viewpager2.widget.ViewPager2
 import com.gmwapp.hi_dude.R
 import com.gmwapp.hi_dude.adapters.OnboardingPagerAdapter
+import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import android.content.Intent
 import android.graphics.Paint
+import android.net.Uri
 import android.os.CountDownTimer
 import android.text.Editable
 import android.text.SpannableString
@@ -23,6 +28,8 @@ import android.view.View
 import android.view.inputmethod.InputMethodManager
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import com.gmwapp.hi_dude.BaseApplication
@@ -33,6 +40,7 @@ import com.gmwapp.hi_dude.dialogs.BottomSheetCountry
 import com.gmwapp.hi_dude.retrofit.responses.Country
 import com.gmwapp.hi_dude.viewmodels.LoginViewModel
 import com.google.android.material.snackbar.Snackbar
+import com.zego.ve.Log
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -154,7 +162,7 @@ class NewLoginActivity : BaseActivity(), OnItemSelectionListener<Country> {
             }
 
             override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
-                window.statusBarColor = resources.getColor(R.color.dark_blue)
+                window.statusBarColor = resources.getColor(R.color.background_color)
                 if (!binding.cbTermsAndConditions.isChecked || TextUtils.isEmpty(s)) {
                     //     binding.btnSendOtp.setBackgroundResource(R.drawable.d_button_bg)
                     binding.btnSendOtp.isEnabled = false
@@ -246,7 +254,7 @@ class NewLoginActivity : BaseActivity(), OnItemSelectionListener<Country> {
 
 
     private fun initOtpUI(mobile: String, otp: Int, countryCode: Int) {
-        window.statusBarColor = resources.getColor(R.color.dark_blue)
+        window.statusBarColor = resources.getColor(R.color.background_color)
         binding.tvOtpMobileNumber.text = " $mobile"
         binding.tvOtpMobileNumber.paintFlags =
             binding.tvOtpMobileNumber.paintFlags or Paint.UNDERLINE_TEXT_FLAG
@@ -372,7 +380,15 @@ class NewLoginActivity : BaseActivity(), OnItemSelectionListener<Country> {
 
 
     private fun login(mobile: String) {
-        loginViewModel.login(mobile)
+        Log.d("VerifyOTP", "Calling login function now")
+        Log.d("VerifyOTP", "$mobile")
+
+        if (mobile.isNotEmpty()){
+            Log.d("VerifyOTP", "Not Empty")
+
+            loginViewModel.login(mobile)
+
+        }
     }
 
 
@@ -385,5 +401,4 @@ class NewLoginActivity : BaseActivity(), OnItemSelectionListener<Country> {
     }
 
 }
-
 

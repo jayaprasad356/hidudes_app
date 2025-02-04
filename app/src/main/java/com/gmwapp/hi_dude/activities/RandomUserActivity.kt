@@ -53,6 +53,7 @@ import com.zegocloud.uikit.ZegoUIKit
 import com.zegocloud.uikit.plugin.common.PluginCallbackListener
 import com.zegocloud.uikit.prebuilt.call.ZegoUIKitPrebuiltCallConfig
 import com.zegocloud.uikit.prebuilt.call.ZegoUIKitPrebuiltCallService
+import com.zegocloud.uikit.prebuilt.call.config.ZegoCallDurationConfig
 import com.zegocloud.uikit.prebuilt.call.core.CallInvitationServiceImpl
 import com.zegocloud.uikit.prebuilt.call.invite.internal.OutgoingCallButtonListener
 import com.zegocloud.uikit.prebuilt.call.invite.internal.ZegoCallType
@@ -375,6 +376,10 @@ class RandomUserActivity : BaseActivity(), OnButtonClickListener {
                     finish()
                 }
             }
+
+
+
+
         ZegoUIKitPrebuiltCallService.events.invitationEvents.invitationListener =
             object : ZegoInvitationCallListener {
                 override fun onIncomingCallReceived(
@@ -384,7 +389,6 @@ class RandomUserActivity : BaseActivity(), OnButtonClickListener {
                     callees: MutableList<ZegoCallUser>?
                 ) {
                 }
-
 
                 override fun onIncomingCallCanceled(callID: String?, caller: ZegoCallUser?) {
                     Log.d("InvitationEvent", "Incoming call canceled. CallID: $callID, Caller: ${caller?.name}")
@@ -428,7 +432,9 @@ class RandomUserActivity : BaseActivity(), OnButtonClickListener {
                     ZegoUIKitPrebuiltCallService.endCall()
                     initializeCall(true)
                 }
+
             }
+
 
 
         ZegoUIKit.addRoomStateChangedListener { room, reason, _, _ ->
@@ -648,6 +654,14 @@ class RandomUserActivity : BaseActivity(), OnButtonClickListener {
         // Start the image sequence
         handler.post(updateImageSequence)
     }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        Log.d("destroying","destroyed")
+        intent.replaceExtras(null) // Clears all extras
+
+    }
+
 
 
 

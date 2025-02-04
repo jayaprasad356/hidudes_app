@@ -235,9 +235,10 @@
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btn_update"
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="24dp"
+                android:layout_marginHorizontal="@dimen/_13sdp"
+                android:layout_marginTop="@dimen/_10sdp"
                 android:backgroundTint="@color/button_background_tint2"
                 android:enabled="false"
                 android:fontFamily="@font/poppins_medium"
@@ -246,13 +247,9 @@
                 android:textAllCaps="false"
                 android:textColor="@color/primary_blue"
                 android:textSize="14sp"
-                app:strokeWidth="@dimen/_1sdp"
-                app:strokeColor="@color/primary_blue"
                 app:cornerRadius="@dimen/_18sdp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="@id/gl_right_margin"
-                app:layout_constraintStart_toStartOf="@id/gl_left_margin"
-                app:layout_constraintTop_toBottomOf="@+id/nestedScrollView" />
+                app:strokeWidth="@dimen/_1sdp"
+                app:strokeColor="@color/primary_blue"/>
 
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
