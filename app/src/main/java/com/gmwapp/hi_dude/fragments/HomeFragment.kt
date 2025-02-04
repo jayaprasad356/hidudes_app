@@ -5,13 +5,10 @@ import android.content.Intent
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.os.Bundle
-import android.text.Html
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -24,11 +21,8 @@ import com.gmwapp.hi_dude.callbacks.OnItemSelectionListener
 import com.gmwapp.hi_dude.constants.DConstants
 import com.gmwapp.hi_dude.databinding.FragmentHomeBinding
 import com.gmwapp.hi_dude.retrofit.responses.FemaleUsersResponseData
-import com.gmwapp.hi_dude.retrofit.responses.Reason
-import com.gmwapp.hi_dude.retrofit.responses.UserData
 import com.gmwapp.hi_dude.utils.setOnSingleClickListener
 import com.gmwapp.hi_dude.viewmodels.FemaleUsersViewModel
-import com.google.android.material.snackbar.Snackbar
 import com.onesignal.OneSignal
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -44,6 +38,8 @@ class HomeFragment : BaseFragment() {
     ): View {
         binding = FragmentHomeBinding.inflate(layoutInflater)
 
+
+
         initUI()
         setupSwipeToRefresh()
         return binding.root
@@ -55,12 +51,56 @@ class HomeFragment : BaseFragment() {
             startActivity(intent)
         }
 
-        OneSignal.User.addTag("gender", "male")
-        Log.d("Gender","Male")
-
-
-
         val userData = BaseApplication.getInstance()?.getPrefs()?.getUserData()
+        val language = userData?.language
+
+        val sharedPreferences = requireContext().getSharedPreferences("MyAppPrefs", Context.MODE_PRIVATE)
+        val isTagSet = sharedPreferences.getBoolean("isOneSignalTagSet", false)
+
+        OneSignal.User.addTag("gender", "male")
+        language?.let {
+            OneSignal.User.addTag("language", it)
+            Log.d("OneSignalTag", "Language tag added: $it")
+        }
+
+        language?.let {
+            OneSignal.User.addTag("gender_language", "male_$it")
+            Log.d("OneSignalTag", "male_$it")
+
+        }
+
+
+
+
+
+
+//        // Send the tag only if it hasn't been set before
+//        if (!isTagSet) {
+//            OneSignal.User.addTag("gender", "male")
+//            language?.let {
+//                OneSignal.User.addTag("language", it)
+//                Log.d("OneSignal", "Language tag added: $it")
+//            }
+//
+//            // Mark the flag so this doesn't happen again
+//            sharedPreferences.edit().putBoolean("isOneSignalTagSet", true).apply()
+//        } else {
+//            Log.d("OneSignaltag", "Tag already set, skipping... ")
+//        }
+//
+
+
+
+//
+//        language?.let { OneSignal.User.addTag("language", it)
+//            Log.d("OneSignaltag", "Language tag added: $it")
+//        }
+//
+//        OneSignal.User.addTag("gender", "male")
+//        Log.d("Gender","Male")
+
+
+
         userData?.id?.let {
             if (context?.let { it1 -> isInternetAvailable(it1) } == true) {
                 loadFemaleUsers(it)
@@ -101,6 +141,10 @@ class HomeFragment : BaseFragment() {
 //            else if (it.data?.isEmpty() == true) {
 //                Toast.makeText(activity, "No Data Found", Toast.LENGTH_SHORT).show()
 //            }
+
+            it.data?.firstOrNull()?.audio_status?.let { audioStatus ->
+                Log.d("responsecheck", "Audio Status: $audioStatus")
+            }
 
             if (it?.data != null) {
                 binding.rvProfiles.layoutManager =

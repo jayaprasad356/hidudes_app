@@ -7,12 +7,14 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.gmwapp.hi_dude.constants.DConstants
 import com.gmwapp.hi_dude.repositories.FemaleUsersRepositories
+import com.gmwapp.hi_dude.repositories.TransactionsRepositories
 import com.gmwapp.hi_dude.retrofit.callbacks.NetworkCallback
 import com.gmwapp.hi_dude.retrofit.responses.CallFemaleUserResponse
 import com.gmwapp.hi_dude.retrofit.responses.FemaleCallAttendResponse
 import com.gmwapp.hi_dude.retrofit.responses.FemaleUsersResponse
 import com.gmwapp.hi_dude.retrofit.responses.RandomUsersResponse
 import com.gmwapp.hi_dude.retrofit.responses.ReportsResponse
+import com.gmwapp.hi_dude.retrofit.responses.TransactionsResponse
 import com.gmwapp.hi_dude.retrofit.responses.UpdateCallStatusResponse
 import dagger.hilt.android.lifecycle.HiltViewModel
 import im.zego.uikit.libuikitreport.CommonUtils.getApplication
@@ -52,6 +54,7 @@ class FemaleUsersViewModel @Inject constructor(private val femaleUsersRepositori
                     response: Response<FemaleUsersResponse>
                 ) {
                     femaleUsersResponseLiveData.postValue(response.body());
+                    Log.d("checkResponse","${response.body()}")
                 }
 
                 override fun onFailure(call: Call<FemaleUsersResponse>, t: Throwable) {
@@ -73,6 +76,8 @@ class FemaleUsersViewModel @Inject constructor(private val femaleUsersRepositori
                     response: Response<RandomUsersResponse>
                 ) {
                     randomUsersResponseLiveData.postValue(response.body());
+                    Log.d("checkRandomResponse","${response.body()}")
+
                 }
 
                 override fun onFailure(call: Call<RandomUsersResponse>, t: Throwable) {

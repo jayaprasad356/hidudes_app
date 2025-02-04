@@ -11,6 +11,7 @@ import com.bumptech.glide.request.RequestOptions
 import com.gmwapp.hi_dude.R
 import com.gmwapp.hi_dude.callbacks.OnItemSelectionListener
 import com.gmwapp.hi_dude.databinding.AdapterFemaleUserBinding
+import com.gmwapp.hi_dude.retrofit.responses.FemaleUsersResponse
 import com.gmwapp.hi_dude.retrofit.responses.FemaleUsersResponseData
 import com.gmwapp.hi_dude.retrofit.responses.Interests
 import com.gmwapp.hi_dude.utils.Helper
@@ -24,7 +25,7 @@ import com.google.android.flexbox.JustifyContent
 
 class FemaleUserAdapter(
     val activity: Activity,
-    private val femaleUsers: List<FemaleUsersResponseData>,
+    private var femaleUsers: List<FemaleUsersResponseData>,
     val onAudioListener: OnItemSelectionListener<FemaleUsersResponseData>,
     val onVideoListener: OnItemSelectionListener<FemaleUsersResponseData>
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
@@ -54,13 +55,13 @@ class FemaleUserAdapter(
         val  videoStatus = femaleUser.video_status
 
         if (audioStatus == 1) {
-            holder.binding.cvAudio.setCardBackgroundColor(ContextCompat.getColor(activity, R.color.button_background))
+            holder.binding.cvAudio.setCardBackgroundColor(ContextCompat.getColor(activity, R.color.purple))
             holder.binding.cvAudio.setOnSingleClickListener{
                 onAudioListener.onItemSelected(femaleUser)
             }
         }
         if (videoStatus == 1) {
-            holder.binding.cvVideo.setCardBackgroundColor(ContextCompat.getColor(activity, R.color.button_background))
+            holder.binding.cvVideo.setCardBackgroundColor(ContextCompat.getColor(activity, R.color.green))
             holder.binding.cvVideo.setOnSingleClickListener{
                 onVideoListener.onItemSelected(femaleUser)
             }
@@ -87,7 +88,7 @@ class FemaleUserAdapter(
             setDrawable(ContextCompat.getDrawable(activity, R.drawable.bg_divider))
             setOrientation(FlexboxItemDecoration.VERTICAL)
         }
-     //   holder.binding.rvInterests.addItemDecoration(itemDecoration)
+        //   holder.binding.rvInterests.addItemDecoration(itemDecoration)
         holder.binding.rvInterests.layoutManager = staggeredGridLayoutManager
 
 

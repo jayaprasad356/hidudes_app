@@ -244,7 +244,45 @@ class FemaleHomeFragment : BaseFragment() {
 
     private fun initUI() {
 
+        val prefs = BaseApplication.getInstance()?.getPrefs()
+        val userData = prefs?.getUserData()
+
+
+        val language = userData?.language
+
+        val sharedPreferences = requireContext().getSharedPreferences("MyAppPrefs", Context.MODE_PRIVATE)
+        val isTagSet = sharedPreferences.getBoolean("isOneSignalTagSet", false)
+
+
+
         OneSignal.User.addTag("gender", "female")
+        language?.let {
+            OneSignal.User.addTag("language", it)
+            Log.d("OneSignalTag", "Language tag added: $it")
+        }
+
+        language?.let {
+            OneSignal.User.addTag("gender_language", "female_$it")
+            Log.d("OneSignalTag", "female_$it")
+
+        }
+
+
+
+//
+//        // Send the tag only if it hasn't been set before
+//        if (!isTagSet) {
+//            OneSignal.User.addTag("gender", "female")
+//            language?.let {
+//                OneSignal.User.addTag("language", it)
+//                Log.d("OneSignalTag", "Language tag added: $it")
+//            }
+//
+//            // Mark the flag so this doesn't happen again
+//            sharedPreferences.edit().putBoolean("isOneSignalTagSet", true).apply()
+//        } else {
+//            Log.d("OneSignalTag", "Tag already set, skipping... ")
+//        }
 
 
 
@@ -252,8 +290,7 @@ class FemaleHomeFragment : BaseFragment() {
             val intent = Intent(context, EarningsActivity::class.java)
             startActivity(intent)
         })
-        val prefs = BaseApplication.getInstance()?.getPrefs()
-        val userData = prefs?.getUserData()
+
         if (userData != null) {
             binding.sAudio.isChecked = userData.audio_status == 1
             binding.sVideo.isChecked = userData.video_status == 1
@@ -261,6 +298,7 @@ class FemaleHomeFragment : BaseFragment() {
 
         binding.tvCoins.text = "₹" + userData?.balance.toString()
 
+        Log.d("femaleuserdata", "${userData?.name} , ${userData?.language}")
 
         femaleUsersViewModel.getReports(userData?.id!!)
 

@@ -159,6 +159,7 @@ class RandomUserActivity : BaseActivity(), OnButtonClickListener {
             } else {
                 val receiverId = intent.getIntExtra(DConstants.RECEIVER_ID, 0)
                 val receiverName = intent.getStringExtra(DConstants.RECEIVER_NAME)
+                Log.d("receivername","$receiverName")
                 callType = intent.getStringExtra(DConstants.CALL_TYPE)
                 instance?.setCallType(callType)
                 val userData = instance?.getPrefs()?.getUserData()
@@ -171,6 +172,9 @@ class RandomUserActivity : BaseActivity(), OnButtonClickListener {
                 femaleUsersViewModel.callFemaleUserResponseLiveData.observe(this, Observer {
 
                     GiftImageViewModel.fetchGiftImages()
+
+                    Log.d("typeofcall","${it.data?.audio_status}")
+                    Log.d("typeofcall","${it.data?.video_status}")
 
                     if (it != null && it.success) {
                         val callId = it.data?.call_id
@@ -304,6 +308,7 @@ class RandomUserActivity : BaseActivity(), OnButtonClickListener {
                 val data = it.data
                 data?.call_id?.let { it1 ->
 
+                    Log.d("randomfemalecalling","${data.user_name}")
                     setupCall(
                         data.call_user_id.toString(),
                         data.call_user_name.toString(),
@@ -314,6 +319,10 @@ class RandomUserActivity : BaseActivity(), OnButtonClickListener {
                 }
                 data?.call_id?.let { it1 -> addRoomStateChangedListener(it1) }
                 Log.d("balanceTime", "${data?.balance_time}")
+                Log.d("StarTime", "${data?.balance_time}")
+                Log.d("EndTime", "${data?.balance_time}")
+
+
             } else {
                 Toast.makeText(
                     this@RandomUserActivity, it?.message, Toast.LENGTH_LONG
