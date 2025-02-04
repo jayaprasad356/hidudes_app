@@ -1,13 +1,20 @@
 package com.gmwapp.hi_dude.activities
 
+import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.view.View
 import android.widget.Toast
 import androidx.activity.viewModels
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.Observer
 import com.gmwapp.hi_dude.BaseApplication
+import com.gmwapp.hi_dude.R
+import com.gmwapp.hi_dude.constants.DConstants
 import com.gmwapp.hi_dude.databinding.ActivityBankUpdateBinding
+import com.gmwapp.hi_dude.retrofit.responses.UserData
 import com.gmwapp.hi_dude.viewmodels.BankViewModel
 import com.gmwapp.hi_dude.viewmodels.ProfileViewModel
 import dagger.hilt.android.AndroidEntryPoint

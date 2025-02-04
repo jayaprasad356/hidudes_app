@@ -11,11 +11,16 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.gmwapp.hi_dude.BaseApplication
 import com.gmwapp.hi_dude.R
 import com.gmwapp.hi_dude.activities.RandomUserActivity
+import com.gmwapp.hi_dude.adapters.CoinAdapter
+import com.gmwapp.hi_dude.adapters.FemaleUserAdapter
 import com.gmwapp.hi_dude.adapters.RecentCallsAdapter
 import com.gmwapp.hi_dude.callbacks.OnItemSelectionListener
 import com.gmwapp.hi_dude.constants.DConstants
 import com.gmwapp.hi_dude.databinding.FragmentRecentBinding
 import com.gmwapp.hi_dude.retrofit.responses.CallsListResponseData
+import com.gmwapp.hi_dude.retrofit.responses.CoinsResponseData
+import com.gmwapp.hi_dude.retrofit.responses.FemaleUsersResponseData
+import com.gmwapp.hi_dude.viewmodels.AccountViewModel
 import com.gmwapp.hi_dude.viewmodels.RecentViewModel
 import dagger.hilt.android.AndroidEntryPoint
 

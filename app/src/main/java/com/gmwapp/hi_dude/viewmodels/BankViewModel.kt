@@ -6,8 +6,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.gmwapp.hi_dude.constants.DConstants
 import com.gmwapp.hi_dude.repositories.BankRepositories
+import com.gmwapp.hi_dude.repositories.EarningsRepositories
+import com.gmwapp.hi_dude.repositories.TransactionsRepositories
 import com.gmwapp.hi_dude.retrofit.callbacks.NetworkCallback
 import com.gmwapp.hi_dude.retrofit.responses.BankUpdateResponse
+import com.gmwapp.hi_dude.retrofit.responses.EarningsResponse
+import com.gmwapp.hi_dude.retrofit.responses.TransactionsResponse
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import retrofit2.Call

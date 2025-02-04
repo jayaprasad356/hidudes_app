@@ -24,8 +24,11 @@ import com.gmwapp.hi_dude.callbacks.OnItemSelectionListener
 import com.gmwapp.hi_dude.constants.DConstants
 import com.gmwapp.hi_dude.databinding.FragmentHomeBinding
 import com.gmwapp.hi_dude.retrofit.responses.FemaleUsersResponseData
+import com.gmwapp.hi_dude.retrofit.responses.Reason
+import com.gmwapp.hi_dude.retrofit.responses.UserData
 import com.gmwapp.hi_dude.utils.setOnSingleClickListener
 import com.gmwapp.hi_dude.viewmodels.FemaleUsersViewModel
+import com.google.android.material.snackbar.Snackbar
 import com.onesignal.OneSignal
 import dagger.hilt.android.AndroidEntryPoint
 

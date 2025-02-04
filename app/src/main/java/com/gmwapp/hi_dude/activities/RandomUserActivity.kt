@@ -63,7 +63,6 @@ import java.util.TimeZone
 @AndroidEntryPoint
 class RandomUserActivity : BaseActivity(), OnButtonClickListener {
     private var timer: CountDownTimer? = null;
-    private var mediaPlayer: MediaPlayer? = null
     private var isReceiverDetailsAvailable: Boolean = false
     private val CALL_PERMISSIONS_REQUEST_CODE = 1
     lateinit var binding: ActivityRandomUserBinding
@@ -142,19 +141,11 @@ class RandomUserActivity : BaseActivity(), OnButtonClickListener {
     }
 
     private fun initializeCall(cancelled: Boolean) {
-        if (mediaPlayer == null) {
-            val resID = resources.getIdentifier("rhythm", "raw", packageName)
-            mediaPlayer = MediaPlayer.create(this, resID)
-            mediaPlayer?.isLooping = true
-            // mediaPlayer?.start()
-        }
 
         val instance = BaseApplication.getInstance()
         if (isReceiverDetailsAvailable) {
             instance?.setReceiverDetailsAvailable(true)
             if (cancelled) {
-                mediaPlayer?.pause()
-                mediaPlayer?.stop()
                 finish()
             } else {
                 val receiverId = intent.getIntExtra(DConstants.RECEIVER_ID, 0)
@@ -214,6 +205,7 @@ class RandomUserActivity : BaseActivity(), OnButtonClickListener {
         if (BaseApplication.getInstance()?.getRoomId() != null) {
             moveTaskToBack(true)
         }
+        CallInvitationServiceImpl.getInstance().hideIncomingCallDialog()
     }
 
     override fun onRequestPermissionsResult(
@@ -296,15 +288,11 @@ class RandomUserActivity : BaseActivity(), OnButtonClickListener {
                 Toast.makeText(
                     this@RandomUserActivity, it?.message, Toast.LENGTH_LONG
                 ).show()
-                mediaPlayer?.pause()
-                mediaPlayer?.stop()
                 finish()
             }
         })
         femaleUsersViewModel.randomUsersErrorLiveData.observe(this, Observer {
             showErrorMessage(it)
-            mediaPlayer?.pause()
-            mediaPlayer?.stop()
             finish()
         })
     }
@@ -313,7 +301,7 @@ class RandomUserActivity : BaseActivity(), OnButtonClickListener {
         val progressBar = findViewById<ProgressBar>(R.id.progressBar)
 
         // Set the ProgressBar max to 100
-        val max = (if (isReceiverDetailsAvailable) 30 else 28) * 1000L
+        val max = (if (isReceiverDetailsAvailable) 30 else 60) * 1000L
         progressBar.max = max.toInt()
 
         // Timer for 30 seconds
@@ -414,8 +402,6 @@ class RandomUserActivity : BaseActivity(), OnButtonClickListener {
                     startService(Intent(this@RandomUserActivity, CallingService::class.java))
                     timer?.cancel();
                     lastActiveTime = System.currentTimeMillis()
-                    mediaPlayer?.pause()
-                    mediaPlayer?.stop()
                     roomID = room
                     BaseApplication.getInstance()?.setRoomId(roomID)
                     userId = BaseApplication.getInstance()?.getPrefs()
@@ -456,8 +442,6 @@ class RandomUserActivity : BaseActivity(), OnButtonClickListener {
                             ).setInputData(data).setConstraints(constraints).build()
                             WorkManager.getInstance(this@RandomUserActivity)
                                 .enqueue(oneTimeWorkRequest)
-                            mediaPlayer?.pause()
-                            mediaPlayer?.stop()
                             finish()
                             val receiverId = intent.getIntExtra(DConstants.RECEIVER_ID, 0)
                             val intent = Intent(this@RandomUserActivity, RatingActivity::class.java)
@@ -481,8 +465,6 @@ class RandomUserActivity : BaseActivity(), OnButtonClickListener {
             } catch (e: Exception) {
             }
             ZegoUIKitPrebuiltCallService.endCall()
-            mediaPlayer?.pause()
-            mediaPlayer?.stop()
         } catch (e: Exception) {
         }
     }
@@ -514,7 +496,7 @@ class RandomUserActivity : BaseActivity(), OnButtonClickListener {
         user.avatar = instance?.getPrefs()?.getUserData()?.image
         binding.voiceCallButton.setCustomData(callId.toString())
         binding.voiceCallButton.setInvitees(listOf(user))
-        binding.voiceCallButton.setTimeout(if (isReceiverDetailsAvailable) 30 else 7)
+        binding.voiceCallButton.setTimeout(if (isReceiverDetailsAvailable) 30 else 15)
         callUserName = targetName
         callUserId = targetUserId
         instance?.setCallUserId(callUserId)
@@ -539,7 +521,7 @@ class RandomUserActivity : BaseActivity(), OnButtonClickListener {
         user.avatar = instance?.getPrefs()?.getUserData()?.image
         binding.voiceCallButton.setCustomData(callId.toString())
         binding.voiceCallButton.setInvitees(listOf(user))
-        binding.voiceCallButton.setTimeout(if (isReceiverDetailsAvailable) 30 else 7)
+        binding.voiceCallButton.setTimeout(if (isReceiverDetailsAvailable) 30 else 15)
         lifecycleScope.launch {
             if (instance?.isCalled() == false || instance?.isCalled() == null) {
                 delay(4000)
