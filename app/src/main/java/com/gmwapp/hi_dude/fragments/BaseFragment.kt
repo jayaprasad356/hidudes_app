@@ -58,6 +58,7 @@ import com.zegocloud.uikit.prebuilt.call.core.invite.advanced.ZegoCallInvitation
 import com.zegocloud.uikit.prebuilt.call.core.invite.ui.CallRouteActivity
 import com.zegocloud.uikit.prebuilt.call.core.notification.NotificationUtil
 import com.zegocloud.uikit.prebuilt.call.core.notification.PrebuiltCallNotificationManager
+import com.zegocloud.uikit.prebuilt.call.core.notification.RingtoneManager
 import com.zegocloud.uikit.prebuilt.call.invite.ZegoUIKitPrebuiltCallInvitationConfig
 import com.zegocloud.uikit.prebuilt.call.invite.internal.CallInviteActivity
 import com.zegocloud.uikit.prebuilt.call.invite.internal.ZegoUIKitPrebuiltCallConfigProvider
@@ -82,6 +83,7 @@ import java.util.Arrays
 
 @AndroidEntryPoint
 open class BaseFragment : Fragment() {
+    private var lastAction: String? = null
     private var wakeLock:PowerManager.WakeLock? =null
     private lateinit var mContext:Context;
     private var zimBackup:ZIM? = null;
@@ -98,12 +100,13 @@ open class BaseFragment : Fragment() {
             }else{
                 try {
                     val audioManager = context?.getSystemService(Context.AUDIO_SERVICE) as AudioManager?
-                    audioManager?.getStreamMaxVolume(AudioManager.STREAM_MUSIC)?.let {
+                    audioManager?.getStreamMaxVolume(AudioManager.STREAM_RING)?.let {
                         audioManager.setStreamVolume(
-                            AudioManager.STREAM_MUSIC,
+                            AudioManager.STREAM_RING,
                             it,
                             0
                         )
+
                     }
                 } catch (e: Exception) {
                 }
@@ -186,6 +189,10 @@ open class BaseFragment : Fragment() {
         EventBus.getDefault().register(this)
     }
 
+    override fun onResume() {
+        super.onResume()
+        stopMedia()
+    }
     override fun onAttach(context: Context) {
         super.onAttach(context)
         this.mContext = context;
@@ -230,12 +237,7 @@ open class BaseFragment : Fragment() {
                     0
                 )
             }
-            val resID = resources.getIdentifier("rhythm", "raw", context?.packageName)
-            BaseApplication.getInstance()?.getMediaPlayer()?.stop()
-            val mediaPlayer = MediaPlayer.create(context, resID)
-            BaseApplication.getInstance()?.setMediaPlayer(mediaPlayer)
-            mediaPlayer?.isLooping = true
-            mediaPlayer?.start()
+            RingtoneManager.playRingTone(true)
         } catch (e: Exception) {
         }
     }
@@ -418,10 +420,9 @@ open class BaseFragment : Fragment() {
 
         val screenOnOffReceiver: BroadcastReceiver = object : BroadcastReceiver() {
             override fun onReceive(context: Context, intent: Intent) {
+                val strAction = intent.action
                 if (zimBackup != null) {
-                    val strAction = intent.action
-
-                    if (strAction == Intent.ACTION_SCREEN_OFF || strAction == Intent.ACTION_SCREEN_ON) {
+                    if (strAction == Intent.ACTION_SCREEN_OFF && (lastAction == null || lastAction == Intent.ACTION_SCREEN_ON)) {
                         val keyguardManager =
                             ZegoConnectionImpl.context.getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager
 
@@ -456,6 +457,7 @@ open class BaseFragment : Fragment() {
                         }
                     }
                 }
+                lastAction = strAction
             }
         }
 
@@ -572,17 +574,5 @@ open class BaseFragment : Fragment() {
             PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
         }
         return openIntent
-    }
-    fun wakeLockScreen() {
-        val powerManager = mContext.getSystemService(Context.POWER_SERVICE) as PowerManager
-        val wakeLock = powerManager.newWakeLock(
-            PowerManager.SCREEN_BRIGHT_WAKE_LOCK or PowerManager.ACQUIRE_CAUSES_WAKEUP,
-            "MyApp::MyWakeLockTag"
-        )
-
-        wakeLock.acquire(3000)
-        val handler = Handler(Looper.getMainLooper())
-
-        handler.postDelayed(Runnable { wakeLock.release() }, 5000)
     }
 }
