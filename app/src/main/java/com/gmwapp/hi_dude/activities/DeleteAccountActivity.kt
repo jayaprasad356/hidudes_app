@@ -31,6 +31,7 @@ import com.google.android.flexbox.FlexWrap
 import com.google.android.flexbox.FlexboxItemDecoration
 import com.google.android.flexbox.FlexboxLayoutManager
 import com.google.android.flexbox.JustifyContent
+import com.tencent.mmkv.MMKV
 import com.zegocloud.uikit.prebuilt.call.ZegoUIKitPrebuiltCallService
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -113,6 +114,8 @@ class DeleteAccountActivity : BaseActivity(), OnButtonClickListener {
         })
         profileViewModel.deleteUserLiveData.observe(this, Observer {
             if (it!=null && it.success) {
+                MMKV.defaultMMKV().remove("user_id");
+                MMKV.defaultMMKV().remove("user_name");
                 ZegoUIKitPrebuiltCallService.unInit()
                 prefs?.clearUserData()
                 val intent = Intent(this, NewLoginActivity::class.java)
@@ -151,16 +154,16 @@ class DeleteAccountActivity : BaseActivity(), OnButtonClickListener {
 
             override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
                 if (TextUtils.isEmpty(s)) {
-                   // binding.btnDeleteAccount.setBackgroundResource(R.drawable.d_button_bg_disabled)
-                   // binding.btnDeleteAccount.setTextColor(getColor(R.color.black))
+                    // binding.btnDeleteAccount.setBackgroundResource(R.drawable.d_button_bg_disabled)
+                    // binding.btnDeleteAccount.setTextColor(getColor(R.color.black))
                     binding.btnDeleteAccount.isEnabled = false
                 } else {
                     binding.tvRemainingText.text = getString(
                         R.string.description_remaining_text,
                         s.length
                     )
-                //    binding.btnDeleteAccount.setBackgroundResource(R.drawable.d_button_bg_red)
-                  //  binding.btnDeleteAccount.setTextColor(getColor(R.color.white))
+                    //    binding.btnDeleteAccount.setBackgroundResource(R.drawable.d_button_bg_red)
+                    //  binding.btnDeleteAccount.setTextColor(getColor(R.color.white))
                     binding.btnDeleteAccount.isEnabled = true
                 }
             }
@@ -180,7 +183,7 @@ class DeleteAccountActivity : BaseActivity(), OnButtonClickListener {
                 if (reason.name == "Other") {
                     selectedReasons.clear()
                     binding.btnDeleteAccount.isEnabled = false
-                   // binding.btnDeleteAccount.setBackgroundResource(R.drawable.d_button_bg_disabled)
+                    // binding.btnDeleteAccount.setBackgroundResource(R.drawable.d_button_bg_disabled)
                     binding.etDescription.setText("")
                     if (reason.isSelected == true) {
                         binding.tvRemainingText.visibility = View.GONE
@@ -201,12 +204,12 @@ class DeleteAccountActivity : BaseActivity(), OnButtonClickListener {
                     }
                     if (selectedReasons.size > 0) {
                         binding.btnDeleteAccount.isEnabled = true
-                       // binding.btnDeleteAccount.setTextColor(getColor(R.color.white))
-                      //  binding.btnDeleteAccount.setBackgroundResource(R.drawable.d_button_bg_red)
+                        // binding.btnDeleteAccount.setTextColor(getColor(R.color.white))
+                        //  binding.btnDeleteAccount.setBackgroundResource(R.drawable.d_button_bg_red)
                     } else {
                         binding.btnDeleteAccount.isEnabled = false
-                       // binding.btnDeleteAccount.setTextColor(getColor(R.color.black))
-                     //   binding.btnDeleteAccount.setBackgroundResource(R.drawable.d_button_bg_disabled)
+                        // binding.btnDeleteAccount.setTextColor(getColor(R.color.black))
+                        //   binding.btnDeleteAccount.setBackgroundResource(R.drawable.d_button_bg_disabled)
                     }
                 }
             }

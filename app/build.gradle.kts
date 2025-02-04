@@ -116,7 +116,7 @@ dependencies {
     implementation ("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
 
 
-    implementation ("com.github.ZEGOCLOUD:zego_uikit_prebuilt_call_android:+")
+    implementation ("com.github.ZEGOCLOUD:zego_uikit_prebuilt_call_android:3.9.1-beta2")
 
     implementation ("com.airbnb.android:lottie:3.4.0")
 

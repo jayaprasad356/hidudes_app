@@ -141,7 +141,6 @@ class RandomUserActivity : BaseActivity(), OnButtonClickListener {
     }
 
     private fun initializeCall(cancelled: Boolean) {
-
         val instance = BaseApplication.getInstance()
         if (isReceiverDetailsAvailable) {
             instance?.setReceiverDetailsAvailable(true)

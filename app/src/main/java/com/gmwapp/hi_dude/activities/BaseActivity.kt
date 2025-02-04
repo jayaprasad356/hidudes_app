@@ -42,6 +42,7 @@ import com.gmwapp.hi_dude.utils.UsersImage
 import com.gmwapp.hi_dude.viewmodels.ProfileViewModel
 import com.gmwapp.hi_dude.widgets.CustomCallView
 import com.gmwapp.hi_dude.workers.CallUpdateWorker
+import com.tencent.mmkv.MMKV
 import com.zegocloud.uikit.ZegoUIKit
 import com.zegocloud.uikit.components.audiovideo.ZegoAvatarViewProvider
 import com.zegocloud.uikit.components.audiovideo.ZegoForegroundViewProvider
@@ -185,30 +186,30 @@ open class BaseActivity : AppCompatActivity() {
             instance?.getPrefs()?.getUserData()?.id?.let {
                 instance.getCallType()?.let { it1 ->
                     profileViewModel.getRemainingTime(
-                            it, it1,object : NetworkCallback<GetRemainingTimeResponse> {
-                                override fun onResponse(
-                                    call: Call<GetRemainingTimeResponse>, response: Response<GetRemainingTimeResponse>
-                                ) {
-                                    val body = response?.body()
-                                    if (body?.success == true) {
-                                        balanceTime = body.data?.remaining_time
-                                        EventBus.getDefault().post(UpdateRemainingTimeEvent(balanceTime));
+                        it, it1,object : NetworkCallback<GetRemainingTimeResponse> {
+                            override fun onResponse(
+                                call: Call<GetRemainingTimeResponse>, response: Response<GetRemainingTimeResponse>
+                            ) {
+                                val body = response?.body()
+                                if (body?.success == true) {
+                                    balanceTime = body.data?.remaining_time
+                                    EventBus.getDefault().post(UpdateRemainingTimeEvent(balanceTime));
 
-                                        ZegoUIKitPrebuiltCallService.sendInRoomCommand(
-                                            DConstants.REMAINING_TIME + "=" + balanceTime, arrayListOf(null)
-                                        ) {}
-                                    }
-                                }
-
-                                override fun onFailure(call: Call<GetRemainingTimeResponse>, t: Throwable) {
-                                }
-
-                                override fun onNoNetwork() {
+                                    ZegoUIKitPrebuiltCallService.sendInRoomCommand(
+                                        DConstants.REMAINING_TIME + "=" + balanceTime, arrayListOf(null)
+                                    ) {}
                                 }
                             }
-                        )
-                    }
+
+                            override fun onFailure(call: Call<GetRemainingTimeResponse>, t: Throwable) {
+                            }
+
+                            override fun onNoNetwork() {
+                            }
+                        }
+                    )
                 }
+            }
         }
     }
 
@@ -251,8 +252,10 @@ open class BaseActivity : AppCompatActivity() {
             getString(R.string.please_login_again_to_continue),
             Toast.LENGTH_SHORT
         ).show()
+        MMKV.defaultMMKV().remove("user_id");
+        MMKV.defaultMMKV().remove("user_name");
         ZegoUIKitPrebuiltCallService.unInit()
-            val prefs = BaseApplication.getInstance()?.getPrefs()
+        val prefs = BaseApplication.getInstance()?.getPrefs()
         prefs?.clearUserData()
         val intent = Intent(this, LoginActivity::class.java)
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
@@ -317,7 +320,7 @@ open class BaseActivity : AppCompatActivity() {
 
                             ZegoUIKitPrebuiltCallService.sendInRoomCommand(
                                 "active&is_direct_call="+BaseApplication.getInstance()?.isReceiverDetailsAvailable()
-                                +DConstants.REMAINING_TIME + "="+balanceTime, arrayListOf(null)
+                                        +DConstants.REMAINING_TIME + "="+balanceTime, arrayListOf(null)
                             ) {}
                             if (roomID != null && lastActiveTime != null && System.currentTimeMillis() - lastActiveTime!! > 15 * 1000) {
                                 ZegoUIKitPrebuiltCallService.endCall()
