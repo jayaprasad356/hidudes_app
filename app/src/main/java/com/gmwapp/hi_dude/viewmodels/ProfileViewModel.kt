@@ -1,5 +1,6 @@
 package com.gmwapp.hi_dude.viewmodels
 
+import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -17,6 +18,7 @@ import com.gmwapp.hi_dude.retrofit.responses.VoiceUpdateResponse
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import okhttp3.MultipartBody
+import org.greenrobot.eventbus.EventBus
 import retrofit2.Call
 import retrofit2.Response
 import javax.inject.Inject
@@ -114,8 +116,8 @@ class ProfileViewModel @Inject constructor(private val profileRepositories: Prof
     fun getUserSync(
         userId: Int
     ): Response<RegisterResponse> {
-            return profileRepositories.getUserSync(
-                userId)
+        return profileRepositories.getUserSync(
+            userId)
     }
 
     fun registerFemale(
@@ -247,10 +249,13 @@ class ProfileViewModel @Inject constructor(private val profileRepositories: Prof
                         call: Call<SpeechTextResponse>, response: Response<SpeechTextResponse>
                     ) {
                         speechTextLiveData.postValue(response.body())
+                        Log.d("speechtest","${response.body()}")
+
                     }
 
                     override fun onFailure(call: Call<SpeechTextResponse>, t: Throwable) {
                         speechTextErrorLiveData.postValue(t.message)
+                        Log.d("speechtest","${t.message}")
                     }
 
                     override fun onNoNetwork() {
@@ -300,4 +305,3 @@ class ProfileViewModel @Inject constructor(private val profileRepositories: Prof
     }
 
 }
-

@@ -37,6 +37,12 @@ class RecentFragment : BaseFragment() {
         val userData = BaseApplication.getInstance()?.getPrefs()?.getUserData()
         userData?.let { recentViewModel.getCallsList(userData.id, userData.gender) }
 
+        binding.swipeRefreshLayout.setOnRefreshListener {
+            // Start refreshing the data
+            userData?.let { recentViewModel.getCallsList(userData.id, userData.gender) }
+        }
+
+
 
 
         recentViewModel.callsListLiveData.observe(viewLifecycleOwner, Observer{
@@ -49,13 +55,16 @@ class RecentFragment : BaseFragment() {
         })
 
         recentViewModel.callsListLiveData.observe(viewLifecycleOwner, Observer {
+
+            binding.swipeRefreshLayout.isRefreshing = false
+
             if(it!=null && it.success && it.data!=null) {
                 binding.rvCalls.setLayoutManager(
                     LinearLayoutManager(
                         requireActivity(), LinearLayoutManager.VERTICAL, false
                     )
                 )
-              //  val recentCallsAdapter = RecentCallsAdapter(requireActivity(),it.data)
+                //  val recentCallsAdapter = RecentCallsAdapter(requireActivity(),it.data)
 
 
 
@@ -69,7 +78,7 @@ class RecentFragment : BaseFragment() {
                                 intent.putExtra(DConstants.RECEIVER_ID, data.id)
                                 intent.putExtra(DConstants.RECEIVER_NAME, data.name)
                                 intent.putExtra(DConstants.CALL_ID, 0)
-                               intent.putExtra(DConstants.IMAGE, data.image)
+                                intent.putExtra(DConstants.IMAGE, data.image)
                                 intent.putExtra(DConstants.IS_RECEIVER_DETAILS_AVAILABLE, true)
                                 intent.putExtra(DConstants.TEXT, getString(R.string.wait_user_hint, data.name))
                                 startActivity(intent)

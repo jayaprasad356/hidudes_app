@@ -2,6 +2,8 @@ package com.gmwapp.hi_dude.activities
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
+import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.core.view.ViewCompat
@@ -12,6 +14,7 @@ import com.gmwapp.hi_dude.R
 import com.gmwapp.hi_dude.databinding.ActivityYoutubeBinding
 import com.gmwapp.hi_dude.utils.setOnSingleClickListener
 import com.gmwapp.hi_dude.viewmodels.AccountViewModel
+import com.gmwapp.hi_dude.viewmodels.ExplanationVideoViewModel
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.YouTubePlayer
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.listeners.AbstractYouTubePlayerListener
 import dagger.hilt.android.AndroidEntryPoint
@@ -20,7 +23,7 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class YoutubeActivity : BaseActivity() {
     lateinit var binding: ActivityYoutubeBinding
-    private val accountViewModel: AccountViewModel by viewModels()
+    private val ExplanationVideoViewModel: ExplanationVideoViewModel by viewModels()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityYoutubeBinding.inflate(layoutInflater)
@@ -36,33 +39,46 @@ class YoutubeActivity : BaseActivity() {
 
     private fun initUI() {
         val prefs = BaseApplication.getInstance()?.getPrefs()
-        binding.youtubePlayerView.addYouTubePlayerListener(object : AbstractYouTubePlayerListener() {
-            override fun onReady(youTubePlayer: YouTubePlayer) {
-                prefs?.getSettingsData()?.demo_video?.let { youTubePlayer.loadVideo(it, 0f) }
-            }
-        })
+        val language = prefs?.getUserData()?.language
+//        binding.youtubePlayerView.addYouTubePlayerListener(object : AbstractYouTubePlayerListener() {
+//            override fun onReady(youTubePlayer: YouTubePlayer) {
+//                prefs?.getSettingsData()?.demo_video?.let { youTubePlayer.loadVideo(it, 0f) }
+//
+//            }
+//        })
 
-        accountViewModel.getSettings()
-        accountViewModel.settingsLiveData.observe(this, Observer {
-            if (it!=null && it.success) {
-                if (it.data != null) {
-                    if (it.data.size > 0) {
-                        val settingsData = it.data.get(0)
-                        prefs?.setSettingsData(settingsData)
+        language?.let { ExplanationVideoViewModel.fetchVideos(it) }
+        ExplanationVideoViewModel.videoResponseLiveData.observe(this) { response ->
+            response?.let {
+                if (it.success && it.data.isNotEmpty()) {
+                    val videoUrl = it.data[0].video_link
 
-                        val demo_video = it.data.get(0).demo_video
+                    Log.d("VideoURL", "Loaded Video: $videoUrl")
 
-                   //     Toast.makeText(this, "$demo_video", Toast.LENGTH_SHORT).show()
-
-                        binding.youtubePlayerView.addYouTubePlayerListener(object : AbstractYouTubePlayerListener() {
+                    // Extract video ID
+                    val videoId = extractVideoId(videoUrl)
+                    if (videoId != null) {
+                        Log.d("VideoID", "Extracted ID: $videoId")
+                        binding.youtubePlayerView.addYouTubePlayerListener(object :
+                            AbstractYouTubePlayerListener() {
                             override fun onReady(youTubePlayer: YouTubePlayer) {
-                                youTubePlayer.loadVideo("$demo_video", 0f)
+                                youTubePlayer.loadVideo(videoId, 0f)
                             }
                         })
+                    } else {
+                        Log.e("VideoError", "Invalid YouTube URL: $videoUrl")
                     }
+                } else {
+                    Log.e("VideoError", "Failed to load video")
                 }
             }
-        })
+        }
+
+
+
+
+
+
         binding.btnComplete.setOnSingleClickListener({
             val intent = Intent(this, AlmostDoneActivity::class.java)
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
@@ -76,5 +92,11 @@ class YoutubeActivity : BaseActivity() {
             finish()
         })
     }
+
+    private fun extractVideoId(url: String): String? {
+        val regex = Regex("(?:youtu\\.be/|youtube\\.com/(?:.*v=|.*\\/|.*embed\\/|.*watch\\?v=|.*shorts/))([a-zA-Z0-9_-]{11})")
+        return regex.find(url)?.groupValues?.get(1)
+    }
+
 
 }

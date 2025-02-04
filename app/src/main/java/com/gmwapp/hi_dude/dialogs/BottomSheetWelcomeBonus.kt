@@ -22,7 +22,7 @@ class BottomSheetWelcomeBonus(
 ) : BottomSheetDialogFragment() {
 
     interface OnAddCoinsListener {
-        fun onAddCoins(coins: Int, id: Int)
+        fun onAddCoins(coins: String, id: Int)
     }
 
     private var _binding: BottomSheetWelcomeBonusBinding? = null
@@ -54,13 +54,17 @@ class BottomSheetWelcomeBonus(
         binding.tvBonusOriginal.text = "₹$orinalPrice"
         binding.tvBonusDiscount.text = "₹$discountedPrice"
 
+        val twoPercentage = discountedPrice.toDouble() * 0.02
+        val roundedAmount = Math.round(twoPercentage)
+        val total_amount = (discountedPrice.toDouble() + roundedAmount).toString()
+
         // Button click listeners
         binding.tvViewMorePlans.setOnSingleClickListener {
             startActivity(Intent(context, WalletActivity::class.java))
         }
 
         binding.btnAddCoins.setOnSingleClickListener {
-            addCoinsListener?.onAddCoins(discountedPrice, id)
+            addCoinsListener?.onAddCoins(total_amount, id)
         }
 
         return binding.root

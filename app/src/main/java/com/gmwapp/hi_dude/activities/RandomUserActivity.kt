@@ -1,13 +1,16 @@
 package com.gmwapp.hi_dude.activities
 
 import android.Manifest
+import android.app.Activity
 import android.app.AlertDialog
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.drawable.ColorDrawable
 import android.media.MediaPlayer
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.util.Log
+import android.view.WindowManager
 import android.widget.Button
 import android.widget.ProgressBar
 import android.widget.Toast
@@ -39,6 +42,8 @@ import com.permissionx.guolindev.PermissionX
 import com.permissionx.guolindev.callback.ExplainReasonCallback
 import com.permissionx.guolindev.callback.RequestCallback
 import com.zegocloud.uikit.ZegoUIKit
+import com.zegocloud.uikit.plugin.common.PluginCallbackListener
+import com.zegocloud.uikit.prebuilt.call.ZegoUIKitPrebuiltCallConfig
 import com.zegocloud.uikit.prebuilt.call.ZegoUIKitPrebuiltCallService
 import com.zegocloud.uikit.prebuilt.call.core.CallInvitationServiceImpl
 import com.zegocloud.uikit.prebuilt.call.invite.internal.OutgoingCallButtonListener
@@ -141,7 +146,7 @@ class RandomUserActivity : BaseActivity(), OnButtonClickListener {
             val resID = resources.getIdentifier("rhythm", "raw", packageName)
             mediaPlayer = MediaPlayer.create(this, resID)
             mediaPlayer?.isLooping = true
-            mediaPlayer?.start()
+            // mediaPlayer?.start()
         }
 
         val instance = BaseApplication.getInstance()
@@ -501,6 +506,8 @@ class RandomUserActivity : BaseActivity(), OnButtonClickListener {
 
     private fun StartVoiceCall(targetUserId: String, targetName: String, callId: Int) {
         binding.voiceCallButton.setIsVideoCall(false)
+
+
         binding.voiceCallButton.resourceID = "zego_call"
         val user = ZegoUIKitUser(targetUserId, targetName)
         val instance = BaseApplication.getInstance()

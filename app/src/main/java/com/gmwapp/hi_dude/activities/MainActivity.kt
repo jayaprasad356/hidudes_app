@@ -179,7 +179,7 @@ class MainActivity : BaseActivity(), BottomNavigationView.OnNavigationItemSelect
     }
 
 
-    override fun onAddCoins(amount: Int, id: Int) {
+    override fun onAddCoins(amount: String, id: Int) {
 
         var amount = "$amount"
         var pointsId = "$id"
@@ -233,4 +233,4 @@ class MainActivity : BaseActivity(), BottomNavigationView.OnNavigationItemSelect
         val originalPrice = price / (1 - (savePercentage / 100.0)) // Use Double for division
         return round(originalPrice).toInt() // Round to the nearest integer
     }
-    }
+}

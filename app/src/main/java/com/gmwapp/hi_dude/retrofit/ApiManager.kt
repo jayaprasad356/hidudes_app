@@ -10,6 +10,7 @@ import com.gmwapp.hi_dude.retrofit.responses.CallsListResponse
 import com.gmwapp.hi_dude.retrofit.responses.CoinsResponse
 import com.gmwapp.hi_dude.retrofit.responses.DeleteUserResponse
 import com.gmwapp.hi_dude.retrofit.responses.EarningsResponse
+import com.gmwapp.hi_dude.retrofit.responses.ExplanationVideoResponse
 import com.gmwapp.hi_dude.retrofit.responses.FemaleCallAttendResponse
 import com.gmwapp.hi_dude.retrofit.responses.FemaleUsersResponse
 import com.gmwapp.hi_dude.retrofit.responses.GetRemainingTimeResponse
@@ -62,7 +63,7 @@ class ApiManager @Inject constructor(private val retrofit: Retrofit) {
     }
 
     fun appUpdate(
-         callback: NetworkCallback<AppUpdateResponse>
+        callback: NetworkCallback<AppUpdateResponse>
     ) {
         if (Helper.checkNetworkConnection()) {
             val apiCall: Call<AppUpdateResponse> = getApiInterface().appUpdate(1)
@@ -137,8 +138,8 @@ class ApiManager @Inject constructor(private val retrofit: Retrofit) {
     fun getUserSync(
         userId: Int
     ): Response<RegisterResponse> {
-            val apiCall: Call<RegisterResponse> = getApiInterface().getUserSync(userId)
-            return apiCall.execute()
+        val apiCall: Call<RegisterResponse> = getApiInterface().getUserSync(userId)
+        return apiCall.execute()
     }
 
     fun registerFemale(
@@ -257,7 +258,7 @@ class ApiManager @Inject constructor(private val retrofit: Retrofit) {
         startedTime: String,
         endedTime: String,
     ) : Response<UpdateConnectedCallResponse>{
-            return getApiInterface().updateConnectedCall(userId, callId, startedTime, endedTime)
+        return getApiInterface().updateConnectedCall(userId, callId, startedTime, endedTime)
     }
 
     suspend fun individualUpdateConnectedCall(
@@ -266,7 +267,7 @@ class ApiManager @Inject constructor(private val retrofit: Retrofit) {
         startedTime: String,
         endedTime: String,
     ) : Response<UpdateConnectedCallResponse>{
-            return getApiInterface().individualUpdateConnectedCall(userId, callId, startedTime, endedTime)
+        return getApiInterface().individualUpdateConnectedCall(userId, callId, startedTime, endedTime)
     }
 
     fun getEarnings(
@@ -363,6 +364,18 @@ class ApiManager @Inject constructor(private val retrofit: Retrofit) {
     ) {
         if (Helper.checkNetworkConnection()) {
             val apiCall: Call<OfferResponse> = getApiInterface().getOffer(userId)
+            apiCall.enqueue(callback)
+        } else {
+            callback.onNoNetwork()
+        }
+    }
+
+    fun getExplanationvideos(
+        language: String,
+        callback: NetworkCallback<ExplanationVideoResponse>
+    ) {
+        if (Helper.checkNetworkConnection()) {
+            val apiCall: Call<ExplanationVideoResponse> = getApiInterface().getExplanationVideos(language)
             apiCall.enqueue(callback)
         } else {
             callback.onNoNetwork()
@@ -619,11 +632,11 @@ interface ApiInterface {
     fun updateUpi(
         @Field("user_id") userId: Int,
         @Field("upi_id") upiId: String,
-        ): Call<UpiUpdateResponse>
+    ): Call<UpiUpdateResponse>
 
     @FormUrlEncoded
     @POST("dwpay/add_coins_requests.php")
-     fun addPoints(
+    fun addPoints(
         @Field("buyer_name") buyer_name: String,
         @Field("amount") amount: String,
         @Field("email") email: String,
@@ -692,4 +705,10 @@ interface ApiInterface {
 
     @POST("settings_list")
     fun getSettings(): Call<SettingsResponse>
+
+    @FormUrlEncoded
+    @POST("explaination_video_list")
+    fun getExplanationVideos(
+        @Field("language") language: String
+    ): Call<ExplanationVideoResponse>
 }

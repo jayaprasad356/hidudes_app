@@ -26,8 +26,8 @@ class AccountViewModel @Inject constructor(private val accountRepositories: Acco
                     response: Response<SettingsResponse>
                 ) {
                     settingsLiveData.postValue(response.body());
-                    Log.d("Retrofit", "Request URL: ${call.request().url}")
-                    Log.d("Retrofit2", "Request URL: ${response.body()}")
+                    Log.d("settingResponse", "Request URL: ${call.request().url}")
+                    Log.d("supportUrl", "Request URL: ${response.body()?.data?.firstOrNull()?.support_mail}")
 
 
 
@@ -43,5 +43,4 @@ class AccountViewModel @Inject constructor(private val accountRepositories: Acco
     }
 
 }
-
 

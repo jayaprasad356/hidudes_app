@@ -121,6 +121,13 @@ class BankUpdateActivity : BaseActivity() {
             }
         })
 
+        viewModel.bankErrorLiveData.observe(this, Observer { errorMessage ->
+            errorMessage?.let {
+                showToast(it) // Show the error message as a Toast
+            }
+        })
+
+
         profileViewModel.getUserLiveData.observe(this, Observer {
             it.data?.let { it1 ->
                 BaseApplication.getInstance()?.getPrefs()?.setUserData(it1)

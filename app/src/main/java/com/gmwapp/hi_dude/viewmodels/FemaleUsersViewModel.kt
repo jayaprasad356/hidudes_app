@@ -134,15 +134,17 @@ class FemaleUsersViewModel @Inject constructor(private val femaleUsersRepositori
         }
     }
 
-   fun femaleCallAttend(userId: Int, callId: Int,
-                        startTime: String,callback: NetworkCallback<FemaleCallAttendResponse>) {
+    fun femaleCallAttend(userId: Int, callId: Int,
+                         startTime: String,callback: NetworkCallback<FemaleCallAttendResponse>) {
         viewModelScope.launch {
+            Log.d("femaleCallAttend","femaleCallAttend")
+
             femaleUsersRepositories.femaleCallAttend(userId,callId,startTime, callback)
         }
     }
 
-   fun callFemaleUser(userId: Int, callUserId: Int,
-                      callType: String,) {
+    fun callFemaleUser(userId: Int, callUserId: Int,
+                       callType: String,) {
         viewModelScope.launch {
             femaleUsersRepositories.callFemaleUser(userId,callUserId,callType, object:NetworkCallback<CallFemaleUserResponse> {
                 override fun onResponse(
@@ -164,4 +166,3 @@ class FemaleUsersViewModel @Inject constructor(private val femaleUsersRepositori
     }
 
 }
-

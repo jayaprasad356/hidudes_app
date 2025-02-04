@@ -1,5 +1,6 @@
 package com.gmwapp.hi_dude.viewmodels
 
+import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -31,7 +32,7 @@ class BankViewModel @Inject constructor(private val bankRepositories: BankReposi
         branch: String,
 
 
-    ) {
+        ) {
         viewModelScope.launch {
             bankRepositories.updatebank(userId, bank, accountNum, branch, ifsc, holderName, object : NetworkCallback<BankUpdateResponse> {
                 override fun onResponse(
@@ -39,10 +40,20 @@ class BankViewModel @Inject constructor(private val bankRepositories: BankReposi
                     response: Response<BankUpdateResponse>
                 ) {
                     bankResponseLiveData.postValue(response.body())
+                    bankErrorLiveData.postValue(response.body()?.message)
+
+
+                    Log.d("bankresposne","${response.body()}")
+
+
+
                 }
 
                 override fun onFailure(call: Call<BankUpdateResponse>, t: Throwable) {
+                    Log.e("bankresposneError", "Error occurred", t)
+
                     bankErrorLiveData.postValue(DConstants.LOGIN_ERROR)
+                    Log.d("bankresposneError","${t.message}")
                 }
 
                 override fun onNoNetwork() {
@@ -52,4 +63,3 @@ class BankViewModel @Inject constructor(private val bankRepositories: BankReposi
         }
     }
 }
-

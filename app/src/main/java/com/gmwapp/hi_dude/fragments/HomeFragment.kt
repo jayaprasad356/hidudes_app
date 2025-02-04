@@ -5,10 +5,13 @@ import android.content.Intent
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.os.Bundle
+import android.text.Html
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -147,12 +150,36 @@ class HomeFragment : BaseFragment() {
         initFab()
     }
 
+//    private fun setupSwipeToRefresh() {
+//        binding.swipeRefreshLayout.setOnRefreshListener {
+//            val userData = BaseApplication.getInstance()?.getPrefs()?.getUserData()
+//            userData?.id?.let {
+//                if (context?.let { context -> isInternetAvailable(context) } == true) {
+//                    loadFemaleUsers(it)
+//                    Log.d("refreshing","refreshing")
+//                } else {
+//                    binding.tvNointernet.visibility = View.VISIBLE
+//                    binding.swipeRefreshLayout.isRefreshing = false
+//                }
+//            }
+//        }
+//    }
+
+
     private fun setupSwipeToRefresh() {
         binding.swipeRefreshLayout.setOnRefreshListener {
             val userData = BaseApplication.getInstance()?.getPrefs()?.getUserData()
             userData?.id?.let {
                 if (context?.let { context -> isInternetAvailable(context) } == true) {
+                    // Clear the existing data
+                    femaleUsersViewModel.femaleUsersResponseLiveData.value?.data?.clear()
+
+                    // Notify the adapter that data has been cleared
+                    (binding.rvProfiles.adapter as? FemaleUserAdapter)?.notifyDataSetChanged()
+
+                    // Reload the data
                     loadFemaleUsers(it)
+                    Log.d("refreshing", "refreshing")
                 } else {
                     binding.tvNointernet.visibility = View.VISIBLE
                     binding.swipeRefreshLayout.isRefreshing = false
@@ -160,6 +187,7 @@ class HomeFragment : BaseFragment() {
             }
         }
     }
+
 
     private fun loadFemaleUsers(userId: Int) {
         femaleUsersViewModel.getFemaleUsers(userId)
@@ -245,4 +273,5 @@ class HomeFragment : BaseFragment() {
         return capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) ||
                 capabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR)
     }
+
 }
