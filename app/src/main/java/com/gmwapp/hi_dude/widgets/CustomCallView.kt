@@ -11,6 +11,7 @@ import android.util.Log
 import android.view.View
 import android.view.View.OnLayoutChangeListener
 import android.view.WindowManager
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.ViewCompat
@@ -20,6 +21,7 @@ import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
+import com.bumptech.glide.Glide
 import com.gmwapp.hi_dude.BaseApplication
 import com.gmwapp.hi_dude.R
 import com.gmwapp.hi_dude.activities.BaseActivity
@@ -28,6 +30,7 @@ import com.gmwapp.hi_dude.activities.WalletActivity
 import com.gmwapp.hi_dude.constants.DConstants
 import com.gmwapp.hi_dude.dagger.GetRemainingTimeEvent
 import com.gmwapp.hi_dude.dagger.UpdateRemainingTimeEvent
+import com.gmwapp.hi_dude.utils.GiftManager
 import com.gmwapp.hi_dude.utils.Helper
 import com.zegocloud.uikit.components.audiovideo.ZegoBaseAudioVideoForegroundView
 import com.zegocloud.uikit.prebuilt.call.ZegoUIKitPrebuiltCallService
@@ -55,6 +58,8 @@ class CustomCallView : ZegoBaseAudioVideoForegroundView, LifecycleObserver {
         registerLifecycleObserver()
     }
 
+
+
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
         EventBus.getDefault().post(GetRemainingTimeEvent());
@@ -68,6 +73,12 @@ class CustomCallView : ZegoBaseAudioVideoForegroundView, LifecycleObserver {
         // Make the window full-screen
         // Make the window full-screen without hiding the navigation bar
         val activity = context as? Activity
+
+
+        post{
+            setupGiftUI()
+        }
+
 
         activity?.window?.apply {
             decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LAYOUT_STABLE  // Ensures layout doesn't change
@@ -100,6 +111,7 @@ class CustomCallView : ZegoBaseAudioVideoForegroundView, LifecycleObserver {
         val prefs = BaseApplication.getInstance()?.getPrefs()
         val userData = prefs?.getUserData()
 
+
         val inflate = inflate(
             context,
             if (userData?.gender == DConstants.MALE)
@@ -120,6 +132,7 @@ class CustomCallView : ZegoBaseAudioVideoForegroundView, LifecycleObserver {
         })
 
         customCallrootView = inflate
+
         tvRemainingTime = inflate.findViewById<View>(R.id.tv_remaining_time) as TextView?
         if (userData?.gender == DConstants.MALE) {
             var clCoins = inflate.findViewById<View>(R.id.cl_coins) as ConstraintLayout?
@@ -153,6 +166,63 @@ class CustomCallView : ZegoBaseAudioVideoForegroundView, LifecycleObserver {
 
         restoreUIState()
     }
+
+    private fun setupGiftUI() {
+        val giftMap = GiftManager.getGiftIconsWithCoins()
+
+        // Find UI components safely
+        val ivGiftList = listOfNotNull(
+            customCallrootView?.findViewById<ImageView?>(R.id.iv_gift1),
+            customCallrootView?.findViewById<ImageView?>(R.id.iv_gift2),
+            customCallrootView?.findViewById<ImageView?>(R.id.iv_gift3),
+            customCallrootView?.findViewById<ImageView?>(R.id.iv_gift4)
+        )
+
+        val tvCoinsList = listOfNotNull(
+            customCallrootView?.findViewById<TextView?>(R.id.tv_coinsAmount1),
+            customCallrootView?.findViewById<TextView?>(R.id.tv_coinsAmount2),
+            customCallrootView?.findViewById<TextView?>(R.id.tv_coinsAmount3),
+            customCallrootView?.findViewById<TextView?>(R.id.tv_coinsAmount4)
+        )
+
+
+        val ivCoinsImage = listOfNotNull(
+            customCallrootView?.findViewById(R.id.iv_coinImg1),
+            customCallrootView?.findViewById(R.id.iv_coinImg2),
+            customCallrootView?.findViewById(R.id.iv_coinImg3),
+            customCallrootView?.findViewById(R.id.iv_coinImg4)
+        )
+
+        // Prevent crash if views are missing
+        if (ivGiftList.isEmpty() || tvCoinsList.isEmpty()) {
+            Log.e("CustomCallView", "Gift views not found in layout!")
+            return
+        }
+
+        // Load gifts dynamically
+        val giftList = giftMap.entries.toList()
+        for (i in ivGiftList.indices) {
+            if (i < giftList.size) {
+                val (iconUrl, coins) = giftList[i]
+
+                // Load the gift image using Glide
+                Glide.with(context)
+                    .load(iconUrl)
+                    .into(ivGiftList[i])
+
+                // Set the coin amount
+                tvCoinsList[i].text = coins.toString()
+                ivCoinsImage[i].visibility = View.VISIBLE
+            } else {
+                // Hide extra gift slots if there are fewer gifts
+                ivGiftList[i].visibility = View.GONE
+                tvCoinsList[i].visibility = View.GONE
+                ivCoinsImage[i].visibility = View.GONE
+
+            }
+        }
+    }
+
 
     private fun restoreUIState() {
         val activity = context as? Activity

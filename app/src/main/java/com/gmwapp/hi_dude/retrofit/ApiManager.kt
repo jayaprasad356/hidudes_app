@@ -14,6 +14,7 @@ import com.gmwapp.hi_dude.retrofit.responses.ExplanationVideoResponse
 import com.gmwapp.hi_dude.retrofit.responses.FemaleCallAttendResponse
 import com.gmwapp.hi_dude.retrofit.responses.FemaleUsersResponse
 import com.gmwapp.hi_dude.retrofit.responses.GetRemainingTimeResponse
+import com.gmwapp.hi_dude.retrofit.responses.GiftImageResponse
 import com.gmwapp.hi_dude.retrofit.responses.LoginResponse
 import com.gmwapp.hi_dude.retrofit.responses.OfferResponse
 import com.gmwapp.hi_dude.retrofit.responses.RandomUsersResponse
@@ -382,6 +383,16 @@ class ApiManager @Inject constructor(private val retrofit: Retrofit) {
         }
     }
 
+    fun getGiftImages(callback: NetworkCallback<GiftImageResponse>) {
+        if (Helper.checkNetworkConnection()) {
+            val apiCall: Call<GiftImageResponse> = getApiInterface().getGiftImages()
+            apiCall.enqueue(callback)
+        } else {
+            callback.onNoNetwork()
+        }
+    }
+
+
 
 
 
@@ -711,4 +722,9 @@ interface ApiInterface {
     fun getExplanationVideos(
         @Field("language") language: String
     ): Call<ExplanationVideoResponse>
+
+
+    @POST("gifts_list")
+    fun getGiftImages(): Call<GiftImageResponse>
+
 }

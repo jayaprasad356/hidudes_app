@@ -1,6 +1,8 @@
 package com.gmwapp.hi_dude.adapters
 
 import android.app.Activity
+import android.graphics.Paint
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -31,6 +33,8 @@ class CoinAdapter(
         val holder: ItemHolder = holderParent as ItemHolder
         val coin: CoinsResponseData = coins[position]
 
+        Log.d("save percent","${coin.save}")
+
         // Set the default selected item to position 0
         if (position == 0 && coins.none { it.isSelected == true }) {
             coin.isSelected = true
@@ -45,18 +49,12 @@ class CoinAdapter(
         // Update the UI based on selection
         if (coin.isSelected == true) {
             holder.binding.cvCoin.strokeWidth = 4
-            holder.binding.cvCoin.strokeColor = activity.resources.getColor(R.color.primary_blue)
-            holder.binding.llPrice.setBackgroundColor(activity.resources.getColor(R.color.primary_blue))
-            holder.binding.tvCoins.setTextColor(activity.resources.getColor(R.color.white))
-            holder.binding.tvCoinstxt.setTextColor(activity.resources.getColor(R.color.white))
-            holder.binding.tvPrice.setTextColor(activity.resources.getColor(R.color.white))
+            holder.binding.cvCoin.strokeColor = activity.resources.getColor(R.color.yellow_dark)
+            holder.binding.llPrice.setBackgroundColor(activity.resources.getColor(R.color.yellow_dark))
         } else {
             holder.binding.cvCoin.strokeWidth = 0
             holder.binding.cvCoin.strokeColor = activity.resources.getColor(R.color.white)
-            holder.binding.llPrice.setBackground(activity.resources.getDrawable(R.drawable.border_coin_bg))
-            holder.binding.tvCoins.setTextColor(activity.resources.getColor(R.color.black_light))
-            holder.binding.tvCoinstxt.setTextColor(activity.resources.getColor(R.color.black_light))
-            holder.binding.tvPrice.setTextColor(activity.resources.getColor(R.color.primary_blue))
+            holder.binding.llPrice.setBackgroundColor(activity.resources.getColor(R.color.pink_extra_light))
         }
 
         // Handle item click

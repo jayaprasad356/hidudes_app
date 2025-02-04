@@ -5,10 +5,14 @@ import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
+import android.view.ViewGroup
+import android.widget.EditText
 import android.widget.Toast
 import androidx.activity.viewModels
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.core.widget.NestedScrollView
 import androidx.lifecycle.Observer
 import com.gmwapp.hi_dude.BaseApplication
 import com.gmwapp.hi_dude.R
@@ -59,6 +63,8 @@ class BankUpdateActivity : BaseActivity() {
         binding.etIfsccode.setText(ifscCode)
         binding.etBankName.setText(bankName)
         binding.etBranchName.setText(branchName)
+
+
 
 
 

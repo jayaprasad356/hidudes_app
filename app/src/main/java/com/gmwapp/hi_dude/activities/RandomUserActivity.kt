@@ -9,6 +9,8 @@ import android.graphics.drawable.ColorDrawable
 import android.media.MediaPlayer
 import android.os.Bundle
 import android.os.CountDownTimer
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.view.WindowManager
 import android.widget.Button
@@ -21,7 +23,9 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.RecyclerView
 import androidx.work.Constraints
 import androidx.work.Data
 import androidx.work.NetworkType
@@ -35,8 +39,12 @@ import com.gmwapp.hi_dude.R
 import com.gmwapp.hi_dude.constants.DConstants
 import com.gmwapp.hi_dude.databinding.ActivityRandomUserBinding
 import com.gmwapp.hi_dude.services.CallingService
+import com.gmwapp.hi_dude.utils.DPreferences
+import com.gmwapp.hi_dude.utils.GiftManager
 import com.gmwapp.hi_dude.viewmodels.FemaleUsersViewModel
+import com.gmwapp.hi_dude.viewmodels.GiftImageViewModel
 import com.gmwapp.hi_dude.viewmodels.ProfileViewModel
+import com.gmwapp.hi_dude.widgets.CustomCallView
 import com.gmwapp.hi_dude.workers.CallUpdateWorker
 import com.permissionx.guolindev.PermissionX
 import com.permissionx.guolindev.callback.ExplainReasonCallback
@@ -63,10 +71,12 @@ import java.util.TimeZone
 @AndroidEntryPoint
 class RandomUserActivity : BaseActivity(), OnButtonClickListener {
     private var timer: CountDownTimer? = null;
+    private var mediaPlayer: MediaPlayer? = null
     private var isReceiverDetailsAvailable: Boolean = false
     private val CALL_PERMISSIONS_REQUEST_CODE = 1
     lateinit var binding: ActivityRandomUserBinding
     private val femaleUsersViewModel: FemaleUsersViewModel by viewModels()
+    private val GiftImageViewModel: GiftImageViewModel by viewModels()
     private var usersCount: Int = 0
     private val profileViewModel: ProfileViewModel by viewModels()
 
@@ -92,6 +102,7 @@ class RandomUserActivity : BaseActivity(), OnButtonClickListener {
             insets
         }
         initUI()
+
         askPermissions()
         onBackPressedDispatcher.addCallback(this) {
             stopCall()
@@ -141,10 +152,19 @@ class RandomUserActivity : BaseActivity(), OnButtonClickListener {
     }
 
     private fun initializeCall(cancelled: Boolean) {
+        if (mediaPlayer == null) {
+            val resID = resources.getIdentifier("rhythm", "raw", packageName)
+            mediaPlayer = MediaPlayer.create(this, resID)
+            mediaPlayer?.isLooping = true
+            // mediaPlayer?.start()
+        }
+
         val instance = BaseApplication.getInstance()
         if (isReceiverDetailsAvailable) {
             instance?.setReceiverDetailsAvailable(true)
             if (cancelled) {
+                mediaPlayer?.pause()
+                mediaPlayer?.stop()
                 finish()
             } else {
                 val receiverId = intent.getIntExtra(DConstants.RECEIVER_ID, 0)
@@ -159,6 +179,9 @@ class RandomUserActivity : BaseActivity(), OnButtonClickListener {
                 }
 
                 femaleUsersViewModel.callFemaleUserResponseLiveData.observe(this, Observer {
+
+                    GiftImageViewModel.fetchGiftImages()
+
                     if (it != null && it.success) {
                         val callId = it.data?.call_id
                         val balanceTime = it.data?.balance_time
@@ -204,7 +227,6 @@ class RandomUserActivity : BaseActivity(), OnButtonClickListener {
         if (BaseApplication.getInstance()?.getRoomId() != null) {
             moveTaskToBack(true)
         }
-        CallInvitationServiceImpl.getInstance().hideIncomingCallDialog()
     }
 
     override fun onRequestPermissionsResult(
@@ -231,6 +253,21 @@ class RandomUserActivity : BaseActivity(), OnButtonClickListener {
     }
 
     private fun initUI() {
+
+        GiftImageViewModel.giftResponseLiveData.observe(this) { response ->
+            response?.let {
+                if (it.success && it.data.isNotEmpty()) {
+                    GiftManager.updateGifts(it.data)
+                    Log.d("GiftManager", "Gifts updated successfully.")
+                } else {
+                    Log.e("GiftManager", "Failed to load gifts")
+                }
+            }
+        }
+
+
+
+
 
         isReceiverDetailsAvailable =
             intent.getBooleanExtra(DConstants.IS_RECEIVER_DETAILS_AVAILABLE, false)
@@ -269,6 +306,9 @@ class RandomUserActivity : BaseActivity(), OnButtonClickListener {
 //        })
 
         femaleUsersViewModel.randomUsersResponseLiveData.observe(this, Observer {
+            GiftImageViewModel.fetchGiftImages()
+
+            startImageSequence()
             if (it != null && it.success) {
                 val data = it.data
                 data?.call_id?.let { it1 ->
@@ -287,11 +327,15 @@ class RandomUserActivity : BaseActivity(), OnButtonClickListener {
                 Toast.makeText(
                     this@RandomUserActivity, it?.message, Toast.LENGTH_LONG
                 ).show()
+                mediaPlayer?.pause()
+                mediaPlayer?.stop()
                 finish()
             }
         })
         femaleUsersViewModel.randomUsersErrorLiveData.observe(this, Observer {
             showErrorMessage(it)
+            mediaPlayer?.pause()
+            mediaPlayer?.stop()
             finish()
         })
     }
@@ -300,7 +344,7 @@ class RandomUserActivity : BaseActivity(), OnButtonClickListener {
         val progressBar = findViewById<ProgressBar>(R.id.progressBar)
 
         // Set the ProgressBar max to 100
-        val max = (if (isReceiverDetailsAvailable) 30 else 60) * 1000L
+        val max = (if (isReceiverDetailsAvailable) 30 else 28) * 1000L
         progressBar.max = max.toInt()
 
         // Timer for 30 seconds
@@ -401,6 +445,8 @@ class RandomUserActivity : BaseActivity(), OnButtonClickListener {
                     startService(Intent(this@RandomUserActivity, CallingService::class.java))
                     timer?.cancel();
                     lastActiveTime = System.currentTimeMillis()
+                    mediaPlayer?.pause()
+                    mediaPlayer?.stop()
                     roomID = room
                     BaseApplication.getInstance()?.setRoomId(roomID)
                     userId = BaseApplication.getInstance()?.getPrefs()
@@ -408,6 +454,7 @@ class RandomUserActivity : BaseActivity(), OnButtonClickListener {
                     callUserId = targetUserId.toString() // Set call_user_id
                     startTime = dateFormat.format(Date()) // Set call start time in IST
                     BaseApplication.getInstance()?.setStartTime(startTime)
+
                 }
 
                 ZegoRoomStateChangedReason.LOGOUT -> {
@@ -441,6 +488,8 @@ class RandomUserActivity : BaseActivity(), OnButtonClickListener {
                             ).setInputData(data).setConstraints(constraints).build()
                             WorkManager.getInstance(this@RandomUserActivity)
                                 .enqueue(oneTimeWorkRequest)
+                            mediaPlayer?.pause()
+                            mediaPlayer?.stop()
                             finish()
                             val receiverId = intent.getIntExtra(DConstants.RECEIVER_ID, 0)
                             val intent = Intent(this@RandomUserActivity, RatingActivity::class.java)
@@ -464,6 +513,8 @@ class RandomUserActivity : BaseActivity(), OnButtonClickListener {
             } catch (e: Exception) {
             }
             ZegoUIKitPrebuiltCallService.endCall()
+            mediaPlayer?.pause()
+            mediaPlayer?.stop()
         } catch (e: Exception) {
         }
     }
@@ -495,7 +546,7 @@ class RandomUserActivity : BaseActivity(), OnButtonClickListener {
         user.avatar = instance?.getPrefs()?.getUserData()?.image
         binding.voiceCallButton.setCustomData(callId.toString())
         binding.voiceCallButton.setInvitees(listOf(user))
-        binding.voiceCallButton.setTimeout(if (isReceiverDetailsAvailable) 30 else 15)
+        binding.voiceCallButton.setTimeout(if (isReceiverDetailsAvailable) 30 else 7)
         callUserName = targetName
         callUserId = targetUserId
         instance?.setCallUserId(callUserId)
@@ -520,7 +571,7 @@ class RandomUserActivity : BaseActivity(), OnButtonClickListener {
         user.avatar = instance?.getPrefs()?.getUserData()?.image
         binding.voiceCallButton.setCustomData(callId.toString())
         binding.voiceCallButton.setInvitees(listOf(user))
-        binding.voiceCallButton.setTimeout(if (isReceiverDetailsAvailable) 30 else 15)
+        binding.voiceCallButton.setTimeout(if (isReceiverDetailsAvailable) 30 else 7)
         lifecycleScope.launch {
             if (instance?.isCalled() == false || instance?.isCalled() == null) {
                 delay(4000)
@@ -561,4 +612,53 @@ class RandomUserActivity : BaseActivity(), OnButtonClickListener {
         //Optional: Change dialog background
         //dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
     }
+
+
+    private fun startImageSequence() {
+        // List of image resources
+        val images = listOf(
+            R.drawable.avatar1,
+            R.drawable.avatar2,
+            R.drawable.avatar3,
+            R.drawable.avatar4,
+            R.drawable.avatar5,
+            R.drawable.avatar6,
+
+            )
+
+        // Handler to post delayed tasks
+        val handler = Handler(Looper.getMainLooper())
+
+        // Function to update image sequence
+        val updateImageSequence = object : Runnable {
+            var currentImageIndex = 0
+
+            override fun run() {
+                if (isFinishing || isDestroyed) {
+                    return // Exit if the activity is finishing or destroyed
+                }
+
+                // Apply circle crop using Glide
+                val requestOptions = RequestOptions().circleCrop()
+
+                // Load the image using Glide with circle crop
+                Glide.with(this@RandomUserActivity)
+                    .load(images[currentImageIndex])  // Load the current image resource
+                    .apply(requestOptions)  // Apply the circle crop transformation
+                    .into(binding.ivLogo)  // Set image into the ImageView
+
+                // Move to the next image
+                currentImageIndex = (currentImageIndex + 1) % images.size  // Loop back to the first image after the last one
+
+                // Post the next update with a delay of 1 second
+                handler.postDelayed(this, 1000)  // 1 second delay
+            }
+        }
+
+        // Start the image sequence
+        handler.post(updateImageSequence)
+    }
+
+
+
 }

@@ -109,6 +109,7 @@ class MainActivity : BaseActivity(), BottomNavigationView.OnNavigationItemSelect
                 val coin = response.data[0].coins
                 val discountedPrice = response.data[0].price
                 val save = response.data[0].save
+                val coinId = response.data[0].id
 
                 val originalPrice = calculateOriginalPrice(discountedPrice, save)
 
@@ -119,7 +120,7 @@ class MainActivity : BaseActivity(), BottomNavigationView.OnNavigationItemSelect
                 if (BaseApplication.getInstance()?.getPrefs()
                         ?.getUserData()?.gender == DConstants.MALE
                 ) {
-                    val bottomSheet = BottomSheetWelcomeBonus(coin, originalPrice, discountedPrice)
+                    val bottomSheet = BottomSheetWelcomeBonus(coin, originalPrice, discountedPrice,coinId)
                     bottomSheet.show(supportFragmentManager, "BottomSheetWelcomeBonus")
                 }
             }
@@ -132,6 +133,7 @@ class MainActivity : BaseActivity(), BottomNavigationView.OnNavigationItemSelect
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.home -> {
+
                 val homeFragment = if (BaseApplication.getInstance()?.getPrefs()
                         ?.getUserData()?.gender == DConstants.FEMALE
                 ) FemaleHomeFragment() else HomeFragment()

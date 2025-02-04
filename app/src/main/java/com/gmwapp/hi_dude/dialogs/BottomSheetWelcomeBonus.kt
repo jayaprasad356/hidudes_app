@@ -18,7 +18,8 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 class BottomSheetWelcomeBonus(
     private val coins: Int,
     private val orinalPrice: Int,
-    private val discountedPrice: Int
+    private val discountedPrice: Int,
+    private val coinId: Int
 ) : BottomSheetDialogFragment() {
 
     interface OnAddCoinsListener {
@@ -64,7 +65,7 @@ class BottomSheetWelcomeBonus(
         }
 
         binding.btnAddCoins.setOnSingleClickListener {
-            addCoinsListener?.onAddCoins(total_amount, id)
+            addCoinsListener?.onAddCoins(total_amount, coinId)
         }
 
         return binding.root
