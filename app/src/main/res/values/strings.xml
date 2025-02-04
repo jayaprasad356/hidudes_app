@@ -221,5 +221,6 @@
     <string name="select">select</string>
     <string name="running_service_to_call">Running service to calling</string>
     <string name="minimum_withdrawal_rs_50">Minimum withdrawal : Rs 50</string>
+    <string name="enable_notification">Please enable the notifications to receive the calls properly</string>
 
 </resources>

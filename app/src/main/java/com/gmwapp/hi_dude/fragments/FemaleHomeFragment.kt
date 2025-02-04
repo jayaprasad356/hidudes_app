@@ -28,6 +28,7 @@ import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequest
 import androidx.work.WorkManager
 import com.gmwapp.hi_dude.BaseApplication
+import com.gmwapp.hi_dude.R
 import com.gmwapp.hi_dude.activities.EarningsActivity
 import com.gmwapp.hi_dude.activities.GrantPermissionsActivity
 import com.gmwapp.hi_dude.constants.DConstants
@@ -139,7 +140,7 @@ class FemaleHomeFragment : BaseFragment() {
                 try {
                     val settingsIntent: Intent = Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS)
                         .putExtra(Settings.EXTRA_APP_PACKAGE, mContext?.packageName)
-
+                    Toast.makeText(context, getString(R.string.enable_notification), Toast.LENGTH_SHORT).show()
                     startActivityForResult(settingsIntent, NOTIFICATIONS_ENABLED_REQUEST_CODE)
                 } catch (e: Exception) {
                     initializeCall()
