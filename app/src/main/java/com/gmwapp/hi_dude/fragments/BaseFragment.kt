@@ -8,6 +8,8 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
+import android.media.AudioManager
+import android.media.MediaPlayer
 import android.os.Build
 import android.os.Build.VERSION_CODES
 import android.os.Handler
@@ -23,6 +25,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatActivity.POWER_SERVICE
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
+import androidx.core.view.size
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.bumptech.glide.Glide
@@ -34,6 +37,7 @@ import com.gmwapp.hi_dude.dagger.SetupZegoKitEvent
 import com.gmwapp.hi_dude.utils.Helper
 import com.gmwapp.hi_dude.utils.UsersImage
 import com.gmwapp.hi_dude.viewmodels.ProfileViewModel
+import com.gmwapp.hi_dude.widgets.CustomCallEmptyView
 import com.gmwapp.hi_dude.widgets.CustomCallView
 import com.google.gson.Gson
 import com.tencent.mmkv.MMKV
@@ -63,6 +67,7 @@ import im.zego.connection.internal.ZegoConnectionImpl
 import im.zego.uikit.libuikitreport.ReportUtil
 import im.zego.zim.ZIM
 import im.zego.zim.callback.ZIMEventHandler
+import im.zego.zim.entity.ZIMCallInvitationAcceptedInfo
 import im.zego.zim.entity.ZIMCallInvitationCancelledInfo
 import im.zego.zim.entity.ZIMCallInvitationEndedInfo
 import im.zego.zim.entity.ZIMCallInvitationReceivedInfo
@@ -88,6 +93,9 @@ open class BaseFragment : Fragment() {
         ) {
             super.onCallInvitationReceived(zim, info, callID)
             zimBackup = zim
+            if(!isResumed){
+                playMedia()
+            }
         }
 
         override fun onCallInvitationCancelled(
@@ -98,6 +106,7 @@ open class BaseFragment : Fragment() {
             super.onCallInvitationCancelled(zim, info, callID)
             mContext?.let { NotificationManagerCompat.from(it).cancel(PrebuiltCallNotificationManager.incoming_call_notification_id) }
             zimBackup = null
+            stopMedia()
         }
 
         override fun onCallUserStateChanged(
@@ -109,6 +118,7 @@ open class BaseFragment : Fragment() {
             try {
                 if(info?.callUserList?.get(0)?.state == ZIMCallUserState.ACCEPTED || info?.callUserList?.get(0)?.state == ZIMCallUserState.REJECTED) {
                     zimBackup = null
+                    stopMedia()
                     mContext?.let { NotificationManagerCompat.from(it).cancel(PrebuiltCallNotificationManager.incoming_call_notification_id) }
                 }
             } catch (e: Exception) {
@@ -124,6 +134,7 @@ open class BaseFragment : Fragment() {
         ) {
             super.onCallInvitationEnded(zim, info, callID)
             zimBackup = null
+            stopMedia()
             mContext?.let { NotificationManagerCompat.from(it).cancel(PrebuiltCallNotificationManager.incoming_call_notification_id) }
         }
 
@@ -134,6 +145,7 @@ open class BaseFragment : Fragment() {
         ) {
             super.onCallInvitationTimeout(zim, info, callID)
             zimBackup = null
+            stopMedia()
             mContext?.let { NotificationManagerCompat.from(it).cancel(PrebuiltCallNotificationManager.incoming_call_notification_id) }
         }
     }
@@ -196,6 +208,26 @@ open class BaseFragment : Fragment() {
         }
     }
 
+    fun playMedia(){
+        val audioManager = context?.getSystemService(Context.AUDIO_SERVICE) as AudioManager?
+        audioManager?.getStreamMaxVolume(AudioManager.STREAM_MUSIC)?.let {
+            audioManager.setStreamVolume(
+                AudioManager.STREAM_MUSIC,
+                it,
+                0
+            )
+        }
+        val resID = resources.getIdentifier("rhythm", "raw", context?.packageName)
+        BaseApplication.getInstance()?.getMediaPlayer()?.stop()
+        val mediaPlayer = MediaPlayer.create(context, resID)
+        BaseApplication.getInstance()?.setMediaPlayer(mediaPlayer)
+        mediaPlayer?.isLooping = true
+        mediaPlayer?.start()
+    }
+
+    fun stopMedia(){
+        BaseApplication.getInstance()?.getMediaPlayer()?.stop()
+    }
 
     fun setupZegoUIKit(Userid: Any, userName: String) {
         val appID: Long = 263451373
@@ -210,7 +242,7 @@ open class BaseFragment : Fragment() {
         callInvitationConfig.callingConfig.onlyInitiatorCanInvite = true
         callInvitationConfig.endCallWhenInitiatorLeave = true
         callInvitationConfig.incomingCallRingtone = "rhythm"
-        callInvitationConfig.outgoingCallRingtone = "rhythm"
+        callInvitationConfig.outgoingCallRingtone = "silent"
         ZegoUIKitPrebuiltCallService.events.callEvents.setOnlySelfInRoomListener {
             ZegoUIKitPrebuiltCallService.endCall()
         }

@@ -13,7 +13,7 @@ import com.gmwapp.hi_dude.R
 
 class CallingService : Service() {
     companion object {
-        private const val callingChannelId = "callingChannelId"
+        const val callingChannelId = "callingChannelId"
         private const val channelName = "callingName"
     }
 
@@ -31,7 +31,7 @@ class CallingService : Service() {
             setOngoing(true)
             setContentText(getString(R.string.running_service_to_call))
             setSmallIcon(R.drawable.logo)
-            val importance = NotificationManager.IMPORTANCE_DEFAULT
+            val importance = NotificationManager.IMPORTANCE_HIGH
             NotificationChannel(callingChannelId, channelName, importance).apply {
                 description = getString(R.string.running_service_to_call)
                 with((this@CallingService.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager)) {

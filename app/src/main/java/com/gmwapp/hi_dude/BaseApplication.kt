@@ -3,6 +3,7 @@ package com.gmwapp.hi_dude
 import android.app.Application
 import android.content.Intent
 import android.content.IntentFilter
+import android.media.MediaPlayer
 import android.util.Log
 import androidx.hilt.work.HiltWorkerFactory
 import androidx.work.Configuration
@@ -28,6 +29,7 @@ class BaseApplication : Application(), Configuration.Provider {
     private var called: Boolean? = null
     private var callType: String? = null
     private var roomId: String? = null
+    private var mediaPlayer: MediaPlayer? = null
     private var endCallUpdatePending: Boolean? = null
     val ONESIGNAL_APP_ID = "2c7d72ae-8f09-48ea-a3c8-68d9c913c592"
 
@@ -85,6 +87,14 @@ class BaseApplication : Application(), Configuration.Provider {
 
     fun getRoomId(): String? {
         return this.roomId
+    }
+
+    fun setMediaPlayer(mediaPlayer: MediaPlayer?) {
+        this.mediaPlayer = mediaPlayer
+    }
+
+    fun getMediaPlayer(): MediaPlayer? {
+        return this.mediaPlayer
     }
 
     fun setReceiverDetailsAvailable(isReceiverDetailsAvailable: Boolean) {
