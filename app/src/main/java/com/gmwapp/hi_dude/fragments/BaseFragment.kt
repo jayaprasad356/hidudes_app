@@ -95,6 +95,18 @@ open class BaseFragment : Fragment() {
             zimBackup = zim
             if(!isResumed){
                 playMedia()
+            }else{
+                try {
+                    val audioManager = context?.getSystemService(Context.AUDIO_SERVICE) as AudioManager?
+                    audioManager?.getStreamMaxVolume(AudioManager.STREAM_MUSIC)?.let {
+                        audioManager.setStreamVolume(
+                            AudioManager.STREAM_MUSIC,
+                            it,
+                            0
+                        )
+                    }
+                } catch (e: Exception) {
+                }
             }
         }
 
@@ -209,24 +221,30 @@ open class BaseFragment : Fragment() {
     }
 
     fun playMedia(){
-        val audioManager = context?.getSystemService(Context.AUDIO_SERVICE) as AudioManager?
-        audioManager?.getStreamMaxVolume(AudioManager.STREAM_MUSIC)?.let {
-            audioManager.setStreamVolume(
-                AudioManager.STREAM_MUSIC,
-                it,
-                0
-            )
+        try {
+            val audioManager = context?.getSystemService(Context.AUDIO_SERVICE) as AudioManager?
+            audioManager?.getStreamMaxVolume(AudioManager.STREAM_MUSIC)?.let {
+                audioManager.setStreamVolume(
+                    AudioManager.STREAM_MUSIC,
+                    it,
+                    0
+                )
+            }
+            val resID = resources.getIdentifier("rhythm", "raw", context?.packageName)
+            BaseApplication.getInstance()?.getMediaPlayer()?.stop()
+            val mediaPlayer = MediaPlayer.create(context, resID)
+            BaseApplication.getInstance()?.setMediaPlayer(mediaPlayer)
+            mediaPlayer?.isLooping = true
+            mediaPlayer?.start()
+        } catch (e: Exception) {
         }
-        val resID = resources.getIdentifier("rhythm", "raw", context?.packageName)
-        BaseApplication.getInstance()?.getMediaPlayer()?.stop()
-        val mediaPlayer = MediaPlayer.create(context, resID)
-        BaseApplication.getInstance()?.setMediaPlayer(mediaPlayer)
-        mediaPlayer?.isLooping = true
-        mediaPlayer?.start()
     }
 
     fun stopMedia(){
-        BaseApplication.getInstance()?.getMediaPlayer()?.stop()
+        try {
+            BaseApplication.getInstance()?.getMediaPlayer()?.stop()
+        } catch (e: Exception) {
+        }
     }
 
     fun setupZegoUIKit(Userid: Any, userName: String) {
