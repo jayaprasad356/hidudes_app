@@ -25,7 +25,6 @@ import com.bumptech.glide.Glide
 import com.gmwapp.hi_dude.BaseApplication
 import com.gmwapp.hi_dude.R
 import com.gmwapp.hi_dude.activities.BaseActivity
-import com.gmwapp.hi_dude.activities.CallInviteWalletActivity
 import com.gmwapp.hi_dude.activities.RandomUserActivity
 import com.gmwapp.hi_dude.activities.WalletActivity
 import com.gmwapp.hi_dude.constants.DConstants
@@ -144,7 +143,7 @@ class CustomCallView : ZegoBaseAudioVideoForegroundView, LifecycleObserver {
                         (context as CallInviteActivity).supportFragmentManager
                     fm?.beginTransaction()?.add(aux, "FRAGMENT_TAG")?.commit()
                     fm?.executePendingTransactions()
-                    val intent = Intent(activity, CallInviteWalletActivity::class.java)
+                    val intent = Intent(activity, WalletActivity::class.java)
                     intent.putExtra(DConstants.NEED_TO_FINISH, true)
                     ZegoUIKitPrebuiltCallService.minimizeCall()
                     aux.startActivityForResult(intent, WALLET_ACTIVITY_REQUEST_CODE)
