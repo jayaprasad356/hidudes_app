@@ -16,16 +16,20 @@ import com.gmwapp.hi_dude.BaseApplication
 import com.gmwapp.hi_dude.R
 import com.gmwapp.hi_dude.adapters.CoinAdapter
 import com.gmwapp.hi_dude.callbacks.OnItemSelectionListener
+import com.gmwapp.hi_dude.constants.DConstants
 import com.gmwapp.hi_dude.databinding.ActivityWalletBinding
 import com.gmwapp.hi_dude.retrofit.responses.CoinsResponseData
 import com.gmwapp.hi_dude.utils.setOnSingleClickListener
 import com.gmwapp.hi_dude.viewmodels.UpiViewModel
 import com.gmwapp.hi_dude.viewmodels.WalletViewModel
+import com.gmwapp.hi_dude.widgets.SpacesItemDecoration
 import com.google.androidbrowserhelper.trusted.LauncherActivity
+import com.zegocloud.uikit.prebuilt.call.ZegoUIKitPrebuiltCallService
+import com.zegocloud.uikit.prebuilt.call.invite.internal.CallInviteActivity
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class WalletActivity : BaseActivity() {
+class WalletActivity : CallInviteBaseActivity()  {
     lateinit var binding: ActivityWalletBinding
     private val WalletViewModel: WalletViewModel by viewModels()
 
@@ -65,7 +69,7 @@ class WalletActivity : BaseActivity() {
         WalletViewModel.coinsLiveData.observe(this, Observer {
 
             if(it.success){
-              //  Toast.makeText(this, it.message, Toast.LENGTH_SHORT).show()
+                //  Toast.makeText(this, it.message, Toast.LENGTH_SHORT).show()
             }
             else{
                 Toast.makeText(this, it.message, Toast.LENGTH_SHORT).show()
@@ -133,7 +137,7 @@ class WalletActivity : BaseActivity() {
                         if (response.isSuccessful && response.body()?.success == true) {
                             Toast.makeText(this@WalletActivity, response.body()?.message, Toast.LENGTH_SHORT).show()
                         } else {
-                           // println("Long URL: ${it.longurl}") // Print to the terminal
+                            // println("Long URL: ${it.longurl}") // Print to the terminal
                             //Toast.makeText(mContext, it.longurl, Toast.LENGTH_SHORT).show()
 
                             val intent =
@@ -141,7 +145,7 @@ class WalletActivity : BaseActivity() {
                             intent.setData(Uri.parse(response.body()?.longurl))
                             startActivity(intent)
                             finish()// Directly starting the intent without launcher
-                          //  Toast.makeText(this@WalletActivity, response.body()?.message ?: "Error", Toast.LENGTH_SHORT).show()
+                            //  Toast.makeText(this@WalletActivity, response.body()?.message ?: "Error", Toast.LENGTH_SHORT).show()
                         }
                     }
 
