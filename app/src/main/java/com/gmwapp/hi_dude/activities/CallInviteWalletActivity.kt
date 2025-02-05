@@ -25,11 +25,12 @@ import com.gmwapp.hi_dude.viewmodels.WalletViewModel
 import com.gmwapp.hi_dude.widgets.SpacesItemDecoration
 import com.google.androidbrowserhelper.trusted.LauncherActivity
 import com.zegocloud.uikit.prebuilt.call.ZegoUIKitPrebuiltCallService
+import com.zegocloud.uikit.prebuilt.call.core.notification.RingtoneManager
 import com.zegocloud.uikit.prebuilt.call.invite.internal.CallInviteActivity
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class WalletActivity : BaseActivity()  {
+class CallInviteWalletActivity : CallInviteBaseActivity()  {
     lateinit var binding: ActivityWalletBinding
     private val WalletViewModel: WalletViewModel by viewModels()
 
@@ -52,6 +53,10 @@ class WalletActivity : BaseActivity()  {
         addObservers()
     }
 
+    override fun onResume() {
+        super.onResume()
+        RingtoneManager.stopRingTone()
+    }
     private fun initUI() {
 
         val userData = BaseApplication.getInstance()?.getPrefs()?.getUserData()
@@ -135,13 +140,13 @@ class WalletActivity : BaseActivity()  {
                 call.enqueue(object : retrofit2.Callback<ApiResponse> {
                     override fun onResponse(call: retrofit2.Call<ApiResponse>, response: retrofit2.Response<ApiResponse>) {
                         if (response.isSuccessful && response.body()?.success == true) {
-                            Toast.makeText(this@WalletActivity, response.body()?.message, Toast.LENGTH_SHORT).show()
+                            Toast.makeText(this@CallInviteWalletActivity, response.body()?.message, Toast.LENGTH_SHORT).show()
                         } else {
                             // println("Long URL: ${it.longurl}") // Print to the terminal
                             //Toast.makeText(mContext, it.longurl, Toast.LENGTH_SHORT).show()
 
                             val intent =
-                                Intent(this@WalletActivity, LauncherActivity::class.java)
+                                Intent(this@CallInviteWalletActivity, LauncherActivity::class.java)
                             intent.setData(Uri.parse(response.body()?.longurl))
                             startActivity(intent)
                             finish()// Directly starting the intent without launcher
@@ -150,7 +155,7 @@ class WalletActivity : BaseActivity()  {
                     }
 
                     override fun onFailure(call: retrofit2.Call<ApiResponse>, t: Throwable) {
-                        Toast.makeText(this@WalletActivity, "Failed: ${t.message}", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this@CallInviteWalletActivity, "Failed: ${t.message}", Toast.LENGTH_SHORT).show()
                     }
                 })
             } else {

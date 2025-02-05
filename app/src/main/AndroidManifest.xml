@@ -144,6 +144,8 @@
                     android:scheme="https" />
             </intent-filter>
         </activity>
+        <activity android:name=".activities.CallInviteWalletActivity" />
+
         <service
             android:name=".services.CallingService"
             android:foregroundServiceType="microphone"
