@@ -95,7 +95,7 @@ open class BaseFragment : Fragment() {
         ) {
             super.onCallInvitationReceived(zim, info, callID)
             zimBackup = zim
-            if(!isResumed){
+            if(lastAction == Intent.ACTION_SCREEN_OFF){
                 playMedia()
             }else{
                 try {
