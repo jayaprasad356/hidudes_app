@@ -135,6 +135,7 @@ class RandomUserActivity : BaseActivity(), OnButtonClickListener {
 
     }
 
+
     fun askPermissions() {
         val permissionNeeded =
             arrayOf("android.permission.RECORD_AUDIO", "android.permission.CAMERA")
@@ -147,9 +148,26 @@ class RandomUserActivity : BaseActivity(), OnButtonClickListener {
         ) {
             requestPermissions(permissionNeeded, CALL_PERMISSIONS_REQUEST_CODE)
         } else {
-            checkOverlayPermission()
+            // Skip overlay permission check and proceed with call initialization
+            initializeCall(false)
         }
     }
+
+//    fun askPermissions() {
+//        val permissionNeeded =
+//            arrayOf("android.permission.RECORD_AUDIO", "android.permission.CAMERA")
+//
+//        if (ContextCompat.checkSelfPermission(
+//                this, "android.permission.CAMERA"
+//            ) != PackageManager.PERMISSION_GRANTED || ContextCompat.checkSelfPermission(
+//                this, "android.permission.RECORD_AUDIO"
+//            ) != PackageManager.PERMISSION_GRANTED
+//        ) {
+//            requestPermissions(permissionNeeded, CALL_PERMISSIONS_REQUEST_CODE)
+//        } else {
+//            checkOverlayPermission()
+//        }
+//    }
 
     private fun initializeCall(cancelled: Boolean) {
         val instance = BaseApplication.getInstance()
@@ -176,6 +194,7 @@ class RandomUserActivity : BaseActivity(), OnButtonClickListener {
 
                     Log.d("typeofcall","${it.data?.audio_status}")
                     Log.d("typeofcall","${it.data?.video_status}")
+
 
                     if (it != null && it.success) {
                         val callId = it.data?.call_id
@@ -225,6 +244,7 @@ class RandomUserActivity : BaseActivity(), OnButtonClickListener {
         CallInvitationServiceImpl.getInstance().hideIncomingCallDialog()
     }
 
+
     override fun onRequestPermissionsResult(
         requestCode: Int, permissions: Array<String>, grantResults: IntArray
     ) {
@@ -234,7 +254,8 @@ class RandomUserActivity : BaseActivity(), OnButtonClickListener {
                 val permissionToCamera = grantResults[0] == PackageManager.PERMISSION_GRANTED
                 val permissionToRecord = grantResults[1] == PackageManager.PERMISSION_GRANTED
                 if (permissionToCamera && permissionToRecord) {
-                    checkOverlayPermission()
+                    // Skip overlay permission check and directly initialize the call
+                    initializeCall(false)
                 } else {
                     finish()
                     val intent = Intent(this, GrantPermissionsActivity::class.java)
@@ -243,6 +264,25 @@ class RandomUserActivity : BaseActivity(), OnButtonClickListener {
             }
         }
     }
+
+//    override fun onRequestPermissionsResult(
+//        requestCode: Int, permissions: Array<String>, grantResults: IntArray
+//    ) {
+//        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+//        when (requestCode) {
+//            CALL_PERMISSIONS_REQUEST_CODE -> if (grantResults.isNotEmpty()) {
+//                val permissionToCamera = grantResults[0] == PackageManager.PERMISSION_GRANTED
+//                val permissionToRecord = grantResults[1] == PackageManager.PERMISSION_GRANTED
+//                if (permissionToCamera && permissionToRecord) {
+//                    checkOverlayPermission()
+//                } else {
+//                    finish()
+//                    val intent = Intent(this, GrantPermissionsActivity::class.java)
+//                    startActivity(intent)
+//                }
+//            }
+//        }
+//    }
 
     override fun onButtonClick() {
         getRemainingTime()
@@ -376,7 +416,6 @@ class RandomUserActivity : BaseActivity(), OnButtonClickListener {
                     finish()
                 }
             }
-
 
 
 
