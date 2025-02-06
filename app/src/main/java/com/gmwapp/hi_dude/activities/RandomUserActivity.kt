@@ -3,7 +3,9 @@ package com.gmwapp.hi_dude.activities
 import android.Manifest
 import android.app.Activity
 import android.app.AlertDialog
+import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.graphics.drawable.ColorDrawable
 import android.media.MediaPlayer
@@ -86,6 +88,8 @@ class RandomUserActivity : BaseActivity(), OnButtonClickListener {
     private var startTime: String = ""
     private var endTime: String = ""
     var targetUserId: String? = null
+    private lateinit var sharedPreferences: SharedPreferences
+    private var isPermissionDenied: Boolean = false
 
     private val dateFormat = SimpleDateFormat("HH:mm:ss").apply {
         timeZone = TimeZone.getTimeZone("Asia/Kolkata") // Set to IST time zone
@@ -101,6 +105,12 @@ class RandomUserActivity : BaseActivity(), OnButtonClickListener {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
+
+        // Initialize SharedPreferences in onCreate
+        sharedPreferences = getSharedPreferences("MyAppPrefs", Context.MODE_PRIVATE)
+        isPermissionDenied = sharedPreferences.getBoolean("isOneSignalTagSet", false)
+
+
         initUI()
 
         askPermissions()
@@ -111,30 +121,39 @@ class RandomUserActivity : BaseActivity(), OnButtonClickListener {
     }
 
     private fun checkOverlayPermission() {
-        try {
-            PermissionX.init(this).permissions(Manifest.permission.SYSTEM_ALERT_WINDOW)
-                .onExplainRequestReason(ExplainReasonCallback { scope, deniedList ->
-                    try {
-                        val message =
-                            "We need your consent for the following permissions in order to use the offline call function properly"
-                        scope.showRequestReasonDialog(deniedList, message, "Allow", "Deny")
-                    } catch (e: Exception) {
-                    }
-                }).request(RequestCallback { allGranted, grantedList, deniedList ->
-                    try {
-                        if (allGranted) {
-                            initializeCall(false)
-                        } else {
-                            checkOverlayPermission()
+
+        if (isPermissionDenied==true){
+            initializeCall(false)
+        }else{
+
+            try {
+                PermissionX.init(this).permissions(Manifest.permission.SYSTEM_ALERT_WINDOW)
+                    .onExplainRequestReason(ExplainReasonCallback { scope, deniedList ->
+                        try {
+                            val message =
+                                "We need your consent for the following permissions in order to use the offline call function properly"
+                            scope.showRequestReasonDialog(deniedList, message, "Allow", "Deny")
+                        } catch (e: Exception) {
                         }
-                    } catch (e: Exception) {
-                    }
-                })
-        } catch (e: Exception) {
+                    }).request(RequestCallback { allGranted, grantedList, deniedList ->
+                        try {
+                            if (allGranted) {
+                                initializeCall(false)
+                            } else {
+                                sharedPreferences.edit().putBoolean("isOneSignalTagSet", true).apply()
+                                initializeCall(false)
+                            }
+                        } catch (e: Exception) {
+                        }
+                    })
+            } catch (e: Exception) {
+            }
         }
 
-    }
 
+
+
+    }
 
     fun askPermissions() {
         val permissionNeeded =
@@ -148,26 +167,9 @@ class RandomUserActivity : BaseActivity(), OnButtonClickListener {
         ) {
             requestPermissions(permissionNeeded, CALL_PERMISSIONS_REQUEST_CODE)
         } else {
-            // Skip overlay permission check and proceed with call initialization
-            initializeCall(false)
+            checkOverlayPermission()
         }
     }
-
-//    fun askPermissions() {
-//        val permissionNeeded =
-//            arrayOf("android.permission.RECORD_AUDIO", "android.permission.CAMERA")
-//
-//        if (ContextCompat.checkSelfPermission(
-//                this, "android.permission.CAMERA"
-//            ) != PackageManager.PERMISSION_GRANTED || ContextCompat.checkSelfPermission(
-//                this, "android.permission.RECORD_AUDIO"
-//            ) != PackageManager.PERMISSION_GRANTED
-//        ) {
-//            requestPermissions(permissionNeeded, CALL_PERMISSIONS_REQUEST_CODE)
-//        } else {
-//            checkOverlayPermission()
-//        }
-//    }
 
     private fun initializeCall(cancelled: Boolean) {
         val instance = BaseApplication.getInstance()
@@ -194,7 +196,6 @@ class RandomUserActivity : BaseActivity(), OnButtonClickListener {
 
                     Log.d("typeofcall","${it.data?.audio_status}")
                     Log.d("typeofcall","${it.data?.video_status}")
-
 
                     if (it != null && it.success) {
                         val callId = it.data?.call_id
@@ -244,7 +245,6 @@ class RandomUserActivity : BaseActivity(), OnButtonClickListener {
         CallInvitationServiceImpl.getInstance().hideIncomingCallDialog()
     }
 
-
     override fun onRequestPermissionsResult(
         requestCode: Int, permissions: Array<String>, grantResults: IntArray
     ) {
@@ -254,8 +254,7 @@ class RandomUserActivity : BaseActivity(), OnButtonClickListener {
                 val permissionToCamera = grantResults[0] == PackageManager.PERMISSION_GRANTED
                 val permissionToRecord = grantResults[1] == PackageManager.PERMISSION_GRANTED
                 if (permissionToCamera && permissionToRecord) {
-                    // Skip overlay permission check and directly initialize the call
-                    initializeCall(false)
+                    checkOverlayPermission()
                 } else {
                     finish()
                     val intent = Intent(this, GrantPermissionsActivity::class.java)
@@ -264,25 +263,6 @@ class RandomUserActivity : BaseActivity(), OnButtonClickListener {
             }
         }
     }
-
-//    override fun onRequestPermissionsResult(
-//        requestCode: Int, permissions: Array<String>, grantResults: IntArray
-//    ) {
-//        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-//        when (requestCode) {
-//            CALL_PERMISSIONS_REQUEST_CODE -> if (grantResults.isNotEmpty()) {
-//                val permissionToCamera = grantResults[0] == PackageManager.PERMISSION_GRANTED
-//                val permissionToRecord = grantResults[1] == PackageManager.PERMISSION_GRANTED
-//                if (permissionToCamera && permissionToRecord) {
-//                    checkOverlayPermission()
-//                } else {
-//                    finish()
-//                    val intent = Intent(this, GrantPermissionsActivity::class.java)
-//                    startActivity(intent)
-//                }
-//            }
-//        }
-//    }
 
     override fun onButtonClick() {
         getRemainingTime()
@@ -473,7 +453,6 @@ class RandomUserActivity : BaseActivity(), OnButtonClickListener {
                 }
 
             }
-
 
 
         ZegoUIKit.addRoomStateChangedListener { room, reason, _, _ ->

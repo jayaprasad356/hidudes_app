@@ -5,6 +5,7 @@ import android.app.ActivityManager
 import android.app.NotificationManager.IMPORTANCE_NONE
 import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
@@ -63,6 +64,8 @@ class FemaleHomeFragment : BaseFragment() {
     private val NOTIFICATIONS_ENABLED_REQUEST_CODE = 3
     lateinit var binding: FragmentFemaleHomeBinding
     private val femaleUsersViewModel: FemaleUsersViewModel by viewModels()
+    private lateinit var sharedPreferences: SharedPreferences
+    private var isPermissionDenied: Boolean = false
     private val dateFormat = SimpleDateFormat("HH:mm:ss").apply {
         timeZone = TimeZone.getTimeZone("Asia/Kolkata") // Set to IST time zone
     }
@@ -88,6 +91,8 @@ class FemaleHomeFragment : BaseFragment() {
     ): View {
         binding = FragmentFemaleHomeBinding.inflate(layoutInflater)
 
+        sharedPreferences = requireContext().getSharedPreferences("MyAppPrefs", Context.MODE_PRIVATE)
+        isPermissionDenied = sharedPreferences.getBoolean("isTagSet", false)
         initUI()
         askPermissions()
         return binding.root
@@ -181,6 +186,14 @@ class FemaleHomeFragment : BaseFragment() {
     }
 
     private fun checkOverlayPermission() {
+
+        if (isPermissionDenied) {
+            // If permission was denied before, do not ask again
+            askNotificationPermission()
+            return
+        }
+
+
         try {
             val result = mContext?.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
 
@@ -207,7 +220,8 @@ class FemaleHomeFragment : BaseFragment() {
             if (Settings.canDrawOverlays(mContext)) {
                 askNotificationPermission()
             } else {
-                checkOverlayPermission()
+                sharedPreferences.edit().putBoolean("isTagSet", true).apply()
+                askNotificationPermission()
             }
         } else if(requestCode == NOTIFICATIONS_ENABLED_REQUEST_CODE){
             askNotificationsEnabled()
