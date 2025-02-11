@@ -206,6 +206,7 @@ class MainActivity : BaseActivity(), BottomNavigationView.OnNavigationItemSelect
 
             accountViewModel.getSettings()
 
+
             accountViewModel.settingsLiveData.observe(this, Observer { response ->
                 if (response != null && response.success) {
                     response.data?.let { settingsList ->
