@@ -87,7 +87,11 @@ class SelectLanguageActivity : BaseActivity() {
                     }
                 }
             } else {
-                Toast.makeText(this@SelectLanguageActivity, it?.message, Toast.LENGTH_LONG).show()
+                Toast.makeText(
+                    this@SelectLanguageActivity,
+                    it?.message ?: "An unknown error occurred",
+                    Toast.LENGTH_LONG
+                ).show()
             }
         })
         binding.btnContinue.setOnSingleClickListener {

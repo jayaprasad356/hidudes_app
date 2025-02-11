@@ -43,8 +43,10 @@ import com.gmwapp.hi_dude.databinding.ActivityRandomUserBinding
 import com.gmwapp.hi_dude.services.CallingService
 import com.gmwapp.hi_dude.utils.DPreferences
 import com.gmwapp.hi_dude.utils.GiftManager
+import com.gmwapp.hi_dude.utils.GiftViewModelProvider
 import com.gmwapp.hi_dude.viewmodels.FemaleUsersViewModel
 import com.gmwapp.hi_dude.viewmodels.GiftImageViewModel
+import com.gmwapp.hi_dude.viewmodels.GiftViewModel
 import com.gmwapp.hi_dude.viewmodels.ProfileViewModel
 import com.gmwapp.hi_dude.widgets.CustomCallView
 import com.gmwapp.hi_dude.workers.CallUpdateWorker
@@ -63,7 +65,10 @@ import com.zegocloud.uikit.prebuilt.call.invite.internal.ZegoCallUser
 import com.zegocloud.uikit.prebuilt.call.invite.internal.ZegoInvitationCallListener
 import com.zegocloud.uikit.service.defines.ZegoUIKitUser
 import dagger.hilt.android.AndroidEntryPoint
+import im.zego.zegoexpress.ZegoExpressEngine
+import im.zego.zegoexpress.callback.IZegoEventHandler
 import im.zego.zegoexpress.constants.ZegoRoomStateChangedReason
+import im.zego.zegoexpress.entity.ZegoUser
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
@@ -91,6 +96,8 @@ class RandomUserActivity : BaseActivity(), OnButtonClickListener {
     private lateinit var sharedPreferences: SharedPreferences
     private var isPermissionDenied: Boolean = false
 
+
+
     private val dateFormat = SimpleDateFormat("HH:mm:ss").apply {
         timeZone = TimeZone.getTimeZone("Asia/Kolkata") // Set to IST time zone
     }
@@ -112,7 +119,6 @@ class RandomUserActivity : BaseActivity(), OnButtonClickListener {
 
 
         initUI()
-
         askPermissions()
         onBackPressedDispatcher.addCallback(this) {
             stopCall()
@@ -176,7 +182,6 @@ class RandomUserActivity : BaseActivity(), OnButtonClickListener {
         if (isReceiverDetailsAvailable) {
             instance?.setReceiverDetailsAvailable(true)
             if (cancelled) {
-                stopCall()
                 finish()
             } else {
                 val receiverId = intent.getIntExtra(DConstants.RECEIVER_ID, 0)
@@ -271,6 +276,25 @@ class RandomUserActivity : BaseActivity(), OnButtonClickListener {
 
     private fun initUI() {
 
+
+        val giftViewModel = ViewModelProvider(this)[GiftViewModel::class.java]
+
+        GiftViewModelProvider.init(giftViewModel)
+
+        // Observe API response
+        giftViewModel.giftResponseLiveData.observe(this) { response ->
+            if (response != null) {
+                Toast.makeText(this, "Gift sent successfully!", Toast.LENGTH_SHORT).show()
+                Log.d("GiftAPI", "Response: $response")
+            }
+        }
+
+        // Observe API failure
+        giftViewModel.giftErrorLiveData.observe(this) { error ->
+            Toast.makeText(this, "Error: $error", Toast.LENGTH_SHORT).show()
+            Log.e("GiftAPI", "Error: $error")
+        }
+
         GiftImageViewModel.giftResponseLiveData.observe(this) { response ->
             response?.let {
                 if (it.success && it.data.isNotEmpty()) {
@@ -349,13 +373,11 @@ class RandomUserActivity : BaseActivity(), OnButtonClickListener {
                 Toast.makeText(
                     this@RandomUserActivity, it?.message, Toast.LENGTH_LONG
                 ).show()
-                stopCall()
                 finish()
             }
         })
         femaleUsersViewModel.randomUsersErrorLiveData.observe(this, Observer {
             showErrorMessage(it)
-            stopCall()
             finish()
         })
     }
@@ -597,6 +619,39 @@ class RandomUserActivity : BaseActivity(), OnButtonClickListener {
             binding.voiceCallButton.performClick()
         }
     }
+
+    private fun showAlertDialog() {
+        val builder = AlertDialog.Builder(this)
+        builder.setTitle("End Call")
+        builder.setMessage("Are you sure you want to end this call?")
+
+        builder.setPositiveButton("End Call") { dialog, which ->
+            stopCall()
+            finish()
+        }
+
+        builder.setNegativeButton("Cancel") { dialog, which ->
+            dialog.dismiss()
+        }
+
+        val dialog = builder.create()
+
+        dialog.show()
+
+        // Get the buttons
+        val negativeButton: Button = dialog.getButton(AlertDialog.BUTTON_NEGATIVE)
+        val positiveButton: Button = dialog.getButton(AlertDialog.BUTTON_POSITIVE)
+
+        // Set text color
+        negativeButton.setTextColor(resources.getColor(R.color.Red)) // Set Cancel button text color
+        positiveButton.setTextColor(resources.getColor(R.color.white))
+        positiveButton.setBackgroundColor(resources.getColor(R.color.teal_200))
+
+
+        //Optional: Change dialog background
+        //dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+    }
+
 
     private fun startImageSequence() {
         // List of image resources

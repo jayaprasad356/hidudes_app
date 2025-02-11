@@ -1,10 +1,13 @@
 package com.gmwapp.hi_dude.widgets
 
 import android.app.Activity
+import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
 import android.content.res.Resources
 import android.graphics.Color
+import android.os.Handler
+import android.os.Looper
 import android.util.AttributeSet
 import android.util.DisplayMetrics
 import android.util.Log
@@ -13,6 +16,7 @@ import android.view.View.OnLayoutChangeListener
 import android.view.WindowManager
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -20,7 +24,10 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
+import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.OnLifecycleEvent
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.ViewModelStoreOwner
 import com.bumptech.glide.Glide
 import com.gmwapp.hi_dude.BaseApplication
 import com.gmwapp.hi_dude.R
@@ -31,7 +38,10 @@ import com.gmwapp.hi_dude.constants.DConstants
 import com.gmwapp.hi_dude.dagger.GetRemainingTimeEvent
 import com.gmwapp.hi_dude.dagger.UpdateRemainingTimeEvent
 import com.gmwapp.hi_dude.utils.GiftManager
+import com.gmwapp.hi_dude.utils.GiftViewModelProvider
 import com.gmwapp.hi_dude.utils.Helper
+import com.gmwapp.hi_dude.viewmodels.GiftViewModel
+import com.gmwapp.hi_dude.viewmodels.LoginViewModel
 import com.zegocloud.uikit.components.audiovideo.ZegoBaseAudioVideoForegroundView
 import com.zegocloud.uikit.prebuilt.call.ZegoUIKitPrebuiltCallService
 import com.zegocloud.uikit.prebuilt.call.invite.internal.CallInviteActivity
@@ -42,15 +52,25 @@ import org.greenrobot.eventbus.ThreadMode
 
 
 class CustomCallView : ZegoBaseAudioVideoForegroundView, LifecycleObserver {
+
+
+
     private var customCallrootView: View? = null
     private var tvRemainingTime: TextView? = null
     private var balanceTime: String? = null
     private var activity: RandomUserActivity? = null
     private var WALLET_ACTIVITY_REQUEST_CODE = 1;
-
+    var remainingTimeLeft = 0
+    private var giftDialog: AlertDialog? = null
+    private val handler = Handler(Looper.getMainLooper())
+    private var checkRunnable: Runnable? = null
+    var userId = 0
+    var receiverId= 0
     constructor(context: Context, userID: String?) : super(context, userID){
         registerLifecycleObserver()
     }
+
+
 
     constructor(
         context: Context, attrs: AttributeSet?, userID: String?
@@ -75,9 +95,12 @@ class CustomCallView : ZegoBaseAudioVideoForegroundView, LifecycleObserver {
         val activity = context as? Activity
 
 
+
+        receiverId = uiKitUser.userID.toInt()
         post{
             setupGiftUI()
         }
+
 
 
         activity?.window?.apply {
@@ -110,6 +133,10 @@ class CustomCallView : ZegoBaseAudioVideoForegroundView, LifecycleObserver {
         // Initialize your custom view
         val prefs = BaseApplication.getInstance()?.getPrefs()
         val userData = prefs?.getUserData()
+
+        if (userData != null) {
+            userId = userData.id
+        }
 
 
         val inflate = inflate(
@@ -167,8 +194,11 @@ class CustomCallView : ZegoBaseAudioVideoForegroundView, LifecycleObserver {
         restoreUIState()
     }
 
+
+
+
     private fun setupGiftUI() {
-        val giftMap = GiftManager.getGiftIconsWithCoins()
+        val giftList = GiftManager.getGiftIconsWithCoins().values.toList()
 
         // Find UI components safely
         val ivGiftList = listOfNotNull(
@@ -200,19 +230,26 @@ class CustomCallView : ZegoBaseAudioVideoForegroundView, LifecycleObserver {
         }
 
         // Load gifts dynamically
-        val giftList = giftMap.entries.toList()
         for (i in ivGiftList.indices) {
             if (i < giftList.size) {
-                val (iconUrl, coins) = giftList[i]
+                val gift = giftList[i] // Get full GiftData object
 
                 // Load the gift image using Glide
                 Glide.with(context)
-                    .load(iconUrl)
+                    .load(gift.gift_icon)
                     .into(ivGiftList[i])
 
                 // Set the coin amount
-                tvCoinsList[i].text = coins.toString()
+                tvCoinsList[i].text = gift.coins.toString()
                 ivCoinsImage[i].visibility = View.VISIBLE
+
+                ivGiftList[i].setOnClickListener {
+                    checkAndSendGift(gift.coins,gift.id)
+                    Log.e("UserIdValue", "user$userId")
+                    Log.e("UserIdValue", "receiver$receiverId")
+                    Log.e("UserIdValue", "coin${gift.id}")
+
+                }
             } else {
                 // Hide extra gift slots if there are fewer gifts
                 ivGiftList[i].visibility = View.GONE
@@ -222,6 +259,70 @@ class CustomCallView : ZegoBaseAudioVideoForegroundView, LifecycleObserver {
             }
         }
     }
+
+    private fun checkAndSendGift(giftCoin: Int, giftId:Int) {
+        val coinLeft = remainingTimeLeft / 6  // Convert remaining time (seconds) to coins
+
+        Log.d("coinleft","$coinLeft coinleft")
+        Log.d("coinleft","$giftCoin giftcoin")
+        Log.d("coinleft","$remainingTimeLeft remainingtimeleft")
+
+        if (coinLeft > giftCoin) {
+            showGiftConfirmationDialog(giftCoin,giftId)
+        } else {
+            Toast.makeText(context, "Not enough coins to send this gift!", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+
+    private fun showGiftConfirmationDialog(giftCoin: Int, giftId:Int) {
+        val dialog = AlertDialog.Builder(context)
+            .setTitle("Send Gift")
+            .setMessage("Want to send a gift worth $giftCoin coins ?")
+            .setPositiveButton("Yes") { _, _ ->
+                //  Toast.makeText(context, "Gift Sent Successfully", Toast.LENGTH_SHORT).show()
+                //  giftViewModel.sendGift(userId, receiverId, giftId)
+                GiftViewModelProvider.giftViewModel.sendGift(userId, receiverId, giftId)
+
+
+            }
+            .setNegativeButton("Cancel") { _, _ ->
+                stopChecking()
+            }
+            .setOnDismissListener {
+                stopChecking()  // Stop checking when dialog is dismissed
+            }
+            .create()
+
+        giftDialog = dialog
+        dialog.show()
+
+        // Start checking coin balance every second
+        startChecking(giftCoin)
+    }
+
+    private fun startChecking(giftCoin: Int) {
+        checkRunnable = object : Runnable {
+            override fun run() {
+                val coinLeft = remainingTimeLeft / 6  // Convert remaining time to coins
+
+                if (coinLeft < giftCoin) {
+                    giftDialog?.dismiss()  // Close the dialog
+                    Toast.makeText(context, "Not enough coins to send this gift!", Toast.LENGTH_SHORT).show()
+                } else {
+                    handler.postDelayed(this, 1000)  // Check again after 1 second
+                }
+            }
+        }
+        handler.postDelayed(checkRunnable!!, 1000)  // Start immediately
+    }
+
+    private fun stopChecking() {
+        checkRunnable?.let { handler.removeCallbacks(it) }
+    }
+
+
+
 
 
     private fun restoreUIState() {
@@ -273,6 +374,8 @@ class CustomCallView : ZegoBaseAudioVideoForegroundView, LifecycleObserver {
         } catch (e: Exception) {
         }
         var remainingTime: Int = balanceTimeInsecs - seconds.toInt()
+        remainingTimeLeft = remainingTime
+        Log.d("remainingTime","$remainingTimeLeft")
         tvRemainingTime?.visibility = View.VISIBLE
         val hours = remainingTime / 3600
         val minutes = (remainingTime % 3600) / 60;

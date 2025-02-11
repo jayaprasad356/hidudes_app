@@ -12,6 +12,7 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.View.OnTouchListener
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.gmwapp.hi_dude.R
 import com.gmwapp.hi_dude.callbacks.OnItemSelectionListener
@@ -23,6 +24,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.naman14.androidlame.Mp3Recorder
 import java.io.File
 import java.io.IOException
+import kotlin.math.ceil
 
 
 class BottomSheetVoiceIdentification : BottomSheetDialogFragment() {
@@ -96,8 +98,20 @@ class BottomSheetVoiceIdentification : BottomSheetDialogFragment() {
                 try {
                     mRecorder?.stop()
 
+                    // Reset and prepare MediaPlayer for new recording
+                    mediaPlayer?.reset()
                     mediaPlayer?.setDataSource(audiofile?.absolutePath)
                     mediaPlayer?.prepare()
+
+                    // Check recording duration
+                    val durationInMillis = mediaPlayer?.duration ?: 0
+                    val durationInSeconds = ceil(durationInMillis / 1000.0).toInt()
+
+                    if (durationInSeconds < 3.5) {
+                        Toast.makeText(context, "Recording must be above 3 seconds", Toast.LENGTH_SHORT).show()
+                        audiofile?.delete() // Delete short recording
+                        return@OnTouchListener true
+                    }
                 } catch (e: Exception) {
                     e.printStackTrace()
                 }
