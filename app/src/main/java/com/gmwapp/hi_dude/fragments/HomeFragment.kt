@@ -9,7 +9,6 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -124,6 +123,7 @@ class HomeFragment : BaseFragment() {
         binding.fabAudio.setOnSingleClickListener {
             val intent = Intent(context, RandomUserActivity::class.java)
             intent.putExtra(DConstants.CALL_TYPE, "audio")
+            intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP)
             startActivity(intent)
         }
 
