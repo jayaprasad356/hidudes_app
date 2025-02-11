@@ -48,6 +48,8 @@ class FemaleUserAdapter(
             .apply(RequestOptions.bitmapTransform(RoundedCorners(28)))
             .into(holder.binding.ivProfile)
 
+        Log.d("FemaleName", "${femaleUser.name} audio ${femaleUser.audio_status   } video ${femaleUser.video_status}")
+
 
 
 
@@ -62,7 +64,6 @@ class FemaleUserAdapter(
                 if (position != RecyclerView.NO_POSITION) {
                     val clickedUser = femaleUsers[position]
                     onAudioListener.onItemSelected(clickedUser)
-                    Log.d("FemaleName", "${clickedUser.name}")
                 }
             }
 
@@ -79,6 +80,15 @@ class FemaleUserAdapter(
             holder.binding.cvAudio.setCardBackgroundColor(ContextCompat.getColor(activity, R.color.inactive_call))
             holder.binding.cvVideo.setCardBackgroundColor(ContextCompat.getColor(activity, R.color.inactive_call))
         }
+
+        if (audioStatus == 0) {
+            holder.binding.cvAudio.setCardBackgroundColor(ContextCompat.getColor(activity, R.color.inactive_call))
+        }
+
+        if (videoStatus == 0) {
+            holder.binding.cvVideo.setCardBackgroundColor(ContextCompat.getColor(activity, R.color.inactive_call))
+        }
+
 
         holder.binding.tvName.text = femaleUser.name
         holder.binding.tvLanguage.text = femaleUser.language

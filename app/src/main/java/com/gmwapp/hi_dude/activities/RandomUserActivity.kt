@@ -118,6 +118,9 @@ class RandomUserActivity : BaseActivity(), OnButtonClickListener {
         isPermissionDenied = sharedPreferences.getBoolean("isOneSignalTagSet", false)
 
 
+
+
+
         initUI()
         askPermissions()
         onBackPressedDispatcher.addCallback(this) {
@@ -286,6 +289,8 @@ class RandomUserActivity : BaseActivity(), OnButtonClickListener {
         giftViewModel.giftResponseLiveData.observe(this) { response ->
             if (response != null) {
                 Toast.makeText(this, "Gift sent successfully!", Toast.LENGTH_SHORT).show()
+                getRemainingTime()
+
                 Log.d("GiftAPI", "Response: $response")
             }
         }
@@ -483,6 +488,8 @@ class RandomUserActivity : BaseActivity(), OnButtonClickListener {
             }
 
 
+
+
         ZegoUIKit.addRoomStateChangedListener { room, reason, _, _ ->
             when (reason) {
                 ZegoRoomStateChangedReason.LOGINED -> {
@@ -549,6 +556,8 @@ class RandomUserActivity : BaseActivity(), OnButtonClickListener {
             }
         }
     }
+
+
 
     private fun stopCall() {
         try {

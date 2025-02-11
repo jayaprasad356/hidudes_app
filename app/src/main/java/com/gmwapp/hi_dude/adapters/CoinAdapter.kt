@@ -2,7 +2,6 @@ package com.gmwapp.hi_dude.adapters
 
 import android.app.Activity
 import android.graphics.Paint
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,6 +11,7 @@ import com.gmwapp.hi_dude.callbacks.OnItemSelectionListener
 import com.gmwapp.hi_dude.databinding.AdapterCoinBinding
 import com.gmwapp.hi_dude.retrofit.responses.CoinsResponseData
 import com.gmwapp.hi_dude.utils.setOnSingleClickListener
+import com.zego.ve.Log
 
 
 class CoinAdapter(
@@ -71,6 +71,7 @@ class CoinAdapter(
             notifyDataSetChanged()
         }
 
+
         // Set coin details
         holder.binding.tvCoins.text = coin.coins.toString()
         if (coin.save == null) {
@@ -80,6 +81,9 @@ class CoinAdapter(
             holder.binding.tvDiscountPrice.text = "Save ${coin.save} %"
         }
         holder.binding.tvPrice.text = activity.getString(R.string.rupee_text, coin.price)
+        if (coin.save==0){
+            holder.binding.tvDiscountPrice.visibility = View.INVISIBLE
+        }
     }
 
     override fun getItemCount(): Int {

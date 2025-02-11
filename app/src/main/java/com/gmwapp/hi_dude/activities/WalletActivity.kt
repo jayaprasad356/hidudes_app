@@ -143,6 +143,7 @@ class WalletActivity : BaseActivity()  {
                             val intent =
                                 Intent(this@WalletActivity, LauncherActivity::class.java)
                             intent.setData(Uri.parse(response.body()?.longurl))
+                            Log.d("WalletResponse","${response.body()?.longurl}")
                             startActivity(intent)
                             finish()// Directly starting the intent without launcher
                             //  Toast.makeText(this@WalletActivity, response.body()?.message ?: "Error", Toast.LENGTH_SHORT).show()
