@@ -77,16 +77,16 @@ class FemaleUserAdapter(
         }
 
         if (audioStatus == 0 && videoStatus == 0) {
-            holder.binding.cvAudio.setCardBackgroundColor(ContextCompat.getColor(activity, R.color.inactive_call))
-            holder.binding.cvVideo.setCardBackgroundColor(ContextCompat.getColor(activity, R.color.inactive_call))
+            holder.binding.cvAudio.setCardBackgroundColor(ContextCompat.getColor(activity, R.color.button_background))
+            holder.binding.cvVideo.setCardBackgroundColor(ContextCompat.getColor(activity, R.color.button_background))
         }
 
         if (audioStatus == 0) {
-            holder.binding.cvAudio.setCardBackgroundColor(ContextCompat.getColor(activity, R.color.inactive_call))
+            holder.binding.cvAudio.setCardBackgroundColor(ContextCompat.getColor(activity, R.color.button_background))
         }
 
         if (videoStatus == 0) {
-            holder.binding.cvVideo.setCardBackgroundColor(ContextCompat.getColor(activity, R.color.inactive_call))
+            holder.binding.cvVideo.setCardBackgroundColor(ContextCompat.getColor(activity, R.color.button_background))
         }
 
 
