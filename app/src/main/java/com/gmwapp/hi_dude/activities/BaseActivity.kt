@@ -214,13 +214,19 @@ open class BaseActivity : AppCompatActivity() {
     }
 
     protected fun activateWakeLock(){
-        val powerManager = context.getSystemService(POWER_SERVICE) as PowerManager
-        wakeLock = powerManager.newWakeLock(PowerManager.FULL_WAKE_LOCK, "Hidude:Calling")
-        wakeLock?.acquire()
+        try {
+            val powerManager = context.getSystemService(POWER_SERVICE) as PowerManager
+            wakeLock = powerManager.newWakeLock(PowerManager.FULL_WAKE_LOCK, "Hidude:Calling")
+            wakeLock?.acquire()
+        } catch (e: Exception) {
+        }
     }
 
     protected fun releaseWakeLock(){
-        wakeLock?.release();
+        try {
+            wakeLock?.release();
+        } catch (e: Exception) {
+        }
     }
 
     override fun onStop() {
@@ -275,8 +281,8 @@ open class BaseActivity : AppCompatActivity() {
         callInvitationConfig.callingConfig.canInvitingInCalling = false
         callInvitationConfig.callingConfig.onlyInitiatorCanInvite = true
         callInvitationConfig.endCallWhenInitiatorLeave = true
-        callInvitationConfig.incomingCallRingtone = "silent"
         callInvitationConfig.outgoingCallRingtone = "silent"
+        callInvitationConfig.incomingCallRingtone = "silent"
         callInvitationConfig.provider = object : ZegoUIKitPrebuiltCallConfigProvider {
 
             override fun requireConfig(invitationData: ZegoCallInvitationData): ZegoUIKitPrebuiltCallConfig {
