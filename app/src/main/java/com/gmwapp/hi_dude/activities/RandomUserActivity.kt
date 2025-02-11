@@ -182,6 +182,7 @@ class RandomUserActivity : BaseActivity(), OnButtonClickListener {
         if (isReceiverDetailsAvailable) {
             instance?.setReceiverDetailsAvailable(true)
             if (cancelled) {
+                stopCall()
                 finish()
             } else {
                 val receiverId = intent.getIntExtra(DConstants.RECEIVER_ID, 0)
@@ -373,11 +374,13 @@ class RandomUserActivity : BaseActivity(), OnButtonClickListener {
                 Toast.makeText(
                     this@RandomUserActivity, it?.message, Toast.LENGTH_LONG
                 ).show()
+                stopCall()
                 finish()
             }
         })
         femaleUsersViewModel.randomUsersErrorLiveData.observe(this, Observer {
             showErrorMessage(it)
+            stopCall()
             finish()
         })
     }
@@ -619,39 +622,6 @@ class RandomUserActivity : BaseActivity(), OnButtonClickListener {
             binding.voiceCallButton.performClick()
         }
     }
-
-    private fun showAlertDialog() {
-        val builder = AlertDialog.Builder(this)
-        builder.setTitle("End Call")
-        builder.setMessage("Are you sure you want to end this call?")
-
-        builder.setPositiveButton("End Call") { dialog, which ->
-            stopCall()
-            finish()
-        }
-
-        builder.setNegativeButton("Cancel") { dialog, which ->
-            dialog.dismiss()
-        }
-
-        val dialog = builder.create()
-
-        dialog.show()
-
-        // Get the buttons
-        val negativeButton: Button = dialog.getButton(AlertDialog.BUTTON_NEGATIVE)
-        val positiveButton: Button = dialog.getButton(AlertDialog.BUTTON_POSITIVE)
-
-        // Set text color
-        negativeButton.setTextColor(resources.getColor(R.color.Red)) // Set Cancel button text color
-        positiveButton.setTextColor(resources.getColor(R.color.white))
-        positiveButton.setBackgroundColor(resources.getColor(R.color.teal_200))
-
-
-        //Optional: Change dialog background
-        //dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-    }
-
 
     private fun startImageSequence() {
         // List of image resources
