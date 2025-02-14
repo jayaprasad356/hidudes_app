@@ -145,7 +145,7 @@ class WalletActivity : BaseActivity()  {
                             if (settingsList.isNotEmpty()) {
                                 val settingsData = settingsList[0]
 
-                                when (settingsData.payment_gateway_type) {
+                                when ("razorpay") {
                                     "razorpay" -> {
 
 

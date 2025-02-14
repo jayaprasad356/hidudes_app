@@ -151,9 +151,7 @@
         app:layout_constraintHeight_default="percent"
         app:layout_constraintStart_toStartOf="@+id/gl_horizontal_center"
         app:layout_constraintTop_toBottomOf="@+id/tv_summary"
-        app:layout_constraintWidth_percent="0.4"
-        app:strokeColor="@color/primary_blue"
-        app:strokeWidth="@dimen/_1sdp">
+        app:layout_constraintWidth_percent="0.4">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:paddingVertical="@dimen/_10sdp"

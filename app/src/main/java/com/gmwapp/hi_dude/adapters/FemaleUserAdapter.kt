@@ -1,6 +1,7 @@
 package com.gmwapp.hi_dude.adapters
 
 import android.app.Activity
+import android.graphics.PorterDuff
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -59,6 +60,13 @@ class FemaleUserAdapter(
 
         if (audioStatus == 1) {
             holder.binding.cvAudio.setCardBackgroundColor(ContextCompat.getColor(activity, R.color.button_background))
+            holder.binding.tvIvAudio.setTextColor(ContextCompat.getColor(activity, R.color.primary_blue))
+            holder.binding.ivAudio.setColorFilter(
+                ContextCompat.getColor(activity, R.color.primary_blue),
+                PorterDuff.Mode.SRC_IN
+            )
+            holder.binding.cvAudio.strokeWidth = 2
+            holder.binding.cvAudio.strokeColor = ContextCompat.getColor(activity, R.color.primary_blue)
             holder.binding.cvAudio.setOnSingleClickListener {
                 val position = holder.adapterPosition
                 if (position != RecyclerView.NO_POSITION) {
@@ -71,6 +79,13 @@ class FemaleUserAdapter(
         }
         if (videoStatus == 1) {
             holder.binding.cvVideo.setCardBackgroundColor(ContextCompat.getColor(activity, R.color.button_background))
+            holder.binding.tvVideo.setTextColor(ContextCompat.getColor(activity, R.color.primary_blue))
+            holder.binding.ivVideo.setColorFilter(
+                ContextCompat.getColor(activity, R.color.primary_blue),
+                PorterDuff.Mode.SRC_IN
+            )
+            holder.binding.cvVideo.strokeWidth = 3
+            holder.binding.cvVideo.strokeColor = ContextCompat.getColor(activity, R.color.primary_blue)
             holder.binding.cvVideo.setOnSingleClickListener{
                 onVideoListener.onItemSelected(femaleUser)
             }
@@ -78,15 +93,43 @@ class FemaleUserAdapter(
 
         if (audioStatus == 0 && videoStatus == 0) {
             holder.binding.cvAudio.setCardBackgroundColor(ContextCompat.getColor(activity, R.color.button_background))
+            holder.binding.tvIvAudio.setTextColor(ContextCompat.getColor(activity, R.color.unselect_grey))
+            holder.binding.ivAudio.setColorFilter(
+                ContextCompat.getColor(activity, R.color.unselect_grey),
+                PorterDuff.Mode.SRC_IN
+            )
+            holder.binding.cvAudio.strokeWidth = 3
+            holder.binding.cvAudio.strokeColor = ContextCompat.getColor(activity, R.color.unselect_grey)
             holder.binding.cvVideo.setCardBackgroundColor(ContextCompat.getColor(activity, R.color.button_background))
+            holder.binding.tvVideo.setTextColor(ContextCompat.getColor(activity, R.color.unselect_grey))
+            holder.binding.ivVideo.setColorFilter(
+                ContextCompat.getColor(activity, R.color.unselect_grey),
+                PorterDuff.Mode.SRC_IN
+            )
+            holder.binding.cvVideo.strokeWidth = 3
+            holder.binding.cvVideo.strokeColor = ContextCompat.getColor(activity, R.color.unselect_grey)
         }
 
         if (audioStatus == 0) {
             holder.binding.cvAudio.setCardBackgroundColor(ContextCompat.getColor(activity, R.color.button_background))
+            holder.binding.tvIvAudio.setTextColor(ContextCompat.getColor(activity, R.color.unselect_grey))
+            holder.binding.ivAudio.setColorFilter(
+                ContextCompat.getColor(activity, R.color.unselect_grey),
+                PorterDuff.Mode.SRC_IN
+            )
+            holder.binding.cvAudio.strokeWidth = 3
+            holder.binding.cvAudio.strokeColor = ContextCompat.getColor(activity, R.color.unselect_grey)
         }
 
         if (videoStatus == 0) {
             holder.binding.cvVideo.setCardBackgroundColor(ContextCompat.getColor(activity, R.color.button_background))
+            holder.binding.tvVideo.setTextColor(ContextCompat.getColor(activity, R.color.unselect_grey))
+            holder.binding.ivVideo.setColorFilter(
+                ContextCompat.getColor(activity, R.color.unselect_grey),
+                PorterDuff.Mode.SRC_IN
+            )
+            holder.binding.cvVideo.strokeWidth = 3
+            holder.binding.cvVideo.strokeColor = ContextCompat.getColor(activity, R.color.unselect_grey)
         }
 
 

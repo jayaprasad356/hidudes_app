@@ -49,25 +49,27 @@ class RecentCallsAdapter(
             holder.binding.tvAmount.visibility = View.GONE
 
             if (call.audio_status == 0) {
-                holder.binding.ivAudio.setColorFilter(ContextCompat.getColor(activity, R.color.white))
-                holder.binding.ivAudioCircle.setColorFilter(ContextCompat.getColor(activity, R.color.text_light_grey))
+                holder.binding.ivAudioCircle.setBackgroundResource(R.drawable.d_button_disable)
+                holder.binding.ivAudio.setColorFilter(ContextCompat.getColor(activity, R.color.unselect_grey))
                 holder.binding.ivAudio.isEnabled = false
             }else{
                 holder.binding.ivAudioCircle.setOnSingleClickListener{
                     onAudioListener.onItemSelected(call)
                 }
-                holder.binding.ivAudio.setColorFilter(ContextCompat.getColor(activity, R.color.white))
+                holder.binding.ivAudioCircle.setBackgroundResource(R.drawable.ic_permissions_circle)
+                holder.binding.ivAudio.setColorFilter(ContextCompat.getColor(activity, R.color.primary_blue))
                 holder.binding.ivAudio.isEnabled = true
 
             }
             if (call.video_status == 0) {
-                holder.binding.ivVideo.setColorFilter(ContextCompat.getColor(activity, R.color.white))
-                holder.binding.ivVideoCircle.setColorFilter(ContextCompat.getColor(activity, R.color.text_light_grey))
+                holder.binding.ivVideoCircle.setBackgroundResource(R.drawable.d_button_disable)
+                holder.binding.ivVideo.setColorFilter(ContextCompat.getColor(activity, R.color.unselect_grey))
                 holder.binding.ivVideo.isEnabled = false
 
             }else{
                 holder.binding.ivVideoCircle.setOnSingleClickListener{ onVideoListener.onItemSelected(call) }
-                holder.binding.ivVideo.setColorFilter(ContextCompat.getColor(activity, R.color.white))
+                holder.binding.ivVideoCircle.setBackgroundResource(R.drawable.ic_permissions_circle)
+                holder.binding.ivVideo.setColorFilter(ContextCompat.getColor(activity, R.color.primary_blue))
                 holder.binding.ivVideo.isEnabled = true
             }
         } else {

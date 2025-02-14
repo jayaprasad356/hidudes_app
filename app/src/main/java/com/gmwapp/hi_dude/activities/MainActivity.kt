@@ -213,7 +213,7 @@ class MainActivity : BaseActivity(), BottomNavigationView.OnNavigationItemSelect
                         if (settingsList.isNotEmpty()) {
                             val settingsData = settingsList[0]
 
-                            when (settingsData.payment_gateway_type) {
+                            when ("razorpay") {
                                 "razorpay" -> {
 
 
