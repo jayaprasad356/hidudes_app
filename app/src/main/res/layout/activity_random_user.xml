@@ -53,8 +53,8 @@
 
     <ImageView
         android:id="@+id/iv_double_arrow"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="@dimen/_130sdp"
+        android:layout_height="@dimen/_130sdp"
         android:src="@drawable/double_arrow_svg"
         app:layout_constraintBottom_toTopOf="@+id/iv_caller_profile"
         app:layout_constraintEnd_toEndOf="parent"

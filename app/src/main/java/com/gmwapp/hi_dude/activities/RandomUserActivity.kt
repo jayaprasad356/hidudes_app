@@ -388,6 +388,11 @@ class RandomUserActivity : BaseActivity(), OnButtonClickListener {
             stopCall()
             finish()
         })
+
+        Glide.with(this)
+            .asGif()
+            .load(R.drawable.double_arrow_gif) // Replace with your GIF file
+            .into(binding.ivDoubleArrow)
     }
 
     private fun progress() {

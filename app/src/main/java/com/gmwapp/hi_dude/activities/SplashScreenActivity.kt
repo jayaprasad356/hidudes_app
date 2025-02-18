@@ -1,5 +1,6 @@
 package com.gmwapp.hi_dude.activities
 
+import android.app.blob.BlobStoreManager
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -8,12 +9,15 @@ import android.net.NetworkCapabilities
 import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
+import android.os.Looper
 import android.view.View
 import android.widget.TextView
 import android.widget.Toast
+import android.widget.VideoView
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
 import com.gmwapp.hi_dude.BaseApplication
 import com.gmwapp.hi_dude.R
 import com.gmwapp.hi_dude.constants.DConstants
@@ -23,6 +27,8 @@ import com.gmwapp.hi_dude.viewmodels.LoginViewModel
 import com.gmwapp.hi_dude.viewmodels.ProfileViewModel
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class SplashScreenActivity : BaseActivity() {
@@ -38,7 +44,36 @@ class SplashScreenActivity : BaseActivity() {
         setContentView(binding.root)
         enableEdgeToEdge()
         initUI()
+        playVideo()
     }
+
+    private fun playVideo() {
+        val videoView = findViewById<VideoView>(R.id.videoView)
+        val videoPath = "android.resource://" + packageName + "/" + R.raw.logo_gif
+
+        videoView.setVideoURI(Uri.parse(videoPath))
+        videoView.setOnPreparedListener { mediaPlayer ->
+            val videoWidth = mediaPlayer.videoWidth
+            val videoHeight = mediaPlayer.videoHeight
+
+            val videoViewWidth = videoView.width
+            val videoViewHeight = videoView.height
+
+            val videoRatio = videoWidth.toFloat() / videoHeight.toFloat()
+            val screenRatio = videoViewWidth.toFloat() / videoViewHeight.toFloat()
+
+            if (videoRatio > screenRatio) {
+                videoView.layoutParams.height = (videoViewWidth / videoRatio).toInt()
+            } else {
+                videoView.layoutParams.width = (videoViewHeight * videoRatio).toInt()
+            }
+
+            videoView.requestLayout()
+            mediaPlayer.isLooping = false
+            videoView.start()
+        }
+    }
+
 
     private fun initUI() {
         // Check for network connectivity
@@ -73,46 +108,57 @@ class SplashScreenActivity : BaseActivity() {
             prefs?.setUserData(it.data)
             userData = it.data
 
-            intent = when {
-                userData?.status == 2 -> {
-                    Intent(this, MainActivity::class.java).apply {
-                        putExtra(
-                            DConstants.AVATAR_ID,
-                            getIntent().getIntExtra(DConstants.AVATAR_ID, 0)
-                        )
-                        putExtra(DConstants.LANGUAGE, userData?.language)
-                        flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                    }
-                }
+            intent?.let {
+                Handler().postDelayed({
 
-                userData?.status == 1 -> {
-                    Intent(this, AlmostDoneActivity::class.java).apply {
-                        flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                    }
-                }
+                    intent = when {
+                        userData?.status == 2 -> {
+                            Intent(this, MainActivity::class.java).apply {
+                                putExtra(
+                                    DConstants.AVATAR_ID,
+                                    getIntent().getIntExtra(DConstants.AVATAR_ID, 0)
+                                )
+                                putExtra(DConstants.LANGUAGE, userData?.language)
+                                flags =
+                                    Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                            }
+                        }
 
-                else -> {
-                    Intent(this, VoiceIdentificationActivity::class.java).apply {
-                        putExtra(DConstants.LANGUAGE, userData?.language)
-                        flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                        userData?.status == 1 -> {
+                            Intent(this, AlmostDoneActivity::class.java).apply {
+                                flags =
+                                    Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                            }
+                        }
+
+                        else -> {
+                            Intent(this, VoiceIdentificationActivity::class.java).apply {
+                                putExtra(DConstants.LANGUAGE, userData?.language)
+                                flags =
+                                    Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                            }
+                        }
                     }
-                }
+                    startActivity(it)
+                    finish()
+                }, 2000)
             }
-            startActivity(intent)
-            finish()
         })
 
 
 
         viewModel.appUpdateResponseLiveData.observe(this, Observer {
-            if (it != null && it.success) {
+            lifecycleScope.launch {
+                delay(2000) // Wait for 10 seconds before navigating
+                if (it != null && it.success) {
 
-                val latestVersion = it.data[0].app_version.toString()
+                    val latestVersion = it.data[0].app_version.toString()
 
-                val link = it.data[0].link
-                val description = it.data[0].description
+                    val link = it.data[0].link
+                    val description = it.data[0].description
 
-                GotoActivity(userData, latestVersion, link, description)
+                    GotoActivity(userData, latestVersion, link, description)
+                }
             }
         })
 
@@ -155,7 +201,7 @@ class SplashScreenActivity : BaseActivity() {
                     Handler().postDelayed({
                         startActivity(it)
                         finish()
-                    }, 3000)
+                    }, 2000)
                 }
             }
         } else {

@@ -26,6 +26,13 @@
         android:orientation="horizontal"
         app:layout_constraintGuide_percent="0.027" />
 
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/gl_bottom_margin"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.97" />
+
     <ImageView
         android:id="@+id/iv_logo"
         android:layout_width="@dimen/_28sdp"
@@ -294,6 +301,24 @@
 
 
         </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.cardview.widget.CardView>
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/btnFloatingAction"
+        android:layout_width="@dimen/_45sdp"
+        android:layout_height="@dimen/_45sdp"
+        android:layout_marginTop="15dp"
+        app:cardCornerRadius="@dimen/_200sdp"
+        app:cardBackgroundColor="@color/button_background"
+        app:layout_constraintEnd_toStartOf="@+id/gl_right_margin"
+        app:layout_constraintBottom_toBottomOf="@+id/gl_bottom_margin">
+
+        <ImageView
+            android:layout_gravity="center"
+            android:layout_width="@dimen/_30sdp"
+            android:layout_height="@dimen/_30sdp"
+            android:src="@drawable/whatsapp"/>
+
     </androidx.cardview.widget.CardView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

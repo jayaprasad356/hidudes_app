@@ -126,6 +126,7 @@ dependencies {
     //circleimageview
     implementation("de.hdodenhof:circleimageview:3.1.0")
     implementation("org.greenrobot:eventbus:3.3.1")
+    implementation("jp.wasabeef:glide-transformations:4.3.0")
 
     implementation(libs.androidx.hilt.common)
     implementation(libs.androidx.hilt.work)
