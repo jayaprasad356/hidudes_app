@@ -22,6 +22,7 @@ import com.gmwapp.hi_dude.retrofit.responses.CoinsResponseData
 import com.gmwapp.hi_dude.retrofit.responses.RazorPayApiResponse
 import com.gmwapp.hi_dude.utils.setOnSingleClickListener
 import com.gmwapp.hi_dude.viewmodels.AccountViewModel
+import com.gmwapp.hi_dude.viewmodels.UpiPaymentViewModel
 import com.gmwapp.hi_dude.viewmodels.UpiViewModel
 import com.gmwapp.hi_dude.viewmodels.WalletViewModel
 import com.gmwapp.hi_dude.widgets.SpacesItemDecoration
@@ -35,6 +36,7 @@ class WalletActivity : BaseActivity()  {
     lateinit var binding: ActivityWalletBinding
     private val WalletViewModel: WalletViewModel by viewModels()
     private val accountViewModel: AccountViewModel by viewModels()
+    private val upiPaymentViewModel: UpiPaymentViewModel by viewModels()
 
 
     private val viewModel: UpiViewModel by viewModels()
@@ -145,7 +147,7 @@ class WalletActivity : BaseActivity()  {
                             if (settingsList.isNotEmpty()) {
                                 val settingsData = settingsList[0]
 
-                                when ("razorpay") {
+                                when ("upigateway") {
                                     "razorpay" -> {
 
 
@@ -182,6 +184,24 @@ class WalletActivity : BaseActivity()  {
 
 
 
+
+                                    }
+
+                                    "upigateway" ->{
+
+                                        Log.d("useing", "upigateway")
+
+                                        val userData = BaseApplication.getInstance()?.getPrefs()?.getUserData()
+                                        var userid = userData?.id
+
+                                        Log.d("useing", "upigateway")
+
+
+                                        userid?.let {
+                                            val clientTxnId = generateRandomTxnId(it,pointsId)  // Generate a new transaction ID
+                                            upiPaymentViewModel.createUpiPayment(it, clientTxnId, total_amount)
+                                            Log.d("upigateway", "upigateway: " + it + " + " + clientTxnId + " + " + total_amount)
+                                        }
 
                                     }
 
@@ -255,6 +275,28 @@ class WalletActivity : BaseActivity()  {
             }
         })
 
+        upiPaymentViewModel.upiPaymentLiveData.observe(this, Observer { response ->
+            if (response != null && response.status) {
+                val paymentUrl = response.data.firstOrNull()?.payment_url
+
+                if (!paymentUrl.isNullOrEmpty()) {
+                    Log.d("UPI Payment", "Payment URL: $paymentUrl")
+                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse(paymentUrl))
+                    startActivity(intent)
+                } else {
+                    Log.e("UPI Payment Error", "Payment URL is null or empty")
+                    Toast.makeText(this, "Payment URL not found. Please try again later.", Toast.LENGTH_LONG).show()
+                }
+            } else {
+                Log.e("UPI Payment Error", "Invalid response: ${response?.data}")
+                Toast.makeText(this, "Payment failed. Please check your internet or payment details.", Toast.LENGTH_LONG).show()
+            }
+        })
+
+    }
+
+    fun generateRandomTxnId(userId: Int, coinId: String): String {
+        return "$userId-$coinId-${System.currentTimeMillis()}"
     }
 
 

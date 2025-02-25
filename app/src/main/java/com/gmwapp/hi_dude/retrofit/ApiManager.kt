@@ -1,5 +1,6 @@
 package com.gmwapp.hi_dude.retrofit
 
+import com.gmwapp.hi_dude.activities.RetrofitClient
 import com.gmwapp.hi_dude.retrofit.callbacks.NetworkCallback
 import com.gmwapp.hi_dude.retrofit.responses.AddPointsResponse
 import com.gmwapp.hi_dude.retrofit.responses.AppUpdateResponse
@@ -29,6 +30,7 @@ import com.gmwapp.hi_dude.retrofit.responses.TransactionsResponse
 import com.gmwapp.hi_dude.retrofit.responses.UpdateCallStatusResponse
 import com.gmwapp.hi_dude.retrofit.responses.UpdateConnectedCallResponse
 import com.gmwapp.hi_dude.retrofit.responses.UpdateProfileResponse
+import com.gmwapp.hi_dude.retrofit.responses.UpiPaymentResponse
 import com.gmwapp.hi_dude.retrofit.responses.UpiUpdateResponse
 import com.gmwapp.hi_dude.retrofit.responses.UserValidationResponse
 import com.gmwapp.hi_dude.retrofit.responses.VoiceUpdateResponse
@@ -473,6 +475,21 @@ class ApiManager @Inject constructor(private val retrofit: Retrofit) {
         }
     }
 
+    fun createUpiPayment(
+        userId: Int,
+        clientTxnId: String,
+        amount: String,
+        callback: NetworkCallback<UpiPaymentResponse>
+    ) {
+
+        if (Helper.checkNetworkConnection()) {
+            val apiCall: Call<UpiPaymentResponse> = getApiInterface().createUpiPayment(userId, clientTxnId, amount)
+            apiCall.enqueue(callback)
+        } else {
+            callback.onNoNetwork()
+        }
+    }
+
     fun getSpeechText(
         userId: Int, language: String, callback: NetworkCallback<SpeechTextResponse>
     ) {
@@ -749,5 +766,13 @@ interface ApiInterface {
         @Field("receiver_id") receiverId: Int,
         @Field("gift_id") giftId: Int
     ): Call<SendGiftResponse>
+
+    @POST("createUpigateway")
+    @FormUrlEncoded
+    fun createUpiPayment(
+        @Field("user_id") userId: Int,
+        @Field("client_txn_id") clientTxnId: String,
+        @Field("amount") amount: String
+    ): Call<UpiPaymentResponse>
 
 }

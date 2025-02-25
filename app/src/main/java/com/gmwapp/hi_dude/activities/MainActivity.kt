@@ -28,6 +28,7 @@ import com.gmwapp.hi_dude.retrofit.responses.RazorPayApiResponse
 import com.gmwapp.hi_dude.viewmodels.AccountViewModel
 import com.gmwapp.hi_dude.viewmodels.OfferViewModel
 import com.gmwapp.hi_dude.viewmodels.ProfileViewModel
+import com.gmwapp.hi_dude.viewmodels.UpiPaymentViewModel
 import com.google.android.material.bottomnavigation.BottomNavigationItemView
 import com.google.android.material.bottomnavigation.BottomNavigationMenuView
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -48,6 +49,9 @@ class MainActivity : BaseActivity(), BottomNavigationView.OnNavigationItemSelect
     val offerViewModel: OfferViewModel by viewModels()
     private val profileViewModel: ProfileViewModel by viewModels()
     private val accountViewModel: AccountViewModel by viewModels()
+    private val upiPaymentViewModel: UpiPaymentViewModel by viewModels()
+
+    lateinit var coinId: String
 
 
 
@@ -94,6 +98,25 @@ class MainActivity : BaseActivity(), BottomNavigationView.OnNavigationItemSelect
     }
 
     private fun initUI() {
+
+        upiPaymentViewModel.upiPaymentLiveData.observe(this, Observer { response ->
+            if (response != null && response.status) {
+                val paymentUrl = response.data.firstOrNull()?.payment_url
+
+                if (!paymentUrl.isNullOrEmpty()) {
+                    Log.d("UPI Payment", "Payment URL: $paymentUrl")
+                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse(paymentUrl))
+                    startActivity(intent)
+                } else {
+                    Log.e("UPI Payment Error", "Payment URL is null or empty")
+                    Toast.makeText(this, "Payment URL not found. Please try again later.", Toast.LENGTH_LONG).show()
+                }
+            } else {
+                Log.e("UPI Payment Error", "Invalid response: ${response?.data}")
+                Toast.makeText(this, "Payment failed. Please check your internet or payment details.", Toast.LENGTH_LONG).show()
+            }
+        })
+
         val prefs = BaseApplication.getInstance()?.getPrefs()
         prefs?.getUserData()?.id?.let { profileViewModel.getUsers(it) }
 
@@ -187,6 +210,7 @@ class MainActivity : BaseActivity(), BottomNavigationView.OnNavigationItemSelect
 
         var amount = "$amount"
         var pointsId = "$id"
+        coinId = id.toString()
         Log.d("amount", "amount $amount")
 
         val userData = BaseApplication.getInstance()?.getPrefs()?.getUserData()
@@ -250,6 +274,20 @@ class MainActivity : BaseActivity(), BottomNavigationView.OnNavigationItemSelect
 
 
 
+
+                                }
+
+                                "upigateway" ->{
+
+                                    val userData = BaseApplication.getInstance()?.getPrefs()?.getUserData()
+                                    var userid = userData?.id
+
+
+                                    userid?.let {
+                                        val clientTxnId = generateRandomTxnId(it,coinId)  // Generate a new transaction ID
+                                        upiPaymentViewModel.createUpiPayment(it, clientTxnId, amount)
+                                        Log.d("upigateway", "upigateway: " + it + " + " + clientTxnId + " + " + amount)
+                                    }
 
                                 }
 
@@ -327,5 +365,9 @@ class MainActivity : BaseActivity(), BottomNavigationView.OnNavigationItemSelect
     fun calculateOriginalPrice(price: Int, savePercentage: Int): Int {
         val originalPrice = price / (1 - (savePercentage / 100.0)) // Use Double for division
         return round(originalPrice).toInt() // Round to the nearest integer
+    }
+
+    fun generateRandomTxnId(userId: Int, coinId: String): String {
+        return "$userId-$coinId-${System.currentTimeMillis()}"
     }
 }
