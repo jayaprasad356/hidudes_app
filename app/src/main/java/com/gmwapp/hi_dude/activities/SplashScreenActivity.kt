@@ -105,44 +105,42 @@ class SplashScreenActivity : BaseActivity() {
 
 
         profileViewModel.getUserLiveData.observe(this, Observer {
+//            Toast.makeText(this, "1", Toast.LENGTH_SHORT).show()
             prefs?.setUserData(it.data)
             userData = it.data
-
-            intent?.let {
-                Handler().postDelayed({
-
-                    intent = when {
-                        userData?.status == 2 -> {
-                            Intent(this, MainActivity::class.java).apply {
-                                putExtra(
-                                    DConstants.AVATAR_ID,
-                                    getIntent().getIntExtra(DConstants.AVATAR_ID, 0)
-                                )
-                                putExtra(DConstants.LANGUAGE, userData?.language)
-                                flags =
-                                    Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                            }
-                        }
-
-                        userData?.status == 1 -> {
-                            Intent(this, AlmostDoneActivity::class.java).apply {
-                                flags =
-                                    Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                            }
-                        }
-
-                        else -> {
-                            Intent(this, VoiceIdentificationActivity::class.java).apply {
-                                putExtra(DConstants.LANGUAGE, userData?.language)
-                                flags =
-                                    Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                            }
-                        }
+            intent = when {
+                userData?.status == 2 -> {
+//                    Toast.makeText(this, "4", Toast.LENGTH_SHORT).show()
+                    Intent(this, MainActivity::class.java).apply {
+                        putExtra(
+                            DConstants.AVATAR_ID,
+                            getIntent().getIntExtra(DConstants.AVATAR_ID, 0)
+                        )
+                        putExtra(DConstants.LANGUAGE, userData?.language)
+                        flags =
+                            Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                     }
-                    startActivity(it)
-                    finish()
-                }, 2000)
+                }
+
+                userData?.status == 1 -> {
+//                    Toast.makeText(this, "5", Toast.LENGTH_SHORT).show()
+                    Intent(this, AlmostDoneActivity::class.java).apply {
+                        flags =
+                            Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                    }
+                }
+
+                else -> {
+//                    Toast.makeText(this, "6", Toast.LENGTH_SHORT).show()
+                    Intent(this, VoiceIdentificationActivity::class.java).apply {
+                        putExtra(DConstants.LANGUAGE, userData?.language)
+                        flags =
+                            Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                    }
+                }
             }
+            startActivity(intent)
+            finish()
         })
 
 

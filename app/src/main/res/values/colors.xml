@@ -12,7 +12,7 @@
     <color name="interest_disabled_text_color">#8a8b8f</color>
     <color name="yellow">#f5e77e</color>
     <color name="yellow_dark">#FFD018</color>
-    <color name="light_blue">#321a56</color>
+    <color name="light_blue">#CFF5FF</color>
     <color name="cardview_divider">#5d457f</color>
     <color name="transaction_divider">#3b3f42</color>
     <color name="profile_cardview_divider">#444549</color>

@@ -3,7 +3,7 @@
     <item android:id="@android:id/background">
         <shape>
             <solid
-                android:color="@color/pink" />
+                android:color="@color/background_color" />
             <corners android:radius="10dp" />
         </shape>
     </item>
@@ -11,7 +11,7 @@
     <item android:id="@android:id/progress">
         <scale android:scaleWidth="100%">
             <shape>
-                <gradient android:angle="270" android:endColor="@color/pink_light" android:startColor="@color/pink" />
+                <gradient android:angle="270" android:endColor="@color/light_blue" android:startColor="@color/primary_blue" />
                 <corners android:radius="10dp" />
             </shape>
         </scale>

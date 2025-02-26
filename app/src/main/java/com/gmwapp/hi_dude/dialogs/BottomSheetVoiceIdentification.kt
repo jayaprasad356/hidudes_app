@@ -62,7 +62,7 @@ class BottomSheetVoiceIdentification : BottomSheetDialogFragment() {
         var timer:CountDownTimer?=null;
         mediaPlayer = MediaPlayer()
         binding.clMicrophone.setOnTouchListener(OnTouchListener { v, event ->
-            if (event.action == MotionEvent.ACTION_DOWN) {
+            if (event.action == MotionEvent .ACTION_DOWN) {
                 binding.tlSpeechTextHintTimer.text = "00:00"
                 binding.tlSpeechTextHintTimer.visibility = View.VISIBLE
                 var secs=0;

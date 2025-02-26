@@ -149,7 +149,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:tint="@color/pink" />
+            app:tint="@color/primary_blue" />
 
         <ProgressBar
             android:id="@+id/pb_progress"
@@ -193,14 +193,14 @@
             app:layout_constraintEnd_toStartOf="@+id/btn_record_again"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:tint="@color/white" />
+            app:tint="@color/primary_blue" />
 
         <TextView
             android:id="@+id/btn_record_again"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/record_again"
-            android:textColor="@color/white"
+            android:textColor="@color/primary_blue"
             android:textSize="14sp"
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -211,21 +211,26 @@
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btn_submit"
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        android:backgroundTint="@color/button_background_tint"
-        android:text="@string/submit"
+        android:layout_marginBottom="6dp"
+        android:layout_marginStart="2dp"
+        android:layout_marginEnd="2dp"
+        android:layout_marginTop="30dp"
         android:textAllCaps="false"
-        android:textColor="@color/button_text_color"
         android:textSize="14sp"
-        android:paddingVertical="@dimen/_10sdp"
+        android:padding="@dimen/_10sdp"
+        android:text="@string/submit"
         android:fontFamily="@font/poppins_medium"
-        android:visibility="gone"
+        android:textColor="@color/primary_blue"
         app:cornerRadius="@dimen/_18sdp"
+        android:backgroundTint="@color/button_background"
+        app:strokeWidth="@dimen/_1sdp"
+        app:strokeColor="@color/primary_blue"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHeight_default="percent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        android:visibility="gone"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
