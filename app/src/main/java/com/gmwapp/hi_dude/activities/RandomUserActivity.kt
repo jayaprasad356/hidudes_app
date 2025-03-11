@@ -281,36 +281,36 @@ class RandomUserActivity : BaseActivity(), OnButtonClickListener {
     private fun initUI() {
 
 
-        val giftViewModel = ViewModelProvider(this)[GiftViewModel::class.java]
-
-        GiftViewModelProvider.init(giftViewModel)
-
-        // Observe API response
-        giftViewModel.giftResponseLiveData.observe(this) { response ->
-            if (response != null) {
-                Toast.makeText(this, "Gift sent successfully!", Toast.LENGTH_SHORT).show()
-                getRemainingTime()
-
-                Log.d("GiftAPI", "Response: $response")
-            }
-        }
-
-        // Observe API failure
-        giftViewModel.giftErrorLiveData.observe(this) { error ->
-            Toast.makeText(this, "Error: $error", Toast.LENGTH_SHORT).show()
-            Log.e("GiftAPI", "Error: $error")
-        }
-
-        GiftImageViewModel.giftResponseLiveData.observe(this) { response ->
-            response?.let {
-                if (it.success && it.data.isNotEmpty()) {
-                    GiftManager.updateGifts(it.data)
-                    Log.d("GiftManager", "Gifts updated successfully.")
-                } else {
-                    Log.e("GiftManager", "Failed to load gifts")
-                }
-            }
-        }
+//        val giftViewModel = ViewModelProvider(this)[GiftViewModel::class.java]
+//
+//        GiftViewModelProvider.init(giftViewModel)
+//
+//        // Observe API response
+//        giftViewModel.giftResponseLiveData.observe(this) { response ->
+//            if (response != null) {
+//                Toast.makeText(this, "Gift sent successfully!", Toast.LENGTH_SHORT).show()
+//                getRemainingTime()
+//
+//                Log.d("GiftAPI", "Response: $response")
+//            }
+//        }
+//
+//        // Observe API failure
+//        giftViewModel.giftErrorLiveData.observe(this) { error ->
+//            Toast.makeText(this, "Error: $error", Toast.LENGTH_SHORT).show()
+//            Log.e("GiftAPI", "Error: $error")
+//        }
+//
+//        GiftImageViewModel.giftResponseLiveData.observe(this) { response ->
+//            response?.let {
+//                if (it.success && it.data.isNotEmpty()) {
+//                    GiftManager.updateGifts(it.data)
+//                    Log.d("GiftManager", "Gifts updated successfully.")
+//                } else {
+//                    Log.e("GiftManager", "Failed to load gifts")
+//                }
+//            }
+//        }
 
 
 

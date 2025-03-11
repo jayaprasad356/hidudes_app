@@ -61,6 +61,9 @@ class BottomSheetVoiceIdentification : BottomSheetDialogFragment() {
     private fun initUI() {
         var timer:CountDownTimer?=null;
         mediaPlayer = MediaPlayer()
+        binding.btnSubmit.setOnSingleClickListener({
+            Toast.makeText(context, "Recording must be above 3 seconds", Toast.LENGTH_SHORT).show()
+        })
         binding.clMicrophone.setOnTouchListener(OnTouchListener { v, event ->
             if (event.action == MotionEvent .ACTION_DOWN) {
                 binding.tlSpeechTextHintTimer.text = "00:00"
@@ -111,6 +114,13 @@ class BottomSheetVoiceIdentification : BottomSheetDialogFragment() {
                         Toast.makeText(context, "Recording must be above 3 seconds", Toast.LENGTH_SHORT).show()
                         audiofile?.delete() // Delete short recording
                         return@OnTouchListener true
+                        binding.btnSubmit.setOnSingleClickListener({
+                            Toast.makeText(context, "Recording must be above 3 seconds", Toast.LENGTH_SHORT).show()
+                        })
+                    } else {
+                        binding.btnSubmit.setOnSingleClickListener({
+                            onItemSelectionListener?.onItemSelected(audiofile.toString())
+                        })
                     }
                 } catch (e: Exception) {
                     e.printStackTrace()
@@ -148,9 +158,6 @@ class BottomSheetVoiceIdentification : BottomSheetDialogFragment() {
             binding.btnSubmit.visibility = View.GONE
             binding.tlSpeechTextHint.visibility = View.VISIBLE
             binding.clMicrophone.visibility = View.VISIBLE
-        })
-        binding.btnSubmit.setOnSingleClickListener({
-            onItemSelectionListener?.onItemSelected(audiofile.toString())
         })
 
     }
