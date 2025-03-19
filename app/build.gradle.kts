@@ -17,8 +17,8 @@ android {
         applicationId = "com.gmwapp.hi_dude"
         minSdk = 26
         targetSdk = 35
-        versionCode = 6
-        versionName = "6.0"
+        versionCode = 8
+        versionName = "8.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -136,6 +136,7 @@ dependencies {
     implementation("com.google.androidbrowserhelper:androidbrowserhelper:2.5.0")
 
     implementation ("com.github.NorthernCaptain:TAndroidLame:1.1")
+    implementation ("com.android.billingclient:billing:7.1.1")
 
 
     testImplementation(libs.junit)

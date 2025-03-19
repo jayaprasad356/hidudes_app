@@ -1,7 +1,9 @@
 package com.gmwapp.hi_dude.retrofit
 
+import android.util.Log
 import com.gmwapp.hi_dude.activities.RetrofitClient
 import com.gmwapp.hi_dude.retrofit.callbacks.NetworkCallback
+import com.gmwapp.hi_dude.retrofit.responses.AddCoinsResponse
 import com.gmwapp.hi_dude.retrofit.responses.AddPointsResponse
 import com.gmwapp.hi_dude.retrofit.responses.AppUpdateResponse
 import com.gmwapp.hi_dude.retrofit.responses.AvatarsListResponse
@@ -490,6 +492,20 @@ class ApiManager @Inject constructor(private val retrofit: Retrofit) {
         }
     }
 
+    fun addCoins(
+        userId: Int,
+        coinsId: Int,
+        callback: NetworkCallback<AddCoinsResponse>
+    ) {
+
+        if (Helper.checkNetworkConnection()) {
+            val apiCall: Call<AddCoinsResponse> = getApiInterface().addCoins(userId, coinsId)
+            apiCall.enqueue(callback)
+        } else {
+            callback.onNoNetwork()
+        }
+    }
+
     fun getSpeechText(
         userId: Int, language: String, callback: NetworkCallback<SpeechTextResponse>
     ) {
@@ -774,5 +790,12 @@ interface ApiInterface {
         @Field("client_txn_id") clientTxnId: String,
         @Field("amount") amount: String
     ): Call<UpiPaymentResponse>
+
+    @POST("add_coins")
+    @FormUrlEncoded
+    fun addCoins(
+        @Field("user_id") userId: Int,
+        @Field("coins_id") coinsId: Int,
+    ): Call<AddCoinsResponse>
 
 }

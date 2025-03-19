@@ -24,6 +24,20 @@ class DPreferences(context: Context) {
         }
     }
 
+    fun setAfterAddCoins(coins: String) {
+        try {
+            mPrefsWrite.putString("after_add_coins", coins)
+            mPrefsWrite.apply()
+        } catch (e: Exception) {
+            e.message?.let { Log.e("DPreferences", it) }
+        }
+    }
+
+    fun getAfterAddCoins(): String {
+        return mPrefsRead.getString("after_add_coins", "0") ?: "0"
+    }
+
+
     fun clearUserData() {
         try {
             mPrefsWrite.clear()
