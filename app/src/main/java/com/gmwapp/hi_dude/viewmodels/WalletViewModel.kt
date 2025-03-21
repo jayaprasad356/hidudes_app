@@ -1,10 +1,14 @@
 package com.gmwapp.hi_dude.viewmodels
 
+import android.content.Intent
 import android.util.Log
 import android.widget.Toast
+import androidx.core.content.ContextCompat.startActivity
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.gmwapp.hi_dude.activities.MainActivity
 import com.gmwapp.hi_dude.repositories.WalletRepositories
 import com.gmwapp.hi_dude.retrofit.callbacks.NetworkCallback
 import com.gmwapp.hi_dude.retrofit.responses.AddCoinsResponse
@@ -25,6 +29,8 @@ class WalletViewModel @Inject constructor(private val walletRepositories: Wallet
     val coinsLiveData = MutableLiveData<CoinsResponse>()
     val addCoinsResponse = MutableLiveData<AddCoinsResponse>()
     val afterAddCoinsLiveData = MutableLiveData<String>()
+    private val _navigateToMain = MutableLiveData<Boolean>()
+    val navigateToMain: LiveData<Boolean> get() = _navigateToMain
 
     fun getCoins(userId: Int) {
         viewModelScope.launch {
@@ -46,6 +52,7 @@ class WalletViewModel @Inject constructor(private val walletRepositories: Wallet
     }
 
     fun addCoins(userId: Int, coinId: Int) {
+        _navigateToMain.postValue(false)
         viewModelScope.launch {
             walletRepositories.addCoins(userId, coinId, object : NetworkCallback<AddCoinsResponse> {
                 override fun onResponse(call: Call<AddCoinsResponse>, response: Response<AddCoinsResponse>) {
@@ -62,6 +69,9 @@ class WalletViewModel @Inject constructor(private val walletRepositories: Wallet
                             Log.d("UPI PaymentCheck", "Message: ${it.message}")
                             if (it.success) {
                                 Log.d("addCoins", "Coins added successfully! Fetching updated balance...")
+
+                                _navigateToMain.postValue(true) // ✅ Notify Activity to navigate
+
                                 // ✅ Save new coin balance to SharedPreferences
                                 DPreferences(context).setAfterAddCoins(it.data.coins)
 

@@ -29,6 +29,136 @@ import com.google.android.material.bottomsheet.BottomSheetDialog
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import android.app.Activity
+import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
+import com.google.android.material.snackbar.Snackbar
+import com.google.android.play.core.appupdate.*
+import com.google.android.play.core.install.InstallStateUpdatedListener
+import com.google.android.play.core.install.model.AppUpdateType
+import com.google.android.play.core.install.model.InstallStatus
+import com.google.android.play.core.install.model.UpdateAvailability
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+
+//class SplashScreenActivity : AppCompatActivity() {
+//
+//    private lateinit var appUpdateManager: AppUpdateManager
+//    private val REQUEST_CODE_UPDATE = 100
+//
+//    override fun onCreate(savedInstanceState: Bundle?) {
+//        super.onCreate(savedInstanceState)
+//        setContentView(R.layout.activity_splash_screen)
+//
+//        checkForAppUpdate()
+//    }
+//
+//    private fun fakeUpdateCheck() {
+//        // Simulate an update being available
+//        val fakeUpdateAvailable = true
+//        if (fakeUpdateAvailable) {
+//            showUpdateDialog("https://your-app-update-link.com", "New version available. Update now.")
+//        }
+//    }
+//
+//    private fun checkForAppUpdate() {
+//        appUpdateManager = AppUpdateManagerFactory.create(this)
+//        val appUpdateInfoTask = appUpdateManager.appUpdateInfo
+//
+//        appUpdateInfoTask.addOnSuccessListener { appUpdateInfo ->
+//            when {
+//                // Immediate update (forces update before using the app)
+//                appUpdateInfo.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE &&
+//                        appUpdateInfo.isUpdateTypeAllowed(AppUpdateType.IMMEDIATE) -> {
+//                    startImmediateUpdate(appUpdateInfo)
+//                }
+//
+//                // Flexible update (allows user to continue using the app)
+//                appUpdateInfo.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE &&
+//                        appUpdateInfo.isUpdateTypeAllowed(AppUpdateType.FLEXIBLE) -> {
+//                    startFlexibleUpdate(appUpdateInfo)
+//                }
+//
+//                // If an update was already in progress
+//                appUpdateInfo.updateAvailability() == UpdateAvailability.DEVELOPER_TRIGGERED_UPDATE_IN_PROGRESS -> {
+//                    startImmediateUpdate(appUpdateInfo)
+//                }
+//            }
+//        }
+//    }
+//
+//    private fun startImmediateUpdate(appUpdateInfo: AppUpdateInfo) {
+//        appUpdateManager.startUpdateFlowForResult(
+//            appUpdateInfo,
+//            AppUpdateType.IMMEDIATE,
+//            this,
+//            REQUEST_CODE_UPDATE
+//        )
+//    }
+//
+//    private fun startFlexibleUpdate(appUpdateInfo: AppUpdateInfo) {
+//        appUpdateManager.startUpdateFlowForResult(
+//            appUpdateInfo,
+//            AppUpdateType.FLEXIBLE,
+//            this,
+//            REQUEST_CODE_UPDATE
+//        )
+//
+//        appUpdateManager.registerListener(installStateUpdatedListener)
+//    }
+//
+//    private val installStateUpdatedListener = InstallStateUpdatedListener { state ->
+//        if (state.installStatus() == InstallStatus.DOWNLOADED) {
+//            showUpdateCompleteSnackbar()
+//        }
+//    }
+//
+//    private fun showUpdateCompleteSnackbar() {
+//        Snackbar.make(findViewById(android.R.id.content), "Update downloaded. Restart app to apply changes.", Snackbar.LENGTH_INDEFINITE)
+//            .setAction("Restart") {
+//                appUpdateManager.completeUpdate()
+//            }.show()
+//    }
+//
+//    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+//        super.onActivityResult(requestCode, resultCode, data)
+//        if (requestCode == REQUEST_CODE_UPDATE) {
+//            if (resultCode != Activity.RESULT_OK) {
+//                Toast.makeText(this, "Update failed!", Toast.LENGTH_SHORT).show()
+//                checkForAppUpdate()
+//            }
+//        }
+//    }
+//
+//    override fun onDestroy() {
+//        super.onDestroy()
+//        appUpdateManager.unregisterListener(installStateUpdatedListener)
+//    }
+//
+//        private fun showUpdateDialog(link: String, description: String) {
+//        val bottomSheetDialog = BottomSheetDialog(this)
+//        val view = layoutInflater.inflate(R.layout.bottom_dialog_update, null)
+//        bottomSheetDialog.setContentView(view)
+//        bottomSheetDialog.setCancelable(false);
+//
+//        val btnUpdate = view.findViewById<View>(R.id.btnUpdate)
+//        val dialogMessage = view.findViewById<TextView>(R.id.dialog_message)
+//        dialogMessage.text = description
+//        btnUpdate.setOnClickListener(View.OnClickListener {
+//            val url = link;
+//            val i = Intent(Intent.ACTION_VIEW)
+//            i.data = Uri.parse(url)
+//            startActivity(i)
+//        })
+//
+//
+//        // Customize your bottom dialog here
+//        // For example, you can set text, buttons, etc.
+//
+//        bottomSheetDialog.show()
+//    }
+//}
+
 
 @AndroidEntryPoint
 class SplashScreenActivity : BaseActivity() {

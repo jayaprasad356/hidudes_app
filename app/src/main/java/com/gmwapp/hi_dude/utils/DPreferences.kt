@@ -37,6 +37,32 @@ class DPreferences(context: Context) {
         return mPrefsRead.getString("after_add_coins", "0") ?: "0"
     }
 
+    fun setSelectedUserId(userId: String) {
+        try {
+            mPrefsWrite.putString("selected_user_id", userId)
+            mPrefsWrite.apply()
+        } catch (e: Exception) {
+            e.message?.let { Log.e("DPreferences", it) }
+        }
+    }
+
+    fun getSelectedUserId(): String {
+        return mPrefsRead.getString("selected_user_id", "0") ?: "0"
+    }
+
+    fun setSelectedPlanId(planId: String) {
+        try {
+            mPrefsWrite.putString("selected_plan_id", planId)
+            mPrefsWrite.apply()
+        } catch (e: Exception) {
+            e.message?.let { Log.e("DPreferences", it) }
+        }
+    }
+
+    fun getSelectedPlanId(): String {
+        return mPrefsRead.getString("selected_plan_id", "0") ?: "0"
+    }
+
 
     fun clearUserData() {
         try {

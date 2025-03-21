@@ -17,8 +17,8 @@ android {
         applicationId = "com.gmwapp.hi_dude"
         minSdk = 26
         targetSdk = 35
-        versionCode = 8
-        versionName = "8.0"
+        versionCode = 11
+        versionName = "11.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -64,6 +64,7 @@ android {
 }
 
 dependencies {
+    implementation(libs.androidx.espresso.core)
     val lifecycleVersion = "2.6.2"
     val glideVersion = "4.11.0"
 
@@ -137,6 +138,9 @@ dependencies {
 
     implementation ("com.github.NorthernCaptain:TAndroidLame:1.1")
     implementation ("com.android.billingclient:billing:7.1.1")
+    implementation (libs.app.update)
+    implementation (libs.app.update.ktx)
+
 
 
     testImplementation(libs.junit)

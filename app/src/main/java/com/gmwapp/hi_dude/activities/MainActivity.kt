@@ -26,6 +26,7 @@ import com.gmwapp.hi_dude.fragments.ProfileFemaleFragment
 import com.gmwapp.hi_dude.fragments.ProfileFragment
 import com.gmwapp.hi_dude.fragments.RecentFragment
 import com.gmwapp.hi_dude.retrofit.responses.RazorPayApiResponse
+import com.gmwapp.hi_dude.utils.DPreferences
 import com.gmwapp.hi_dude.viewmodels.AccountViewModel
 import com.gmwapp.hi_dude.viewmodels.OfferViewModel
 import com.gmwapp.hi_dude.viewmodels.ProfileViewModel
@@ -53,6 +54,7 @@ class MainActivity : BaseActivity(), BottomNavigationView.OnNavigationItemSelect
     private val profileViewModel: ProfileViewModel by viewModels()
     private val accountViewModel: AccountViewModel by viewModels()
     private val upiPaymentViewModel: UpiPaymentViewModel by viewModels()
+    private val WalletViewModel: WalletViewModel by viewModels()
 
     lateinit var coinId: String
 
@@ -217,11 +219,23 @@ class MainActivity : BaseActivity(), BottomNavigationView.OnNavigationItemSelect
 
         if (userId != null && pointsId.isNotEmpty()) {
             if (pointsIdInt != null) {
+
+                // ✅ Save userId and pointsIdInt BEFORE launching billing
+                val preferences = DPreferences(this)
+                preferences.setSelectedUserId(userId.toString())
+                preferences.setSelectedPlanId(java.lang.String.valueOf(pointsIdInt))
                 billingManager!!.purchaseProduct(
-                    pointsId,
+//                    "coins_12",
+                        pointsId,
                     userId,
                     pointsIdInt
                 )
+                WalletViewModel.navigateToMain.observe(this, Observer { shouldNavigate ->
+                    val intent = Intent(this, MainActivity::class.java)
+                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                    startActivity(intent)
+                    finish() // ✅ Now this works because we are in an Activity
+                })
             }
         } else {
             Toast.makeText(this, "Invalid input data", Toast.LENGTH_SHORT).show()

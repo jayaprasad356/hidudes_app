@@ -2,6 +2,8 @@ package com.gmwapp.hi_dude.constants
 
 
 object DConstants {
+    val UPDATE_REQUEST_CODE = 1001
+
     const val COUNTRY_CODE: String = "country_code"
     const val MOBILE_NUMBER: String = "mobile_number"
     const val OTP: String = "otp"
