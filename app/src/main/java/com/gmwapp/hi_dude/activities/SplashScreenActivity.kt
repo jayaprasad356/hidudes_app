@@ -300,7 +300,7 @@ class SplashScreenActivity : BaseActivity() {
         description: String
     ) {
 
-        if (currentVersion >= latestVersion) {
+        if (currentVersion.toInt() >= latestVersion.toInt()) {
 //            Toast.makeText(this, "1", Toast.LENGTH_SHORT).show()
             if (userData == null) {
 //                Toast.makeText(this, "2", Toast.LENGTH_SHORT).show()

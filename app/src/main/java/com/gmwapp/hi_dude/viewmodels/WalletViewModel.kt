@@ -29,7 +29,7 @@ class WalletViewModel @Inject constructor(private val walletRepositories: Wallet
     val coinsLiveData = MutableLiveData<CoinsResponse>()
     val addCoinsResponse = MutableLiveData<AddCoinsResponse>()
     val afterAddCoinsLiveData = MutableLiveData<String>()
-    private val _navigateToMain = MutableLiveData<Boolean>()
+    val _navigateToMain = MutableLiveData<Boolean>()
     val navigateToMain: LiveData<Boolean> get() = _navigateToMain
 
     fun getCoins(userId: Int) {

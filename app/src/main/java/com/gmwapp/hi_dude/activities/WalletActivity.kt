@@ -136,16 +136,39 @@ class WalletActivity : BaseActivity()  {
                     preferences.setSelectedUserId(userId.toString())
                     preferences.setSelectedPlanId(java.lang.String.valueOf(pointsIdInt))
                     billingManager!!.purchaseProduct(
-//                        "coins_12",
-                        pointsId,
+                        //"coins_12",
+                       pointsId,
                         userId,
                         pointsIdInt
                     )
                     WalletViewModel.navigateToMain.observe(this, Observer { shouldNavigate ->
-                        val intent = Intent(this, MainActivity::class.java)
-                        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                        startActivity(intent)
-                        finish() // ✅ Now this works because we are in an Activity
+
+                        if (shouldNavigate) {
+                            Toast.makeText(this, "Coin updated successfully", Toast.LENGTH_SHORT)
+                                .show()
+                            userData?.id?.let { profileViewModel.getUsers(it) }
+
+                            profileViewModel.getUserLiveData.observe(this, Observer {
+                                it.data?.let { it1 ->
+                                    BaseApplication.getInstance()?.getPrefs()?.setUserData(it1)
+                                }
+                                binding.tvCoins.text = it.data?.coins.toString()
+                                WalletViewModel._navigateToMain.postValue(false)
+                            })
+                        }else{
+
+                            profileViewModel.getUserLiveData.observe(this, Observer {
+                                it.data?.let { it1 ->
+                                    BaseApplication.getInstance()?.getPrefs()?.setUserData(it1)
+                                }
+                                binding.tvCoins.text = it.data?.coins.toString()
+
+                            })
+                        }
+//                        val intent = Intent(this, MainActivity::class.java)
+//                        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+//                        startActivity(intent)
+//                        finish() // ✅ Now this works because we are in an Activity
                     })
                 }
             } else {
