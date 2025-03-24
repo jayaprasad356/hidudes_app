@@ -140,6 +140,7 @@ dependencies {
     implementation ("com.android.billingclient:billing:7.1.1")
     implementation (libs.app.update)
     implementation (libs.app.update.ktx)
+    implementation (libs.facebook.android.sdk)
 
 
 

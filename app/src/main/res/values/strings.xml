@@ -223,4 +223,8 @@
     <string name="minimum_withdrawal_rs_50">Minimum withdrawal : Rs 50</string>
     <string name="enable_notification">Please enable the notifications to receive the calls properly</string>
 
+    <string name="facebook_app_id">956402286643150</string>
+    <string name="fb_login_protocol_scheme">fb956402286643150</string>
+    <string name="facebook_client_token">fb7da5a71c97c1fba876990b5daf6a41</string>
+
 </resources>

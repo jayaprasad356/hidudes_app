@@ -14,6 +14,7 @@ import androidx.activity.viewModels
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.Observer
+import com.facebook.appevents.AppEventsLogger
 import com.gmwapp.hi_dude.BaseApplication
 import com.gmwapp.hi_dude.BillingManager.BillingManager
 import com.gmwapp.hi_dude.R
@@ -25,7 +26,6 @@ import com.gmwapp.hi_dude.fragments.HomeFragment
 import com.gmwapp.hi_dude.fragments.ProfileFemaleFragment
 import com.gmwapp.hi_dude.fragments.ProfileFragment
 import com.gmwapp.hi_dude.fragments.RecentFragment
-import com.gmwapp.hi_dude.retrofit.responses.RazorPayApiResponse
 import com.gmwapp.hi_dude.utils.DPreferences
 import com.gmwapp.hi_dude.viewmodels.AccountViewModel
 import com.gmwapp.hi_dude.viewmodels.OfferViewModel
@@ -36,7 +36,6 @@ import com.google.android.material.bottomnavigation.BottomNavigationItemView
 import com.google.android.material.bottomnavigation.BottomNavigationMenuView
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.navigation.NavigationBarView
-import com.google.androidbrowserhelper.trusted.LauncherActivity
 import dagger.hilt.android.AndroidEntryPoint
 import kotlin.math.round
 
@@ -57,7 +56,7 @@ class MainActivity : BaseActivity(), BottomNavigationView.OnNavigationItemSelect
     private val WalletViewModel: WalletViewModel by viewModels()
 
     lateinit var coinId: String
-
+    private lateinit var logger: AppEventsLogger
 
 
 
@@ -96,7 +95,16 @@ class MainActivity : BaseActivity(), BottomNavigationView.OnNavigationItemSelect
                 }, 3000)
             }
         }
+
+        logger = AppEventsLogger.newLogger(this) // Initialize Logger
+
+        logSentFriendRequestEvent()
     }
+
+    fun logSentFriendRequestEvent() {
+        logger.logEvent("sentFriendRequest")
+    }
+
     override fun resumeZegoCloud(){
         addRoomStateChangedListener()
         moveTaskToBack(true)
