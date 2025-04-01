@@ -17,8 +17,8 @@ android {
         applicationId = "com.gmwapp.hi_dude"
         minSdk = 26
         targetSdk = 35
-        versionCode = 14
-        versionName = "14.0"
+        versionCode = 15
+        versionName = "15.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
