@@ -31,6 +31,7 @@ import com.gmwapp.hi_dude.retrofit.responses.SpeechTextResponse
 import com.gmwapp.hi_dude.retrofit.responses.TransactionsResponse
 import com.gmwapp.hi_dude.retrofit.responses.UpdateCallStatusResponse
 import com.gmwapp.hi_dude.retrofit.responses.UpdateConnectedCallResponse
+import com.gmwapp.hi_dude.retrofit.responses.UpdateImageResponse
 import com.gmwapp.hi_dude.retrofit.responses.UpdateProfileResponse
 import com.gmwapp.hi_dude.retrofit.responses.UpiPaymentResponse
 import com.gmwapp.hi_dude.retrofit.responses.UpiUpdateResponse
@@ -39,6 +40,7 @@ import com.gmwapp.hi_dude.retrofit.responses.VoiceUpdateResponse
 import com.gmwapp.hi_dude.retrofit.responses.WithdrawResponse
 import com.gmwapp.hi_dude.utils.Helper
 import okhttp3.MultipartBody
+import okhttp3.RequestBody
 import retrofit2.Call
 import retrofit2.Response
 import retrofit2.Retrofit
@@ -304,6 +306,19 @@ class ApiManager @Inject constructor(private val retrofit: Retrofit) {
         }
     }
 
+    fun updateImage(
+        userId: RequestBody,
+        image: MultipartBody.Part?, // ✅ Ensure this is non-null
+        callback: NetworkCallback<UpdateImageResponse>
+    ) {
+        if (Helper.checkNetworkConnection()) {
+            val apiCall: Call<UpdateImageResponse> = getApiInterface().updateImage(userId, image)
+            apiCall.enqueue(callback)
+        } else {
+            callback.onNoNetwork()
+        }
+    }
+
 
     fun updateRating(
         userId: Int,
@@ -495,11 +510,27 @@ class ApiManager @Inject constructor(private val retrofit: Retrofit) {
     fun addCoins(
         userId: Int,
         coinsId: Int,
+        status: Int,
+        massage: String,
         callback: NetworkCallback<AddCoinsResponse>
     ) {
 
         if (Helper.checkNetworkConnection()) {
-            val apiCall: Call<AddCoinsResponse> = getApiInterface().addCoins(userId, coinsId)
+            val apiCall: Call<AddCoinsResponse> = getApiInterface().addCoins(userId, coinsId, status, massage)
+            apiCall.enqueue(callback)
+        } else {
+            callback.onNoNetwork()
+        }
+    }
+
+    fun tryCoins(
+        userId: Int,
+        coinsId: Int,
+        callback: NetworkCallback<AddCoinsResponse>
+    ) {
+
+        if (Helper.checkNetworkConnection()) {
+            val apiCall: Call<AddCoinsResponse> = getApiInterface().tryCoins(userId, coinsId)
             apiCall.enqueue(callback)
         } else {
             callback.onNoNetwork()
@@ -676,6 +707,13 @@ interface ApiInterface {
         @Field("holder_name") holderName: String
     ): Call<BankUpdateResponse>
 
+    @Multipart
+    @POST("update_image")
+    fun updateImage(
+        @Part("user_id") userId: RequestBody,
+        @Part image: MultipartBody.Part?
+    ): Call<UpdateImageResponse>
+
     @FormUrlEncoded
     @POST("ratings")
     fun updateRatings(
@@ -794,6 +832,15 @@ interface ApiInterface {
     @POST("add_coins")
     @FormUrlEncoded
     fun addCoins(
+        @Field("user_id") userId: Int,
+        @Field("coins_id") coinsId: Int,
+        @Field("status") status: Int,
+        @Field("massage") massage: String,
+    ): Call<AddCoinsResponse>
+
+    @POST("try_coins")
+    @FormUrlEncoded
+    fun tryCoins(
         @Field("user_id") userId: Int,
         @Field("coins_id") coinsId: Int,
     ): Call<AddCoinsResponse>

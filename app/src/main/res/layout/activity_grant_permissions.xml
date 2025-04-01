@@ -247,6 +247,55 @@
         app:layout_constraintEnd_toStartOf="@id/gl_right_margin"
         app:layout_constraintBottom_toBottomOf="@+id/cl_notifications" />
 
+    <androidx.constraintlayout.widget.ConstraintLayout
+    android:id="@+id/cl_media"
+    android:layout_width="50dp"
+    android:layout_height="50dp"
+    android:layout_marginTop="16dp"
+    app:layout_constraintStart_toEndOf="@+id/gl_left_margin"
+    app:layout_constraintTop_toBottomOf="@+id/cl_notifications"
+    android:background="@drawable/d_button_bg"
+    android:backgroundTint="@color/button_background">
+
+    <ImageView
+        android:id="@+id/iv_media"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:src="@drawable/ic_file"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHeight_default="percent"
+        app:layout_constraintHeight_percent="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintWidth_default="percent"
+        app:layout_constraintWidth_percent="0.5"
+        app:tint="@color/white" />
+</androidx.constraintlayout.widget.ConstraintLayout>
+
+    <TextView
+        android:id="@+id/tv_media_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:fontFamily="@font/poppins_regular"
+        android:text="@string/photo_and_video"
+        android:textColor="@color/white"
+        android:textSize="14sp"
+        app:layout_constraintStart_toEndOf="@+id/cl_media"
+        app:layout_constraintTop_toTopOf="@+id/cl_media" />
+
+    <TextView
+        android:id="@+id/tv_media_hint"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="@string/photo_video_hint"
+        android:textColor="@color/black_light"
+        android:textSize="12sp"
+        app:layout_constraintStart_toStartOf="@+id/tv_media_title"
+        app:layout_constraintEnd_toStartOf="@id/gl_right_margin"
+        app:layout_constraintBottom_toBottomOf="@+id/cl_media" />
+
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btn_continue"
         android:layout_width="0dp"

@@ -1,19 +1,26 @@
 package com.gmwapp.hi_dude.fragments
 
+import android.Manifest
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.gmwapp.hi_dude.BaseApplication
 import com.gmwapp.hi_dude.R
+import com.gmwapp.hi_dude.activities.GrantPermissionsActivity
 import com.gmwapp.hi_dude.activities.RandomUserActivity
 import com.gmwapp.hi_dude.activities.WalletActivity
 import com.gmwapp.hi_dude.adapters.FemaleUserAdapter
@@ -196,6 +203,65 @@ class HomeFragment : BaseFragment() {
         })
 
         initFab()
+
+        askMediaPermissions()
+
+    }
+
+
+
+    private fun askMediaPermissions() {
+        val requiredPermissions = when {
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE -> { // Android 14+ (API 34)
+                Log.d("askMediaPermissions", "android version :" + Build.VERSION.SDK_INT.toString())
+                Log.d("askMediaPermissions", "android version :" + Build.VERSION_CODES.UPSIDE_DOWN_CAKE.toString())
+                try {
+                    arrayOf(Manifest.permission.READ_MEDIA_VISUAL_USER_SELECTED)  // Access selected media
+                } catch (e : Exception) {
+                    Log.d("askMediaPermissions", "android version :" + e.message)
+                    arrayOf(Manifest.permission.READ_MEDIA_AUDIO)
+                    arrayOf(Manifest.permission.READ_MEDIA_IMAGES)
+                    arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE)
+                }
+            }
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU -> { // Android 13 (API 33)
+                arrayOf(
+                    Manifest.permission.READ_MEDIA_AUDIO,
+                    Manifest.permission.READ_MEDIA_IMAGES
+                )
+            }
+            else -> { // Android 12 and below
+                arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE)
+            }
+        }
+
+        // Check if permissions are already granted
+        if (requiredPermissions.all { ContextCompat.checkSelfPermission(requireActivity(), it) == PackageManager.PERMISSION_GRANTED }) {
+            onMediaPermissionsGranted()
+        } else {
+
+            // Show a message explaining why the permission is needed
+//            Toast.makeText(requireActivity(), "This app needs access to your photos, videos, Microphone and media files.", Toast.LENGTH_LONG).show()
+
+            // Request permissions if not granted
+            requestPermissionLauncher.launch(requiredPermissions)
+        }
+    }
+
+    private val requestPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
+        val allGranted = permissions.all { it.value }
+        if (allGranted) {
+            onMediaPermissionsGranted()
+        } else {
+            val intent = Intent(context, GrantPermissionsActivity::class.java)
+            startActivity(intent)
+//            Toast.makeText(requireActivity(), "Permissions denied. Unable to access media.", Toast.LENGTH_LONG).show()
+        }
+    }
+
+    private fun onMediaPermissionsGranted() {
+//        Toast.makeText(requireActivity(), "Media permissions granted!", Toast.LENGTH_LONG).show()
+        // Proceed with accessing images/videos
     }
 
 //    private fun setupSwipeToRefresh() {

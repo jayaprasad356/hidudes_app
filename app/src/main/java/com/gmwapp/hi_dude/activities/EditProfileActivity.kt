@@ -53,6 +53,7 @@ class EditProfileActivity : BaseActivity() {
 
     private fun initUI() {
         val userData = BaseApplication.getInstance()?.getPrefs()?.getUserData()
+        val profileStatus = userData?.profile_status.toString()
         binding.etUserName.setText(userData?.name)
 
         val gender = userData?.gender
@@ -192,14 +193,19 @@ class EditProfileActivity : BaseActivity() {
             val layoutManager = binding.rvAvatars.layoutManager as CenterLayoutManager
             val avatarId =
                 profileViewModel.avatarsListLiveData.value?.data?.get(layoutManager.findFirstCompletelyVisibleItemPosition())?.id
-            userData?.let { it1 ->
-                avatarId?.let { it2 ->
-                    binding.pbUpdateLoader.visibility = View.VISIBLE
-                    binding.btnUpdate.text = ""
-                    profileViewModel.updateProfile(
-                        it1.id, it2, binding.etUserName.text.toString(), selectedInterests
-                    )
+
+            if (profileStatus == "0") {
+                userData?.let { it1 ->
+                    avatarId?.let { it2 ->
+                        binding.pbUpdateLoader.visibility = View.VISIBLE
+                        binding.btnUpdate.text = ""
+                        profileViewModel.updateProfile(
+                            it1.id, it2, binding.etUserName.text.toString(), selectedInterests
+                        )
+                    }
                 }
+            } else {
+                Toast.makeText(this@EditProfileActivity, "Profile already updated. Avatar can't be changed. For queries, contact support.", Toast.LENGTH_LONG).show()
             }
 
         })

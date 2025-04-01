@@ -53,7 +53,7 @@ public class BillingManager {
     }
 
     private void queryAvailableProducts() {
-        List<String> skuList = List.of("coins_12", "2", "3", "4", "5", "6", "7", "8", "9", "coins_12", "coins_11", "coins_11"); // Ensure these match Play Console
+        List<String> skuList = List.of("coins_11", "coins_12", "2", "3", "4", "5", "6", "7", "8", "9"); // Ensure these match Play Console
         SkuDetailsParams params = SkuDetailsParams.newBuilder()
                 .setSkusList(skuList)
                 .setType(BillingClient.SkuType.INAPP)  // Use .SkuType.SUBS for subscriptions
@@ -116,6 +116,20 @@ public class BillingManager {
     private void handlePurchase(Purchase purchase) {
         Log.e("Billing", "handlePurchase called!");
 
+        // ✅ Retrieve userId and pointsIdInt from SharedPreferences
+        DPreferences preferences = new DPreferences(activity);
+        String savedUserId = preferences.getSelectedUserId();
+        String savedCoinId = preferences.getSelectedPlanId();
+
+        // ✅ Ensure retrieved values are valid
+        if (savedUserId.equals("0") || savedCoinId.equals("0")) {
+            Log.e("Billing", "Invalid saved userId or coinId");
+            return;
+        }
+
+        int user_id = Integer.parseInt(savedUserId);
+        int coin_id = Integer.parseInt(savedCoinId);
+
         if (purchase.getPurchaseState() == Purchase.PurchaseState.PURCHASED) {
             ConsumeParams consumeParams = ConsumeParams.newBuilder()
                     .setPurchaseToken(purchase.getPurchaseToken())
@@ -125,24 +139,10 @@ public class BillingManager {
                 if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.OK) {
                     Log.d("Billing", "Product consumed successfully!");
 
-                    // ✅ Retrieve userId and pointsIdInt from SharedPreferences
-                    DPreferences preferences = new DPreferences(activity);
-                    String savedUserId = preferences.getSelectedUserId();
-                    String savedCoinId = preferences.getSelectedPlanId();
-
-                    // ✅ Ensure retrieved values are valid
-                    if (savedUserId.equals("0") || savedCoinId.equals("0")) {
-                        Log.e("Billing", "Invalid saved userId or coinId");
-                        return;
-                    }
-
-                    int user_id = Integer.parseInt(savedUserId);
-                    int coin_id = Integer.parseInt(savedCoinId);
-
                     try {
                         WalletViewModel walletViewModel = new ViewModelProvider((ViewModelStoreOwner) activity).get(WalletViewModel.class);
                         Log.e("Billing", "Calling addCoins with userId=" + user_id + ", coinId=" + coin_id);
-                        walletViewModel.addCoins(user_id, coin_id);
+                        walletViewModel.addCoins(user_id, coin_id, 1, "Coins purchased");
 
                         activity.runOnUiThread(() ->
                                 Toast.makeText(activity, "Coins purchased successfully", Toast.LENGTH_SHORT).show()
@@ -156,6 +156,24 @@ public class BillingManager {
                         );
                     }
                 } else {
+
+                    try {
+                        WalletViewModel walletViewModel = new ViewModelProvider((ViewModelStoreOwner) activity).get(WalletViewModel.class);
+                        Log.e("Billing", "Calling addCoins with userId=" + user_id + ", coinId=" + coin_id);
+                        walletViewModel.addCoins(user_id, coin_id, 1, "Failed to consume purchase: " + billingResult.getResponseCode());
+
+                        activity.runOnUiThread(() ->
+                                        Toast.makeText(activity, "Coins purchased successfully", Toast.LENGTH_SHORT).show()
+//                                Toast.makeText(activity, "Calling addCoins with userId=" + user_id + ", coinId=" + coin_id, Toast.LENGTH_SHORT).show()
+                        );
+
+                    } catch (Exception e) {
+                        Log.e("Billing", "Error updating coins: " + e.getMessage());
+                        activity.runOnUiThread(() ->
+                                Toast.makeText(activity, "Billing Error: " + e.getMessage(), Toast.LENGTH_SHORT).show()
+                        );
+                    }
+
                     Toast.makeText(activity, "Failed to consume purchase: " + billingResult.getResponseCode(), Toast.LENGTH_SHORT).show();
                     Log.e("Billing", "Failed to consume purchase: " + billingResult.getResponseCode());
                 }

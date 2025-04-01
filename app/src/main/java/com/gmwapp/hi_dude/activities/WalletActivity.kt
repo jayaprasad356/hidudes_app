@@ -1,13 +1,22 @@
 package com.gmwapp.hi_dude.activities
 
+import androidx.appcompat.app.AlertDialog
 import android.content.Intent
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
+import android.view.LayoutInflater
 import android.view.View
 import android.widget.Button
+import android.widget.ImageView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
+import androidx.browser.customtabs.CustomTabsIntent
+import androidx.core.content.ContentProviderCompat.requireContext
+import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.Observer
@@ -21,6 +30,7 @@ import com.gmwapp.hi_dude.adapters.CoinAdapter
 import com.gmwapp.hi_dude.callbacks.OnItemSelectionListener
 import com.gmwapp.hi_dude.databinding.ActivityWalletBinding
 import com.gmwapp.hi_dude.retrofit.responses.CoinsResponseData
+import com.gmwapp.hi_dude.retrofit.responses.RazorPayApiResponse
 import com.gmwapp.hi_dude.utils.DPreferences
 import com.gmwapp.hi_dude.utils.setOnSingleClickListener
 import com.gmwapp.hi_dude.viewmodels.AccountViewModel
@@ -28,6 +38,9 @@ import com.gmwapp.hi_dude.viewmodels.ProfileViewModel
 import com.gmwapp.hi_dude.viewmodels.UpiPaymentViewModel
 import com.gmwapp.hi_dude.viewmodels.UpiViewModel
 import com.gmwapp.hi_dude.viewmodels.WalletViewModel
+import com.google.android.material.button.MaterialButton
+import com.google.androidbrowserhelper.trusted.LauncherActivity
+import com.zegocloud.uikit.prebuilt.call.core.utils.Storage.context
 import dagger.hilt.android.AndroidEntryPoint
 
 
@@ -61,7 +74,7 @@ class WalletActivity : BaseActivity()  {
             insets
         }
         initUI()
-//        addObservers()
+        addObservers()
 
     }
 
@@ -78,31 +91,33 @@ class WalletActivity : BaseActivity()  {
 //        binding.rvPlans.addItemDecoration(SpacesItemDecoration(20))
         binding.rvPlans.setLayoutManager(layoutManager)
 //        binding.rvPlans.addItemDecoration(SpacesItemDecoration(10))
-        BaseApplication.getInstance()?.getPrefs()?.getUserData()?.let { WalletViewModel.getCoins(it.id) }
+        BaseApplication.getInstance()?.getPrefs()?.getUserData()
+            ?.let { WalletViewModel.getCoins(it.id) }
         WalletViewModel.coinsLiveData.observe(this, Observer {
 
-            if(it.success){
+            if (it.success) {
                 //  Toast.makeText(this, it.message, Toast.LENGTH_SHORT).show()
-            }
-            else{
+            } else {
                 Toast.makeText(this, it.message, Toast.LENGTH_SHORT).show()
             }
 
-            if (it!=null && it.success && it.data != null) {
+            if (it != null && it.success && it.data != null) {
                 // Create the adapter
-                val coinAdapter = CoinAdapter(this, it.data, object : OnItemSelectionListener<CoinsResponseData> {
-                    override fun onItemSelected(coin: CoinsResponseData) {
-                        // Update button text and make it visible when an item is selected
-                        binding.btnAddCoins.text = getString(R.string.add_quantity_coins, coin.coins)
-                        binding.btnAddCoins.visibility = View.VISIBLE
-                        amount = coin.price.toString()
-                        pointsId = coin.id.toString()
+                val coinAdapter =
+                    CoinAdapter(this, it.data, object : OnItemSelectionListener<CoinsResponseData> {
+                        override fun onItemSelected(coin: CoinsResponseData) {
+                            // Update button text and make it visible when an item is selected
+                            binding.btnAddCoins.text =
+                                getString(R.string.add_quantity_coins, coin.coins)
+                            binding.btnAddCoins.visibility = View.VISIBLE
+                            amount = coin.price.toString()
+                            pointsId = coin.id.toString()
 
-                    }
+                        }
 
-                    val number: CoinsResponseData?
-                        get() = null
-                })
+                        val number: CoinsResponseData?
+                            get() = null
+                    })
 
                 // Set the adapter
                 binding.rvPlans.adapter = coinAdapter
@@ -110,7 +125,8 @@ class WalletActivity : BaseActivity()  {
                 // Set default button text and visibility for the first item
                 if (it.data.isNotEmpty()) {
                     val firstCoin = it.data[0]
-                    binding.btnAddCoins.text = getString(R.string.add_quantity_coins, firstCoin.coins)
+                    binding.btnAddCoins.text =
+                        getString(R.string.add_quantity_coins, firstCoin.coins)
                     binding.btnAddCoins.visibility = View.VISIBLE
                     amount = firstCoin.price.toString()
                     pointsId = firstCoin.id.toString()
@@ -126,7 +142,9 @@ class WalletActivity : BaseActivity()  {
 
             val userData = BaseApplication.getInstance()?.getPrefs()?.getUserData()
             val userId = userData?.id
-            val pointsIdInt = pointsId.toIntOrNull()
+            val pointsIdInt: Int = pointsId.toIntOrNull() ?: 0
+
+//            showEditProfileDialog(pointsIdInt)
 
             if (userId != null && pointsId.isNotEmpty()) {
                 if (pointsIdInt != null) {
@@ -135,9 +153,10 @@ class WalletActivity : BaseActivity()  {
                     val preferences = DPreferences(this)
                     preferences.setSelectedUserId(userId.toString())
                     preferences.setSelectedPlanId(java.lang.String.valueOf(pointsIdInt))
+                    WalletViewModel.tryCoins(userId, pointsIdInt)
                     billingManager!!.purchaseProduct(
                         //"coins_12",
-                       pointsId,
+                        pointsId,
                         userId,
                         pointsIdInt
                     )
@@ -155,7 +174,7 @@ class WalletActivity : BaseActivity()  {
                                 binding.tvCoins.text = it.data?.coins.toString()
                                 WalletViewModel._navigateToMain.postValue(false)
                             })
-                        }else{
+                        } else {
 
                             profileViewModel.getUserLiveData.observe(this, Observer {
                                 it.data?.let { it1 ->
@@ -175,7 +194,7 @@ class WalletActivity : BaseActivity()  {
                 Toast.makeText(this, "Invalid input data", Toast.LENGTH_SHORT).show()
             }
         })
-
+    }
 
 //        binding.btnAddCoins.setOnSingleClickListener {
 //            val userData = BaseApplication.getInstance()?.getPrefs()?.getUserData()
@@ -243,25 +262,15 @@ class WalletActivity : BaseActivity()  {
 //                                                Toast.makeText(this@WalletActivity, "Failed: ${t.message}", Toast.LENGTH_SHORT).show()
 //                                            }
 //                                        })
-//
-//
-//
-//
-//
 //                                    }
 //
 //                                    "upigateway" ->{
-//
 //                                        Log.d("useing", "upigateway")
-//
 //                                        val userData = BaseApplication.getInstance()?.getPrefs()?.getUserData()
 //                                        var userid = userData?.id
-//
 //                                        Log.d("useing", "upigateway")
-//
-//
 //                                        userid?.let {
-//                                            val clientTxnId = generateRandomTxnId(it,pointsId)  // Generate a new transaction ID
+//                                            val clientTxnId = generateRandomTxnId(it, pointsId) // Generate a new transaction ID
 //                                            upiPaymentViewModel.createUpiPayment(it, clientTxnId, total_amount)
 //                                            Log.d("upigateway", "upigateway: " + it + " + " + clientTxnId + " + " + total_amount)
 //                                        }
@@ -293,10 +302,6 @@ class WalletActivity : BaseActivity()  {
 //                                                Toast.makeText(this@WalletActivity, "Failed: ${t.message}", Toast.LENGTH_SHORT).show()
 //                                            }
 //                                        })
-//
-//
-//
-//
 //                                    }
 //                                    else -> {
 //                                        Toast.makeText(this, "Invalid Payment Gateway", Toast.LENGTH_SHORT).show()
@@ -306,73 +311,196 @@ class WalletActivity : BaseActivity()  {
 //                        }
 //                    }
 //                })
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
 //            } else {
 //                Toast.makeText(this, "Invalid input data", Toast.LENGTH_SHORT).show()
 //            }
 //        }
 //    }
-//
-//
 
     fun generateRandomTxnId(userId: Int, coinId: String): String {
         return "$userId-$coinId-${System.currentTimeMillis()}"
     }
 
-  }
-//    private fun addObservers() {
-//        WalletViewModel.afterAddCoinsLiveData.observe(this, Observer { afterAddCoins ->
-//            if (afterAddCoins != null) {
-//                Log.d("UI Update", "Coins updated successfully. Refreshing UI.")
-//
-//                // ✅ Update UI
-//                binding.tvCoins.text = afterAddCoins.toString()
-//
-//                // ✅ Fetch updated user profile
-//                BaseApplication.getInstance()?.getPrefs()?.getUserData()?.id?.let {
-//                    profileViewModel.getUsers(it)
-//                }
-//            }
-//        })
-//
-//        viewModel.addpointResponseLiveData.observe(this, Observer {
-//            if (it != null && it.success) {
-//                Toast.makeText(this, it.message, Toast.LENGTH_SHORT).show()
-//            } else {
-//                Toast.makeText(this, it.message, Toast.LENGTH_SHORT).show()
-//            }
-//        })
-//
-//        upiPaymentViewModel.upiPaymentLiveData.observe(this, Observer { response ->
-//            if (response != null && response.status) {
-//                val paymentUrl = response.data.firstOrNull()?.payment_url
-//                if (!paymentUrl.isNullOrEmpty()) {
-//                    Log.d("UPI Payment", "Payment URL: $paymentUrl")
-//                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse(paymentUrl))
-//                    startActivity(intent)
-//                } else {
-//                    Log.e("UPI Payment Error", "Payment URL is null or empty")
-//                    Toast.makeText(this, "Payment URL not found. Please try again later.", Toast.LENGTH_LONG).show()
-//                }
-//            } else {
-//                Log.e("UPI Payment Error", "Invalid response: ${response?.data}")
-//                Toast.makeText(this, "Payment failed. Please check your internet or payment details.", Toast.LENGTH_LONG).show()
-//            }
-//        })
-//    }
+    private fun addObservers() {
+        WalletViewModel.afterAddCoinsLiveData.observe(this, Observer { afterAddCoins ->
+            if (afterAddCoins != null) {
+                Log.d("UI Update", "Coins updated successfully. Refreshing UI.")
 
+                // ✅ Update UI
+                binding.tvCoins.text = afterAddCoins.toString()
+
+                // ✅ Fetch updated user profile
+                BaseApplication.getInstance()?.getPrefs()?.getUserData()?.id?.let {
+                    profileViewModel.getUsers(it)
+                }
+            }
+        })
+
+        viewModel.addpointResponseLiveData.observe(this, Observer {
+            if (it != null && it.success) {
+                Toast.makeText(this, it.message, Toast.LENGTH_SHORT).show()
+            } else {
+                Toast.makeText(this, it.message, Toast.LENGTH_SHORT).show()
+            }
+        })
+
+        upiPaymentViewModel.upiPaymentLiveData.observe(this, Observer { response ->
+            if (response != null && response.status) {
+                val paymentUrl = response.data.firstOrNull()?.payment_url
+                if (!paymentUrl.isNullOrEmpty()) {
+                    Log.d("UPI Payment", "Payment URL: $paymentUrl")
+                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse(paymentUrl))
+                    startActivity(intent)
+                } else {
+                    Log.e("UPI Payment Error", "Payment URL is null or empty")
+                    Toast.makeText(this, "Payment URL not found. Please try again later.", Toast.LENGTH_LONG).show()
+                }
+            } else {
+                Log.e("UPI Payment Error", "Invalid response: ${response?.data}")
+                Toast.makeText(this, "Payment failed. Please check your internet or payment details.", Toast.LENGTH_LONG).show()
+            }
+        })
+    }
+
+    private fun showEditProfileDialog(pointsIdInt: Int) {
+        val dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_edit_profile, null)
+        val builder = AlertDialog.Builder(this, R.style.MaterialAlertDialogTheme)
+            .setView(dialogView)
+
+        val dialog = builder.create()
+        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        dialog.show()
+
+
+        val userData = BaseApplication.getInstance()?.getPrefs()?.getUserData()
+
+        val userId = userData?.id
+        val name = userData?.name ?: ""
+        val email = "test@gmail.com"
+        val mobile = userData?.mobile ?: ""
+
+        // get 2 percentage of amount
+        val twoPercentage = amount.toDouble() * 0.02
+        val roundedAmount = Math.round(twoPercentage)
+        val total_amount = (amount.toDouble() + roundedAmount).toString()
+
+        dialogView.findViewById<MaterialButton>(R.id.btn_upload_photo).setText("Default Pay")
+
+        dialogView.findViewById<MaterialButton>(R.id.btn_upload_photo).apply {
+            setText("QR Scanner") // Set button text
+            setIconResource(0) // Removes the icon
+            // or
+            // icon = null
+        }
+
+        dialogView.findViewById<MaterialButton>(R.id.btn_edit_profile).apply {
+            setText("Direct Pay") // Set button text
+            setIconResource(0) // Removes the icon
+        }
+
+        // Set up button click listeners
+        dialogView.findViewById<MaterialButton>(R.id.btn_edit_profile).setOnClickListener {
+            if (userId != null && pointsId.isNotEmpty()) {
+                if (pointsIdInt != null) {
+
+                    // ✅ Save userId and pointsIdInt BEFORE launching billing
+                    val preferences = DPreferences(this)
+                    preferences.setSelectedUserId(userId.toString())
+                    preferences.setSelectedPlanId(java.lang.String.valueOf(pointsIdInt))
+                    WalletViewModel.tryCoins(userId, pointsIdInt)
+                    billingManager!!.purchaseProduct(
+                        //"coins_12",
+                        pointsId,
+                        userId,
+                        pointsIdInt
+                    )
+                    WalletViewModel.navigateToMain.observe(this, Observer { shouldNavigate ->
+
+                        if (shouldNavigate) {
+                            Toast.makeText(this, "Coin updated successfully", Toast.LENGTH_SHORT)
+                                .show()
+                            userData.id.let { profileViewModel.getUsers(it) }
+
+                            profileViewModel.getUserLiveData.observe(this, Observer {
+                                it.data?.let { it1 ->
+                                    BaseApplication.getInstance()?.getPrefs()?.setUserData(it1)
+                                }
+                                binding.tvCoins.text = it.data?.coins.toString()
+                                WalletViewModel._navigateToMain.postValue(false)
+                            })
+                        }else{
+
+                            profileViewModel.getUserLiveData.observe(this, Observer {
+                                it.data?.let { it1 ->
+                                    BaseApplication.getInstance()?.getPrefs()?.setUserData(it1)
+                                }
+                                binding.tvCoins.text = it.data?.coins.toString()
+
+                            })
+                        }
+//                        val intent = Intent(this, MainActivity::class.java)
+//                        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+//                        startActivity(intent)
+//                        finish() // ✅ Now this works because we are in an Activity
+                    })
+                }
+            } else {
+                Toast.makeText(this, "Invalid input data", Toast.LENGTH_SHORT).show()
+            }
+            dialog.dismiss()
+        }
+
+        dialogView.findViewById<MaterialButton>(R.id.btn_upload_photo).setOnClickListener {
+            if (userId != null && pointsId.isNotEmpty() && total_amount.isNotEmpty()) {
+                val userIdWithPoints = "$userId-$pointsId"
+
+                val apiService = RetrofitClient.instance
+                val call = apiService.addCoins(name, total_amount, email, mobile, userIdWithPoints)
+                val callRazor = apiService.addCoinsRazorPay(userIdWithPoints,name,total_amount,email,mobile)
+
+                accountViewModel.getSettings()
+
+                accountViewModel.settingsLiveData.observe(this, Observer { response ->
+                    if (response != null && response.success) {
+                        response.data?.let { settingsList ->
+                            if (settingsList.isNotEmpty()) {
+                                val settingsData = settingsList[0]
+
+                                when ("upigateway") {
+
+                                    "upigateway" ->{
+                                        Log.d("useing", "upigateway")
+                                        val userData = BaseApplication.getInstance()?.getPrefs()?.getUserData()
+                                        var userid = userData?.id
+                                        Log.d("useing", "upigateway")
+                                        userid?.let {
+                                            val clientTxnId = generateRandomTxnId(it, pointsId) // Generate a new transaction ID
+                                            upiPaymentViewModel.createUpiPayment(it, clientTxnId, total_amount)
+                                            Log.d("upigateway", "upigateway: " + it + " + " + clientTxnId + " + " + total_amount)
+                                        }
+                                    }
+                                    else -> {
+                                        Toast.makeText(this, "Invalid Payment Gateway", Toast.LENGTH_SHORT).show()
+                                    }
+                                }
+                            }
+                        }
+                    }
+                })
+            } else {
+                Toast.makeText(this, "Invalid input data", Toast.LENGTH_SHORT).show()
+            }
+
+            dialog.dismiss()
+        }
+
+        dialogView.findViewById<ImageView>(R.id.iv_close).setOnClickListener {
+            dialog.dismiss()
+        }
+
+        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT)) // Removes default dialog background
+        dialog.show()
+    }
 
     private fun refreshUI() {
         val intent = intent

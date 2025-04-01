@@ -39,5 +39,6 @@ data class UserData (
     val ifsc:String?,
     val holder_name:String?,
     val upi_id:String?,
+    val profile_status:String?,
 
 )

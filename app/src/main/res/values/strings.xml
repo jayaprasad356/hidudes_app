@@ -179,6 +179,7 @@
     <string name="camera_hint"><![CDATA[Settings > Apps > App management > HI dude > Permission > Camera]]></string>
     <string name="microphone_hint"><![CDATA[Settings > Apps > App management > HI dude > Permission > Microphone]]></string>
     <string name="notofications_hint"><![CDATA[Settings > Apps > App management > HI dude > Permission > Notifications]]></string>
+    <string name="photo_video_hint"><![CDATA[Settings > Apps > App management > HI dude > Permission > Photos and Videos]]></string>
     <string name="microphone">Microphone</string>
     <string name="please_enter_the_valid_otp">Please enter the valid OTP</string>
     <string name="warning_end_call">Are you sure you want to end your call?</string>
@@ -226,5 +227,6 @@
     <string name="facebook_app_id">956402286643150</string>
     <string name="fb_login_protocol_scheme">fb956402286643150</string>
     <string name="facebook_client_token">fb7da5a71c97c1fba876990b5daf6a41</string>
+    <string name="photo_and_video">Photo and Video</string>
 
 </resources>

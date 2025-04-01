@@ -17,8 +17,8 @@ android {
         applicationId = "com.gmwapp.hi_dude"
         minSdk = 26
         targetSdk = 35
-        versionCode = 13
-        versionName = "13.0"
+        versionCode = 14
+        versionName = "14.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -39,7 +39,8 @@ android {
         create("development") {
             dimension = "hidude"
           applicationIdSuffix = ".dev"
-            buildConfigField( "String", "BASE_URL",  "\"https://demohidude.in/api/auth/\"")
+//            buildConfigField( "String", "BASE_URL",  "\"https://demohidude.in/api/auth/\"")
+            buildConfigField( "String", "BASE_URL",  "\"https://demo.hidude.in/api/auth/\"")
         }
         create("production") {
             dimension = "hidude"
@@ -141,6 +142,8 @@ dependencies {
     implementation (libs.app.update)
     implementation (libs.app.update.ktx)
     implementation (libs.facebook.android.sdk)
+    implementation (libs.android.image.cropper)
+//    implementation ("com.vanniktech:android-image-cropper:4.5.0")
 
 
 

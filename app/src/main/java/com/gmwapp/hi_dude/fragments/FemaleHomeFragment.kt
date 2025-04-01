@@ -18,6 +18,7 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.browser.customtabs.CustomTabsClient.getPackageName
+import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.viewModels
@@ -95,6 +96,7 @@ class FemaleHomeFragment : BaseFragment() {
         isPermissionDenied = sharedPreferences.getBoolean("isTagSet", false)
         initUI()
         askPermissions()
+        askMediaPermissions()
         return binding.root
     }
 
@@ -183,6 +185,60 @@ class FemaleHomeFragment : BaseFragment() {
             val intent = Intent(context, GrantPermissionsActivity::class.java)
             startActivity(intent)
         }
+    }
+
+    private fun askMediaPermissions() {
+        val requiredPermissions = when {
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE -> { // Android 14+ (API 34)
+                Log.d("askMediaPermissions", "android version :" + Build.VERSION.SDK_INT.toString())
+                Log.d("askMediaPermissions", "android version :" + Build.VERSION_CODES.UPSIDE_DOWN_CAKE.toString())
+                try {
+                    arrayOf(Manifest.permission.READ_MEDIA_VISUAL_USER_SELECTED)  // Access selected media
+                } catch (e : Exception) {
+                    Log.d("askMediaPermissions", "android version :" + e.message)
+                    arrayOf(Manifest.permission.READ_MEDIA_AUDIO)
+                    arrayOf(Manifest.permission.READ_MEDIA_IMAGES)
+                    arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE)
+                }
+            }
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU -> { // Android 13 (API 33)
+                arrayOf(
+                    Manifest.permission.READ_MEDIA_AUDIO,
+                    Manifest.permission.READ_MEDIA_IMAGES
+                )
+            }
+            else -> { // Android 12 and below
+                arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE)
+            }
+        }
+
+        // Check if permissions are already granted
+        if (requiredPermissions.all { ContextCompat.checkSelfPermission(requireActivity(), it) == PackageManager.PERMISSION_GRANTED }) {
+            onMediaPermissionsGranted()
+        } else {
+
+            // Show a message explaining why the permission is needed
+//            Toast.makeText(requireActivity(), "This app needs access to your photos, videos, Microphone and media files.", Toast.LENGTH_LONG).show()
+
+            // Request permissions if not granted
+            requestMediaPermissionLauncher.launch(requiredPermissions)
+        }
+    }
+
+    private val requestMediaPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
+        val allGranted = permissions.all { it.value }
+        if (allGranted) {
+            onMediaPermissionsGranted()
+        } else {
+            val intent = Intent(context, GrantPermissionsActivity::class.java)
+            startActivity(intent)
+//            Toast.makeText(requireActivity(), "Permissions denied. Unable to access media.", Toast.LENGTH_LONG).show()
+        }
+    }
+
+    private fun onMediaPermissionsGranted() {
+//        Toast.makeText(requireActivity(), "Media permissions granted!", Toast.LENGTH_LONG).show()
+        // Proceed with accessing images/videos
     }
 
     private fun checkOverlayPermission() {
