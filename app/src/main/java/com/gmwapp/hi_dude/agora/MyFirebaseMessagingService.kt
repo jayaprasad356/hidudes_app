@@ -36,7 +36,7 @@ import com.gmwapp.hi_dude.BaseApplication
 import com.gmwapp.hi_dude.R
 import com.gmwapp.hi_dude.activities.BankUpdateActivity
 import com.gmwapp.hi_dude.activities.EarningsActivity
-import com.gmwapp.hi_dude.activities.FemaleAudioCallingActivity
+import com.gmwapp.hi_dude.agora.female.FemaleAudioCallingActivity
 import com.gmwapp.hi_dude.activities.MainActivity
 import com.gmwapp.hi_dude.agora.female.FemaleCallAcceptActivity
 import com.gmwapp.hi_dude.agora.female.FemaleVideoCallingActivity

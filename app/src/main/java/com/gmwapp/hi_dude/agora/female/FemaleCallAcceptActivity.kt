@@ -20,7 +20,7 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.gmwapp.hi_dude.BaseApplication
 import com.gmwapp.hi_dude.R
-import com.gmwapp.hi_dude.activities.FemaleAudioCallingActivity
+import com.gmwapp.hi_dude.agora.female.FemaleAudioCallingActivity
 import com.gmwapp.hi_dude.activities.MainActivity
 import com.gmwapp.hi_dude.agora.MyFirebaseMessagingService
 import com.gmwapp.hi_dude.databinding.ActivityFemaleCallAcceptBinding

@@ -1,5 +1,6 @@
 package com.gmwapp.hi_dude.viewmodels
 
+import android.content.Context
 import android.content.Intent
 import android.util.Log
 import android.widget.Toast
@@ -15,8 +16,9 @@ import com.gmwapp.hi_dude.retrofit.responses.AddCoinsResponse
 import com.gmwapp.hi_dude.retrofit.responses.CoinsResponse
 import com.gmwapp.hi_dude.retrofit.responses.UpiPaymentResponse
 import com.gmwapp.hi_dude.utils.DPreferences
-import com.zegocloud.uikit.prebuilt.call.core.utils.Storage.context
+//import com.zegocloud.uikit.prebuilt.call.core.utils.Storage.context
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Response
@@ -24,7 +26,9 @@ import javax.inject.Inject
 
 
 @HiltViewModel
-class WalletViewModel @Inject constructor(private val walletRepositories: WalletRepositories) : ViewModel() {
+class WalletViewModel @Inject constructor(private val walletRepositories: WalletRepositories,
+                                          @ApplicationContext private val context: Context
+) : ViewModel() {
 
     val coinsLiveData = MutableLiveData<CoinsResponse>()
     val addCoinsResponse = MutableLiveData<AddCoinsResponse>()

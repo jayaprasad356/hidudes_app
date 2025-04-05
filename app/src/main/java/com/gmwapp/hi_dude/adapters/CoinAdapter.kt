@@ -2,6 +2,7 @@ package com.gmwapp.hi_dude.adapters
 
 import android.app.Activity
 import android.graphics.Paint
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,7 +12,7 @@ import com.gmwapp.hi_dude.callbacks.OnItemSelectionListener
 import com.gmwapp.hi_dude.databinding.AdapterCoinBinding
 import com.gmwapp.hi_dude.retrofit.responses.CoinsResponseData
 import com.gmwapp.hi_dude.utils.setOnSingleClickListener
-import com.zego.ve.Log
+//import com.zego.ve.Log
 
 
 class CoinAdapter(

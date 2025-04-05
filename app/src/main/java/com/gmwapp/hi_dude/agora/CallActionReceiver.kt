@@ -6,7 +6,7 @@ import android.content.Context
 import android.content.Intent
 import android.util.Log
 import com.gmwapp.hi_dude.BaseApplication
-import com.gmwapp.hi_dude.activities.FemaleAudioCallingActivity
+import com.gmwapp.hi_dude.agora.female.FemaleAudioCallingActivity
 import com.gmwapp.hi_dude.activities.MainActivity
 import com.gmwapp.hi_dude.agora.female.FemaleCallAcceptActivity
 import com.gmwapp.hi_dude.agora.female.FemaleVideoCallingActivity

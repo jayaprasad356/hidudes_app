@@ -18,8 +18,8 @@ import com.gmwapp.hi_dude.utils.DPreferences
 import com.google.firebase.FirebaseApp
 import com.onesignal.OneSignal
 import com.onesignal.debug.LogLevel
-import com.zegocloud.uikit.prebuilt.call.core.CallInvitationServiceImpl
-import com.zegocloud.uikit.prebuilt.call.core.notification.RingtoneManager
+//import com.zegocloud.uikit.prebuilt.call.core.CallInvitationServiceImpl
+//import com.zegocloud.uikit.prebuilt.call.core.notification.RingtoneManager
 import dagger.hilt.android.HiltAndroidApp
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

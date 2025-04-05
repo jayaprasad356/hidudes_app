@@ -21,6 +21,8 @@
     <!-- Devices running Android 13 (API level 33) or higher -->
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
     <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" />
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.READ_MEDIA_AUDIO" />
 
     <!-- To handle the reselection within the app on devices running Android 14
          or higher if your app targets Android 14 (API level 34) or higher.  -->
@@ -58,6 +60,16 @@
             android:name=".activities.BankUpdateActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".agora.female.FemaleAudioCallingActivity"
+            android:exported="false"
+            android:showWhenLocked="true"
+            android:turnScreenOn="true"
+            android:launchMode="singleTask" />
+
+<!--        <activity-->
+<!--            android:name=".agora.female.FemaleAudioCallingActivity"-->
+<!--            android:exported="false" />-->
         <activity
             android:name=".agora.female.FemaleCallAcceptActivity"
             android:exported="false" />
@@ -235,14 +247,14 @@
 <!--            android:foregroundServiceType="microphone"-->
 <!--            android:exported="false">-->
 <!--        </service>-->
-        <receiver
-            android:name=".receivers.CallReceiver"
-            android:enabled="true"
-            android:exported="true" >
-            <intent-filter>
-                <action android:name="im.zego.zim.zpns.intent.action.MESSAGE" />
-            </intent-filter>
-        </receiver>
+<!--        <receiver-->
+<!--            android:name=".receivers.CallReceiver"-->
+<!--            android:enabled="true"-->
+<!--            android:exported="true" >-->
+<!--            <intent-filter>-->
+<!--                <action android:name="im.zego.zim.zpns.intent.action.MESSAGE" />-->
+<!--            </intent-filter>-->
+<!--        </receiver>-->
 
     </application>
 

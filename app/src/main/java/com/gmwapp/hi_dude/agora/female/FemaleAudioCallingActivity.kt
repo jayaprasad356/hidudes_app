@@ -1,4 +1,4 @@
-package com.gmwapp.hi_dude.activities
+package com.gmwapp.hi_dude.agora.female
 
 import android.Manifest
 import android.app.Dialog
@@ -334,7 +334,9 @@ class FemaleAudioCallingActivity : AppCompatActivity() {
             if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 setupAudioSDKEngine()
                 joinChannel(binding.JoinButton) // Automatically join the channel
+                Log.d("checking_permission", "Permission granted ${grantResults[0]}")
             } else {
+                Log.d("checking_permission", "Permission not granted $${grantResults[0]}")
                 ActivityCompat.requestPermissions(this, REQUESTED_PERMISSIONS, PERMISSION_REQ_ID)
             }
         }

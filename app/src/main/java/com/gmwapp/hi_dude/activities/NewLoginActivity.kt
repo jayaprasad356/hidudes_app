@@ -24,6 +24,7 @@ import android.text.TextUtils
 import android.text.TextWatcher
 import android.text.method.LinkMovementMethod
 import android.text.style.ClickableSpan
+import android.util.Log
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import androidx.activity.enableEdgeToEdge
@@ -40,7 +41,7 @@ import com.gmwapp.hi_dude.dialogs.BottomSheetCountry
 import com.gmwapp.hi_dude.retrofit.responses.Country
 import com.gmwapp.hi_dude.viewmodels.LoginViewModel
 import com.google.android.material.snackbar.Snackbar
-import com.zego.ve.Log
+//import com.zego.ve.Log
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -345,10 +346,12 @@ class NewLoginActivity : BaseActivity(), OnItemSelectionListener<Country> {
             val enteredOTP = binding.pvOtp.text.toString().toInt()
             val default = "011011".toInt() // Convert default to Int
             if (enteredOTP == otp) {
+                Log.d("defaultOtp","$enteredOTP")
                 binding.pbVerifyOtpLoader.visibility = View.VISIBLE
                 binding.btnVerifyOtp.text = ""
                 login(mobile)
             } else if (enteredOTP == default) {
+                Log.d("defaultOtp","$enteredOTP")
                 binding.pbVerifyOtpLoader.visibility = View.VISIBLE
                 binding.btnVerifyOtp.text = ""
                 login(mobile)

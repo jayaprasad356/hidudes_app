@@ -83,7 +83,7 @@ class MaleVideoCallingActivity : AppCompatActivity() {
 
     private val appId = "846d67df5699400994e29f653050c386"
 
-    var appCertificate = "9565a122acba4144926a12214064fd57"
+    var appCertificate = "29110f27c845422d8474dd24508df317"
     var expirationTimeInSeconds = 3600
     lateinit var channelName : String
     private var token : String? = null
