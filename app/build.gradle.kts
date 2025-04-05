@@ -17,8 +17,8 @@ android {
         applicationId = "com.gmwapp.hi_dude"
         minSdk = 26
         targetSdk = 35
-        versionCode = 16
-        versionName = "16.0"
+        versionCode = 15
+        versionName = "15.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -118,7 +118,7 @@ dependencies {
     implementation ("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
 
 
-    implementation ("com.github.ZEGOCLOUD:zego_uikit_prebuilt_call_android:3.9.1-beta2")
+//    implementation ("com.github.ZEGOCLOUD:zego_uikit_prebuilt_call_android:3.9.1-beta2")
 
     implementation ("com.airbnb.android:lottie:3.4.0")
 
@@ -145,7 +145,14 @@ dependencies {
     implementation (libs.android.image.cropper)
 //    implementation ("com.vanniktech:android-image-cropper:4.5.0")
 
+//agora
+    implementation("io.agora.rtc:full-sdk:4.5.0")
+//    implementation("io.agora:agora-rtm:2.2.2")
+    implementation("commons-codec:commons-codec:1.9")
+    implementation ("com.android.billingclient:billing:7.1.1")
 
+    implementation(platform("com.google.firebase:firebase-bom:32.7.2"))
+    implementation("com.google.firebase:firebase-messaging")
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

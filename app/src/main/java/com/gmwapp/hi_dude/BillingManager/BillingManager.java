@@ -2,8 +2,6 @@ package com.gmwapp.hi_dude.BillingManager;
 
 import android.app.Activity;
 import android.content.SharedPreferences;
-import android.os.Handler;
-import android.os.Looper;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -141,60 +139,45 @@ public class BillingManager {
                 if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.OK) {
                     Log.d("Billing", "Product consumed successfully!");
 
-                    WalletViewModel walletViewModel = new ViewModelProvider((ViewModelStoreOwner) activity).get(WalletViewModel.class);
-                    Log.e("Billing", "Calling addCoins with userId=" + user_id + ", coinId=" + coin_id);
-                    walletViewModel.addCoins(user_id, coin_id, 1, "Coins purchased");
+                    try {
+                        WalletViewModel walletViewModel = new ViewModelProvider((ViewModelStoreOwner) activity).get(WalletViewModel.class);
+                        Log.e("Billing", "Calling addCoins with userId=" + user_id + ", coinId=" + coin_id);
+                        walletViewModel.addCoins(user_id, coin_id, 1, "Coins purchased");
 
-                    Toast.makeText(activity, "Coins purchased successfully", Toast.LENGTH_SHORT).show();
+                        activity.runOnUiThread(() ->
+                                Toast.makeText(activity, "Coins purchased successfully", Toast.LENGTH_SHORT).show()
+//                                Toast.makeText(activity, "Calling addCoins with userId=" + user_id + ", coinId=" + coin_id, Toast.LENGTH_SHORT).show()
+                        );
+
+                    } catch (Exception e) {
+                        Log.e("Billing", "Error updating coins: " + e.getMessage());
+                        activity.runOnUiThread(() ->
+                                Toast.makeText(activity, "Billing Error: " + e.getMessage(), Toast.LENGTH_SHORT).show()
+                        );
+                    }
                 } else {
+
+                    try {
+                        WalletViewModel walletViewModel = new ViewModelProvider((ViewModelStoreOwner) activity).get(WalletViewModel.class);
+                        Log.e("Billing", "Calling addCoins with userId=" + user_id + ", coinId=" + coin_id);
+                        walletViewModel.addCoins(user_id, coin_id, 1, "Failed to consume purchase: " + billingResult.getResponseCode());
+
+                        activity.runOnUiThread(() ->
+                                        Toast.makeText(activity, "Coins purchased successfully", Toast.LENGTH_SHORT).show()
+//                                Toast.makeText(activity, "Calling addCoins with userId=" + user_id + ", coinId=" + coin_id, Toast.LENGTH_SHORT).show()
+                        );
+
+                    } catch (Exception e) {
+                        Log.e("Billing", "Error updating coins: " + e.getMessage());
+                        activity.runOnUiThread(() ->
+                                Toast.makeText(activity, "Billing Error: " + e.getMessage(), Toast.LENGTH_SHORT).show()
+                        );
+                    }
+
+                    Toast.makeText(activity, "Failed to consume purchase: " + billingResult.getResponseCode(), Toast.LENGTH_SHORT).show();
                     Log.e("Billing", "Failed to consume purchase: " + billingResult.getResponseCode());
                 }
             });
-
-//            billingClient.consumeAsync(consumeParams, (billingResult, purchaseToken) -> {
-//                if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.OK) {
-//                    Log.d("Billing", "Product consumed successfully!");
-//
-//                    try {
-//                        WalletViewModel walletViewModel = new ViewModelProvider((ViewModelStoreOwner) activity).get(WalletViewModel.class);
-//                        Log.e("Billing", "Calling addCoins with userId=" + user_id + ", coinId=" + coin_id);
-//                        walletViewModel.addCoins(user_id, coin_id, 1, "Coins purchased");
-//
-//                        activity.runOnUiThread(() ->
-//                                Toast.makeText(activity, "Coins purchased successfully", Toast.LENGTH_SHORT).show()
-////                                Toast.makeText(activity, "Calling addCoins with userId=" + user_id + ", coinId=" + coin_id, Toast.LENGTH_SHORT).show()
-//                        );
-//
-//                    } catch (Exception e) {
-//                        Log.e("Billing", "Error updating coins: " + e.getMessage());
-//                        activity.runOnUiThread(() ->
-//                                Toast.makeText(activity, "Billing Error: " + e.getMessage(), Toast.LENGTH_SHORT).show()
-//                        );
-//                    }
-//                    Log.e("Billing", "Failed to consume purchase: " + billingResult.getResponseCode());
-//                } else {
-//
-//                    try {
-//                        WalletViewModel walletViewModel = new ViewModelProvider((ViewModelStoreOwner) activity).get(WalletViewModel.class);
-//                        Log.e("Billing", "Calling addCoins with userId=" + user_id + ", coinId=" + coin_id);
-//                        walletViewModel.tryCoins(user_id, coin_id, 2, "");
-//
-//                        activity.runOnUiThread(() ->
-//                                        Toast.makeText(activity, "Coins purchased successfully", Toast.LENGTH_SHORT).show()
-////                                Toast.makeText(activity, "Calling addCoins with userId=" + user_id + ", coinId=" + coin_id, Toast.LENGTH_SHORT).show()
-//                        );
-//
-//                    } catch (Exception e) {
-//                        Log.e("Billing", "Error updating coins: " + e.getMessage());
-//                        activity.runOnUiThread(() ->
-//                                Toast.makeText(activity, "Billing Error: " + e.getMessage(), Toast.LENGTH_SHORT).show()
-//                        );
-//                    }
-//
-//                    Toast.makeText(activity, "Failed to consume purchase: " + billingResult.getResponseCode(), Toast.LENGTH_SHORT).show();
-//                    Log.e("Billing", "Failed to consume purchase: " + billingResult.getResponseCode());
-//                }
-//            });
         }
     }
 
