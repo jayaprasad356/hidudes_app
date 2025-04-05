@@ -37,7 +37,6 @@ import com.gmwapp.hi_dude.constants.DConstants
 import com.gmwapp.hi_dude.databinding.FragmentFemaleHomeBinding
 import com.gmwapp.hi_dude.retrofit.callbacks.NetworkCallback
 import com.gmwapp.hi_dude.retrofit.responses.FemaleCallAttendResponse
-import com.gmwapp.hi_dude.services.CallingService
 import com.gmwapp.hi_dude.utils.setOnSingleClickListener
 import com.gmwapp.hi_dude.viewmodels.FemaleUsersViewModel
 import com.gmwapp.hi_dude.workers.CallUpdateWorker
@@ -55,6 +54,8 @@ import retrofit2.Response
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.TimeZone
+import com.gmwapp.hi_dude.agora.services.CallingService
+import com.gmwapp.hi_dude.viewmodels.AccountViewModel
 
 
 @AndroidEntryPoint
@@ -64,9 +65,13 @@ class FemaleHomeFragment : BaseFragment() {
     private val CALL_PERMISSIONS_REQUEST_CODE = 1
     private val NOTIFICATIONS_ENABLED_REQUEST_CODE = 3
     lateinit var binding: FragmentFemaleHomeBinding
+    lateinit var language : String
     private val femaleUsersViewModel: FemaleUsersViewModel by viewModels()
+    private val accountViewModel: AccountViewModel by viewModels()
+
     private lateinit var sharedPreferences: SharedPreferences
     private var isPermissionDenied: Boolean = false
+    var whataspplink : String = ""
     private val dateFormat = SimpleDateFormat("HH:mm:ss").apply {
         timeZone = TimeZone.getTimeZone("Asia/Kolkata") // Set to IST time zone
     }
@@ -121,41 +126,43 @@ class FemaleHomeFragment : BaseFragment() {
             requestPermissions(permissionNeeded, CALL_PERMISSIONS_REQUEST_CODE)
         } else {
             checkOverlayPermission()
+//            askNotificationPermission() // Directly proceed to notification permission
+
         }
     }
 
     private fun askNotificationsEnabled(){
-        if(mContext!=null) {
-            val invitationConfig = CallInvitationServiceImpl.getInstance()
-                .callInvitationConfig
-            var channelID = MMKV.defaultMMKV().getString("channelID", null)
-            if (channelID == null) {
-                channelID = if (invitationConfig?.notificationConfig != null) {
-                    invitationConfig.notificationConfig.channelID
-                } else {
-                    PrebuiltCallNotificationManager.incoming_call_channel_id
-                }
-            }
-            if (NotificationManagerCompat.from(mContext!!).areNotificationsEnabled()
-                && NotificationManagerCompat.from(mContext!!)
-                    .getNotificationChannel(channelID.toString())?.importance != IMPORTANCE_NONE
-                && NotificationManagerCompat.from(mContext!!)
-                    .getNotificationChannel(CallingService.callingChannelId)?.importance != IMPORTANCE_NONE
-            ) {
-                initializeCall()
-            }else{
-                try {
-                    val settingsIntent: Intent = Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS)
-                        .putExtra(Settings.EXTRA_APP_PACKAGE, mContext?.packageName)
-                    Toast.makeText(context, getString(R.string.enable_notification), Toast.LENGTH_SHORT).show()
-                    startActivityForResult(settingsIntent, NOTIFICATIONS_ENABLED_REQUEST_CODE)
-                } catch (e: Exception) {
-                    initializeCall()
-                }
-            }
-        }else{
-            initializeCall()
-        }
+//        if(mContext!=null) {
+//            val invitationConfig = CallInvitationServiceImpl.getInstance()
+//                .callInvitationConfig
+//            var channelID = MMKV.defaultMMKV().getString("channelID", null)
+//            if (channelID == null) {
+//                channelID = if (invitationConfig?.notificationConfig != null) {
+//                    invitationConfig.notificationConfig.channelID
+//                } else {
+//                    PrebuiltCallNotificationManager.incoming_call_channel_id
+//                }
+//            }
+//            if (NotificationManagerCompat.from(mContext!!).areNotificationsEnabled()
+//                && NotificationManagerCompat.from(mContext!!)
+//                    .getNotificationChannel(channelID.toString())?.importance != IMPORTANCE_NONE
+//                && NotificationManagerCompat.from(mContext!!)
+//                    .getNotificationChannel(CallingService.callingChannelId)?.importance != IMPORTANCE_NONE
+//            ) {
+//                initializeCall()
+//            }else{
+//                try {
+//                    val settingsIntent: Intent = Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS)
+//                        .putExtra(Settings.EXTRA_APP_PACKAGE, mContext?.packageName)
+//                    Toast.makeText(context, getString(R.string.enable_notification), Toast.LENGTH_SHORT).show()
+//                    startActivityForResult(settingsIntent, NOTIFICATIONS_ENABLED_REQUEST_CODE)
+//                } catch (e: Exception) {
+//                    initializeCall()
+//                }
+//            }
+//        }else{
+//            initializeCall()
+//        }
     }
 
     private fun askNotificationPermission() {
@@ -297,6 +304,8 @@ class FemaleHomeFragment : BaseFragment() {
                     startActivity(intent)
                 } else {
                     checkOverlayPermission()
+//                    askNotificationPermission() // Directly proceed to notification permission
+
                 }
             }
         }
@@ -306,19 +315,20 @@ class FemaleHomeFragment : BaseFragment() {
         val prefs = BaseApplication.getInstance()?.getPrefs()
         val userData = prefs?.getUserData()
         if (userData != null) {
-            registerBroadcastReceiver()
-            setupZegoUIKit(userData.id, userData.name)
-            addRoomStateChangedListener()
+//            registerBroadcastReceiver()
+//            setupZegoUIKit(userData.id, userData.name)
+            //  addRoomStateChangedListener()
         }
     }
 
     private fun initUI() {
 
+        accountViewModel.getSettings()
         val prefs = BaseApplication.getInstance()?.getPrefs()
         val userData = prefs?.getUserData()
 
 
-        val language = userData?.language
+        language = userData?.language.toString()
 
         val sharedPreferences = requireContext().getSharedPreferences("MyAppPrefs", Context.MODE_PRIVATE)
         val isTagSet = sharedPreferences.getBoolean("isOneSignalTagSet", false)
@@ -336,6 +346,23 @@ class FemaleHomeFragment : BaseFragment() {
             Log.d("OneSignalTag", "female_$it")
 
         }
+
+        accountViewModel.settingsLiveData.observe(viewLifecycleOwner, Observer { response ->
+            if (response?.success == true) {
+                response.data?.let { settingsList ->
+                    Log.d("settinglist","$settingsList")
+                    if (settingsList.isNotEmpty()) {
+                        val settingsData = settingsList[0]
+                        settingsData.auto_disable_info?.let { auto_disable_info ->
+                            binding.tvDisclaimer.setText(auto_disable_info)
+                        }
+                    }
+                }
+            }
+        })
+
+
+
 
 
 
@@ -437,85 +464,96 @@ class FemaleHomeFragment : BaseFragment() {
     }
 
 
-    private fun addRoomStateChangedListener() {
-
-        ZegoUIKit.addRoomStateChangedListener { room, reason, _, _ ->
-            when (reason) {
-                ZegoRoomStateChangedReason.LOGINED -> {
-                    if (CallInvitationServiceImpl.getInstance().callInvitationData.type == 1) {
-                        activateWakeLock()
-                    }
-                    mContext?.startService(Intent(mContext, CallingService::class.java))
-                    mContext?.let {
-                        NotificationManagerCompat.from(it)
-                            .cancel(PrebuiltCallNotificationManager.incoming_call_notification_id)
-                    }
-                    CallInvitationServiceImpl.getInstance().dismissCallNotification()
-                    lastActiveTime = System.currentTimeMillis()
-                    roomID = room
-                    startTime = dateFormat.format(Date()) // Set call start time in IST
-                    femaleUsersViewModel.femaleCallAttend(receivedId,
-                        callId,
-                        startTime,
-                        object : NetworkCallback<FemaleCallAttendResponse> {
-                            override fun onResponse(
-                                call: Call<FemaleCallAttendResponse>,
-                                response: Response<FemaleCallAttendResponse>
-                            ) {
-                                balanceTime = response.body()?.data?.remaining_time
-                            }
-
-                            override fun onFailure(
-                                call: Call<FemaleCallAttendResponse>, t: Throwable
-                            ) {
-                            }
-
-                            override fun onNoNetwork() {
-                            }
-                        })
-
-                }
-
-                ZegoRoomStateChangedReason.LOGOUT -> {
-                    releaseWakeLock()
-                    lifecycleScope.launch {
-                        mContext?.stopService(Intent(mContext, CallingService::class.java))
-
-                        lastActiveTime = 0
-                        delay(500)
-                        if (roomID != null) {
-                            roomID = null
-                            endTime = dateFormat.format(Date()) // Set call end time in IST
-
-                            val constraints =
-                                Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED)
-                                    .build()
-                            val data: Data = Data.Builder().putInt(DConstants.USER_ID, receivedId)
-                                .putInt(DConstants.CALL_ID, callId)
-                                .putString(DConstants.STARTED_TIME, startTime).putBoolean(
-                                    DConstants.IS_INDIVIDUAL,
-                                    BaseApplication.getInstance()
-                                        ?.isReceiverDetailsAvailable() == true
-                                ).putString(DConstants.ENDED_TIME, endTime).build()
-                            val oneTimeWorkRequest = OneTimeWorkRequest.Builder(
-                                CallUpdateWorker::class.java
-                            ).setInputData(data).setConstraints(constraints).build()
-                            mContext?.let {
-                                WorkManager.getInstance(it).enqueue(oneTimeWorkRequest)
-                            }
-                            val prefs = BaseApplication.getInstance()?.getPrefs()
-                            val userData = prefs?.getUserData()
-                            if (userData != null) {
-                                setupZegoUIKit(userData.id, userData.name)
-                            }
-                        }
-                    }
-                }
-
-                else -> {
-                }
-            }
-        }
-    }
+//    private fun addRoomStateChangedListener() {
+//
+//        ZegoUIKit.addRoomStateChangedListener { room, reason, _, _ ->
+//            Log.d("roomStateCheck","reason : $reason, room : $room")
+//
+//            when (reason) {
+//                ZegoRoomStateChangedReason.LOGINED -> {
+//                    if (CallInvitationServiceImpl.getInstance().callInvitationData.type == 1) {
+//                        activateWakeLock()
+//                    }
+//                    mContext?.startService(Intent(mContext, CallingService::class.java))
+//                    mContext?.let {
+//                        NotificationManagerCompat.from(it)
+//                            .cancel(PrebuiltCallNotificationManager.incoming_call_notification_id)
+//                    }
+//                    CallInvitationServiceImpl.getInstance().dismissCallNotification()
+//                    lastActiveTime = System.currentTimeMillis()
+//                    roomID = room
+//                    Log.d("roomidCheck","Login $room")
+//
+//                    startTime = dateFormat.format(Date()) // Set call start time in IST
+//                    femaleUsersViewModel.femaleCallAttend(receivedId,
+//                        callId,
+//                        startTime,
+//                        object : NetworkCallback<FemaleCallAttendResponse> {
+//                            override fun onResponse(
+//                                call: Call<FemaleCallAttendResponse>,
+//                                response: Response<FemaleCallAttendResponse>
+//                            ) {
+//                                balanceTime = response.body()?.data?.remaining_time
+//                            }
+//
+//                            override fun onFailure(
+//                                call: Call<FemaleCallAttendResponse>, t: Throwable
+//                            ) {
+//                            }
+//
+//                            override fun onNoNetwork() {
+//                            }
+//                        })
+//
+//                }
+//
+//                ZegoRoomStateChangedReason.LOGOUT -> {
+//                    releaseWakeLock()
+//                    lifecycleScope.launch {
+//                        mContext?.stopService(Intent(mContext, CallingService::class.java))
+//
+//                        lastActiveTime = 0
+//                        delay(500)
+//                        Log.d("roomidCheck","Logout $roomID")
+//
+//                        if (roomID != null) {
+//                            roomID = null
+//                            endTime = dateFormat.format(Date()) // Set call end time in IST
+//
+//                            val constraints =
+//                                Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED)
+//                                    .build()
+//                            Log.d("RoomStateChangedCheck", "Login room: $roomID")
+//                            Log.d("RoomStateChangedCheck", "Start time: $startTime")
+//                            Log.d("RoomStateChangedCheck", "EndTime: $endTime")
+//                            Log.d("RoomStateChangedCheck", "callId: $callId")
+//                            Log.d("RoomStateChangedCheck", "USER_ID: $receivedId")
+//                            val data: Data = Data.Builder().putInt(DConstants.USER_ID, receivedId)
+//                                .putInt(DConstants.CALL_ID, callId)
+//                                .putString(DConstants.STARTED_TIME, startTime).putBoolean(
+//                                    DConstants.IS_INDIVIDUAL,
+//                                    BaseApplication.getInstance()
+//                                        ?.isReceiverDetailsAvailable() == true
+//                                ).putString(DConstants.ENDED_TIME, endTime).build()
+//                            val oneTimeWorkRequest = OneTimeWorkRequest.Builder(
+//                                CallUpdateWorker::class.java
+//                            ).setInputData(data).setConstraints(constraints).build()
+//                            mContext?.let {
+//                                WorkManager.getInstance(it).enqueue(oneTimeWorkRequest)
+//                            }
+//                            val prefs = BaseApplication.getInstance()?.getPrefs()
+//                            val userData = prefs?.getUserData()
+//                            if (userData != null) {
+//                                setupZegoUIKit(userData.id, userData.name)
+//                            }
+//                        }
+//                    }
+//                }
+//
+//                else -> {
+//                }
+//            }
+//        }
+//    }
 
 }

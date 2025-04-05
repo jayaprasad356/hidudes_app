@@ -1,5 +1,6 @@
 package com.gmwapp.hi_dude.repositories
 
+import android.util.Log
 import com.gmwapp.hi_dude.retrofit.ApiManager
 import com.gmwapp.hi_dude.retrofit.callbacks.NetworkCallback
 import com.gmwapp.hi_dude.retrofit.responses.CallFemaleUserResponse
@@ -53,9 +54,11 @@ class FemaleUsersRepositories @Inject constructor(private val apiManager: ApiMan
         callType: String,
         callback: NetworkCallback<CallFemaleUserResponse>
     ) {
+        Log.d("callFemaleUser", "callFemaleUser: $userId $callUserId $callType")
         apiManager.callFemaleUser(
             userId, callUserId, callType, callback
         )
+        Log.d("callFemaleUser", "callFemaleUser: $userId $callUserId $callType")
     }
 
     suspend fun updateConnectedCall(

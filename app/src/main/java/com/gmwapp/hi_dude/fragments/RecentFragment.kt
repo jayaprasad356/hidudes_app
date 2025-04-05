@@ -14,6 +14,7 @@ import com.gmwapp.hi_dude.activities.RandomUserActivity
 import com.gmwapp.hi_dude.adapters.CoinAdapter
 import com.gmwapp.hi_dude.adapters.FemaleUserAdapter
 import com.gmwapp.hi_dude.adapters.RecentCallsAdapter
+import com.gmwapp.hi_dude.agora.male.MaleCallConnectingActivity
 import com.gmwapp.hi_dude.callbacks.OnItemSelectionListener
 import com.gmwapp.hi_dude.constants.DConstants
 import com.gmwapp.hi_dude.databinding.FragmentRecentBinding
@@ -23,6 +24,10 @@ import com.gmwapp.hi_dude.retrofit.responses.FemaleUsersResponseData
 import com.gmwapp.hi_dude.viewmodels.AccountViewModel
 import com.gmwapp.hi_dude.viewmodels.RecentViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import com.gmwapp.hi_dude.agora.male.MaleAudioCallingActivity
+import com.gmwapp.hi_dude.agora.male.MaleVideoCallingActivity
+
+
 
 @AndroidEntryPoint
 class RecentFragment : BaseFragment() {
@@ -78,7 +83,7 @@ class RecentFragment : BaseFragment() {
                         it.data,
                         object : OnItemSelectionListener<CallsListResponseData> {
                             override fun onItemSelected(data: CallsListResponseData) {
-                                val intent = Intent(context, RandomUserActivity::class.java)
+                                val intent = Intent(context, MaleCallConnectingActivity::class.java)
                                 intent.putExtra(DConstants.CALL_TYPE, "audio")
                                 intent.putExtra(DConstants.RECEIVER_ID, data.id)
                                 intent.putExtra(DConstants.RECEIVER_NAME, data.name)
@@ -91,7 +96,7 @@ class RecentFragment : BaseFragment() {
                         },
                         object : OnItemSelectionListener<CallsListResponseData> {
                             override fun onItemSelected(data: CallsListResponseData) {
-                                val intent = Intent(context, RandomUserActivity::class.java)
+                                val intent = Intent(context, MaleCallConnectingActivity::class.java)
                                 intent.putExtra(DConstants.CALL_TYPE, "video")
                                 intent.putExtra(DConstants.RECEIVER_ID, data.id)
                                 intent.putExtra(DConstants.RECEIVER_NAME, data.name)

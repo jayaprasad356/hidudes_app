@@ -66,6 +66,8 @@ android {
 
 dependencies {
     implementation(libs.androidx.espresso.core)
+    implementation(libs.firebase.crashlytics.buildtools)
+    implementation(libs.androidx.lifecycle.process)
     val lifecycleVersion = "2.6.2"
     val glideVersion = "4.11.0"
 
@@ -145,7 +147,14 @@ dependencies {
     implementation (libs.android.image.cropper)
 //    implementation ("com.vanniktech:android-image-cropper:4.5.0")
 
+//agora
+    implementation("io.agora.rtc:full-sdk:4.5.0")
+//    implementation("io.agora:agora-rtm:2.2.2")
+    implementation("commons-codec:commons-codec:1.9")
+    implementation ("com.android.billingclient:billing:7.1.1")
 
+    implementation(platform("com.google.firebase:firebase-bom:32.7.2"))
+    implementation("com.google.firebase:firebase-messaging")
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

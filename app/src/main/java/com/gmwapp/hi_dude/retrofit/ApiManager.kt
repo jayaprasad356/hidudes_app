@@ -14,6 +14,8 @@ import com.gmwapp.hi_dude.retrofit.responses.CoinsResponse
 import com.gmwapp.hi_dude.retrofit.responses.DeleteUserResponse
 import com.gmwapp.hi_dude.retrofit.responses.EarningsResponse
 import com.gmwapp.hi_dude.retrofit.responses.ExplanationVideoResponse
+import com.gmwapp.hi_dude.retrofit.responses.FcmNotificationResponse
+import com.gmwapp.hi_dude.retrofit.responses.FcmTokenResponse
 import com.gmwapp.hi_dude.retrofit.responses.FemaleCallAttendResponse
 import com.gmwapp.hi_dude.retrofit.responses.FemaleUsersResponse
 import com.gmwapp.hi_dude.retrofit.responses.GetRemainingTimeResponse
@@ -35,6 +37,7 @@ import com.gmwapp.hi_dude.retrofit.responses.UpdateImageResponse
 import com.gmwapp.hi_dude.retrofit.responses.UpdateProfileResponse
 import com.gmwapp.hi_dude.retrofit.responses.UpiPaymentResponse
 import com.gmwapp.hi_dude.retrofit.responses.UpiUpdateResponse
+import com.gmwapp.hi_dude.retrofit.responses.UserAvatarResponse
 import com.gmwapp.hi_dude.retrofit.responses.UserValidationResponse
 import com.gmwapp.hi_dude.retrofit.responses.VoiceUpdateResponse
 import com.gmwapp.hi_dude.retrofit.responses.WithdrawResponse
@@ -537,6 +540,48 @@ class ApiManager @Inject constructor(private val retrofit: Retrofit) {
         }
     }
 
+    fun sendFcmNotification(
+        senderId: Int,
+        receiverId: Int,
+        callType: String,
+        channelName: String,
+        message: String,
+        callback: NetworkCallback<FcmNotificationResponse>
+    ) {
+        if (Helper.checkNetworkConnection()) {
+            val apiCall: Call<FcmNotificationResponse> =
+                getApiInterface().sendFcmNotification(senderId, receiverId, callType, channelName, message)
+            apiCall.enqueue(callback)
+        } else {
+            callback.onNoNetwork()
+        }
+    }
+
+    fun getUserAvatar(
+        userId: Int,
+        callback: NetworkCallback<UserAvatarResponse>
+    ) {
+        if (Helper.checkNetworkConnection()) {
+            val apiCall: Call<UserAvatarResponse> = getApiInterface().getUserAvatar(userId)
+            apiCall.enqueue(callback)
+        } else {
+            callback.onNoNetwork()
+        }
+    }
+
+    fun sendFcmToken(
+        userId: Int,
+        token: String,
+        callback: NetworkCallback<FcmTokenResponse>
+    ) {
+        if (Helper.checkNetworkConnection()) {
+            val apiCall: Call<FcmTokenResponse> = getApiInterface().sendFcmToken(userId, token)
+            apiCall.enqueue(callback)
+        } else {
+            callback.onNoNetwork()
+        }
+    }
+
     fun getSpeechText(
         userId: Int, language: String, callback: NetworkCallback<SpeechTextResponse>
     ) {
@@ -844,5 +889,28 @@ interface ApiInterface {
         @Field("user_id") userId: Int,
         @Field("coins_id") coinsId: Int,
     ): Call<AddCoinsResponse>
+
+    @FormUrlEncoded
+    @POST("send_fcm_token")
+    fun sendFcmToken(
+        @Field("user_id") userId: Int,
+        @Field("token") token: String
+    ): Call<FcmTokenResponse>
+
+    @FormUrlEncoded
+    @POST("send-fcm-notification")
+    fun sendFcmNotification(
+        @Field("senderId") senderId: Int,
+        @Field("receiverId") receiverId: Int,
+        @Field("callType") callType: String,
+        @Field("channelName") channelName: String,
+        @Field("message") message: String
+    ): Call<FcmNotificationResponse>
+
+    @FormUrlEncoded
+    @POST("user_avatar_image")
+    fun getUserAvatar(
+        @Field("user_id") userId: Int,
+    ): Call<UserAvatarResponse>
 
 }

@@ -59,6 +59,32 @@
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
         <activity
+            android:name=".agora.female.FemaleCallAcceptActivity"
+            android:exported="false" />
+        <activity
+            android:name=".agora.female.FemaleVideoCallingActivity"
+            android:exported="false" />
+        <activity
+            android:name=".agora.male.MaleAudioCallingActivity"
+            android:exported="false" />
+        <activity
+            android:name=".agora.male.MaleCallConnectingActivity"
+            android:exported="true" />
+        <activity
+            android:name=".agora.male.MaleVideoCallingActivity"
+            android:exported="false" />
+        <activity
+            android:name=".agora.AgoraRandomCallActivity"
+            android:exported="false" />
+        <receiver android:name=".agora.CallActionReceiver" android:exported="true">
+
+            <intent-filter>
+                <action android:name="ACTION_ACCEPT_CALL" />
+                <action android:name="ACTION_REJECT_CALL" />
+            </intent-filter>
+
+        </receiver>
+        <activity
             android:name=".activities.SplashScreenActivity"
             android:exported="true"
             android:resizeableActivity="true">
@@ -183,10 +209,32 @@
         </activity>
 
         <service
-            android:name=".services.CallingService"
-            android:foregroundServiceType="microphone"
-            android:exported="false">
+            android:name=".agora.services.CallingService"
+            android:exported="false"
+            android:foregroundServiceType="microphone" />
+
+        <service
+            android:name=".agora.services.CallingService"
+            android:exported="false"
+            android:foregroundServiceType="microphone" />
+        <service
+            android:name=".agora.FcmCallService"
+            android:exported="false"
+            android:foregroundServiceType="phoneCall"
+            android:permission="android.permission.FOREGROUND_SERVICE_PHONE_CALL" />
+        <service
+            android:name=".agora.MyFirebaseMessagingService"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
         </service>
+
+<!--        <service-->
+<!--            android:name=".services.CallingService"-->
+<!--            android:foregroundServiceType="microphone"-->
+<!--            android:exported="false">-->
+<!--        </service>-->
         <receiver
             android:name=".receivers.CallReceiver"
             android:enabled="true"

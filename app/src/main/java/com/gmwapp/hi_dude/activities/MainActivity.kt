@@ -39,6 +39,7 @@ import com.gmwapp.hi_dude.fragments.ProfileFragment
 import com.gmwapp.hi_dude.fragments.RecentFragment
 import com.gmwapp.hi_dude.utils.DPreferences
 import com.gmwapp.hi_dude.viewmodels.AccountViewModel
+import com.gmwapp.hi_dude.viewmodels.FcmTokenViewModel
 import com.gmwapp.hi_dude.viewmodels.OfferViewModel
 import com.gmwapp.hi_dude.viewmodels.ProfileViewModel
 import com.gmwapp.hi_dude.viewmodels.UpiPaymentViewModel
@@ -48,7 +49,9 @@ import com.google.android.material.bottomnavigation.BottomNavigationMenuView
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.navigation.NavigationBarView
+import com.google.firebase.messaging.FirebaseMessaging
 import dagger.hilt.android.AndroidEntryPoint
+import retrofit2.Call
 import kotlin.math.round
 
 
@@ -64,6 +67,7 @@ class MainActivity : BaseActivity(), BottomNavigationView.OnNavigationItemSelect
     val offerViewModel: OfferViewModel by viewModels()
     private val profileViewModel: ProfileViewModel by viewModels()
     private val accountViewModel: AccountViewModel by viewModels()
+    private val fcmTokenViewModel: FcmTokenViewModel by viewModels()
     private val upiPaymentViewModel: UpiPaymentViewModel by viewModels()
     private val WalletViewModel: WalletViewModel by viewModels()
 
@@ -76,6 +80,17 @@ class MainActivity : BaseActivity(), BottomNavigationView.OnNavigationItemSelect
         Manifest.permission.READ_MEDIA_AUDIO
     )
 
+
+    private val requestPermissionsLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestMultiplePermissions()
+    ) { permissions ->
+        if (permissions[Manifest.permission.MANAGE_OWN_CALLS] == true) {
+            // Permission granted, proceed with call service
+        } else {
+            // Show an error or disable call-related functionality
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -86,13 +101,27 @@ class MainActivity : BaseActivity(), BottomNavigationView.OnNavigationItemSelect
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, 0)
             insets
         }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+                requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+            }
+        }
+
+
+
+
+
         val userData = BaseApplication.getInstance()?.getPrefs()?.getUserData()
         userID = userData?.id.toString()
 
         billingManager = BillingManager(this)
+        accountViewModel.getSettings()
 
         initUI()
         addObservers()
+
+        updateFcmToken(userData?.id)
 
         userName = userData?.name
 
@@ -176,9 +205,19 @@ class MainActivity : BaseActivity(), BottomNavigationView.OnNavigationItemSelect
         logger.logEvent("sentFriendRequest")
     }
 
-    override fun resumeZegoCloud(){
-        addRoomStateChangedListener()
-        moveTaskToBack(true)
+//    override fun resumeZegoCloud(){
+//        addRoomStateChangedListener()
+//        moveTaskToBack(true)
+//    }
+
+    private val requestPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { isGranted: Boolean ->
+        if (isGranted) {
+            // Permission granted, notifications will work
+        } else {
+            // Permission denied, notify the user
+        }
     }
 
     private fun initUI() {
@@ -201,14 +240,44 @@ class MainActivity : BaseActivity(), BottomNavigationView.OnNavigationItemSelect
             }
         })
 
+
+
+
+//        accountViewModel.settingsLiveData.observe(this, Observer { response ->
+//            if (response?.success == true) {
+//                response.data?.let { settingsList ->
+//                    if (settingsList.isNotEmpty()) {
+//                        val settingsData = settingsList[0]
+//                        settingsData.payment_gateway_type?.let { paymentGatewayType ->
+//                            Log.d("settingsData", "settingsData $paymentGatewayType")
+//                            //handlePaymentGateway(paymentGatewayType)
+////                            paymentGateway = paymentGatewayType
+////                            Log.d("paymentGateway","$paymentGateway")
+//                        } ?: run {
+//                            // Show Toast if payment_gateway_type is null
+//                            Toast.makeText(this, "Please try again later", Toast.LENGTH_SHORT).show()
+//                        }
+//                    }
+//                }
+//            }
+//        })
+
+
         val prefs = BaseApplication.getInstance()?.getPrefs()
         prefs?.getUserData()?.id?.let { profileViewModel.getUsers(it) }
 
-        profileViewModel.getUserLiveData.observe(this, Observer {
-            prefs?.setUserData(it.data);
-        });
+        profileViewModel.getUserLiveData.observe(this, Observer { response ->
+            response?.data?.let { userData ->
+                prefs?.setUserData(userData)
+            } ?: run {
+                Log.e("Observer", "RegisterResponse is null")
+            }
+        })
 
-        userID?.let { offerViewModel.getOffer(it.toInt()) }
+
+        Log.d("DEBUG", "Received userID: $userID")
+
+        userID?.toIntOrNull()?.let { offerViewModel.getOffer(it) }
         binding.bottomNavigationView.setOnNavigationItemSelectedListener(this)
         removeShiftMode()
     }
@@ -619,4 +688,51 @@ class MainActivity : BaseActivity(), BottomNavigationView.OnNavigationItemSelect
     fun generateRandomTxnId(userId: Int, coinId: String): String {
         return "$userId-$coinId-${System.currentTimeMillis()}"
     }
+
+
+    fun updateFcmToken(userId: Int?) {
+        FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
+            if (!task.isSuccessful) {
+                Log.w("FCM", "Fetching FCM registration token failed", task.exception)
+                return@addOnCompleteListener
+            }
+            // Get new FCM registration token
+            val token = task.result
+            Log.d("FCM", "Device token: $token")
+
+            userId?.let { fcmTokenViewModel.sendToken(it, token) }
+            observeTokenResponse()
+        }
+    }
+
+    fun observeTokenResponse() {
+        fcmTokenViewModel.tokenResponseLiveData.observe(this) { response ->
+            Log.d("FCMToken", "$response")
+
+            response?.let {
+                if (it.success) {
+                    Log.d("FCMToken", "Token saved successfully!")
+                } else {
+                    Log.e("FCMToken", "Failed to save token")
+                }
+            }
+        }
+
+    }
+
+    private fun requestPermissions() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) { // Android 10+
+            requestPermissionsLauncher.launch(
+                arrayOf(
+                    Manifest.permission.MANAGE_OWN_CALLS
+                )
+            )
+        }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        requestPermissions()
+    }
+
 }

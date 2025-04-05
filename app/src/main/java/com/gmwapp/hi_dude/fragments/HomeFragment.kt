@@ -24,6 +24,8 @@ import com.gmwapp.hi_dude.activities.GrantPermissionsActivity
 import com.gmwapp.hi_dude.activities.RandomUserActivity
 import com.gmwapp.hi_dude.activities.WalletActivity
 import com.gmwapp.hi_dude.adapters.FemaleUserAdapter
+import com.gmwapp.hi_dude.agora.AgoraRandomCallActivity
+import com.gmwapp.hi_dude.agora.male.MaleCallConnectingActivity
 import com.gmwapp.hi_dude.callbacks.OnItemSelectionListener
 import com.gmwapp.hi_dude.constants.DConstants
 import com.gmwapp.hi_dude.databinding.FragmentHomeBinding
@@ -122,20 +124,22 @@ class HomeFragment : BaseFragment() {
                 BaseApplication.getInstance()?.getPrefs()?.setUserData(it1)
             }
             binding.tvCoins.text = it.data?.coins.toString()
+            Log.d("coinsvalue","${it.data?.coins}")
+            Log.d("coinsvalue","${it.data?.name}")
 
         })
 
 
 
         binding.fabAudio.setOnSingleClickListener {
-            val intent = Intent(context, RandomUserActivity::class.java)
+            val intent = Intent(context, AgoraRandomCallActivity::class.java)
             intent.putExtra(DConstants.CALL_TYPE, "audio")
             intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP)
             startActivity(intent)
         }
 
         binding.fabVideo.setOnSingleClickListener {
-            val intent = Intent(context, RandomUserActivity::class.java)
+            val intent = Intent(context, AgoraRandomCallActivity::class.java)
             intent.putExtra(DConstants.CALL_TYPE, "video")
             startActivity(intent)
         }
@@ -164,7 +168,7 @@ class HomeFragment : BaseFragment() {
                         it.data,
                         object : OnItemSelectionListener<FemaleUsersResponseData> {
                             override fun onItemSelected(data: FemaleUsersResponseData) {
-                                val intent = Intent(context, RandomUserActivity::class.java)
+                                val intent = Intent(context, MaleCallConnectingActivity::class.java)
                                 intent.putExtra(DConstants.CALL_TYPE, "audio")
                                 intent.putExtra(DConstants.RECEIVER_ID, data.id)
                                 intent.putExtra(DConstants.RECEIVER_NAME, data.name)
@@ -180,7 +184,7 @@ class HomeFragment : BaseFragment() {
                         },
                         object : OnItemSelectionListener<FemaleUsersResponseData> {
                             override fun onItemSelected(data: FemaleUsersResponseData) {
-                                val intent = Intent(context, RandomUserActivity::class.java)
+                                val intent = Intent(context, MaleCallConnectingActivity::class.java)
                                 intent.putExtra(DConstants.CALL_TYPE, "video")
                                 intent.putExtra(DConstants.RECEIVER_ID, data.id)
                                 intent.putExtra(DConstants.RECEIVER_NAME, data.name)
@@ -386,6 +390,23 @@ class HomeFragment : BaseFragment() {
         val capabilities = connectivityManager.getNetworkCapabilities(network) ?: return false
         return capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) ||
                 capabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        val userData = BaseApplication.getInstance()?.getPrefs()?.getUserData()
+        userData?.id?.let { profileViewModel.getUsers(it) }
+        observeCoins()
+    }
+
+    fun observeCoins(){
+        profileViewModel.getUserLiveData.observe(this, Observer {
+            it.data?.let { it1 ->
+                BaseApplication.getInstance()?.getPrefs()?.setUserData(it1)
+            }
+            Log.d("coinsUpdated_","$${it.data?.coins.toString()}")
+            binding.tvCoins.text = it.data?.coins.toString()
+        })
     }
 
 }
