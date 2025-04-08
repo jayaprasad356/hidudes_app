@@ -40,7 +40,8 @@ class BaseApplication : Application(), Configuration.Provider {
     private var roomId: String? = null
     private var mediaPlayer: MediaPlayer? = null
     private var endCallUpdatePending: Boolean? = null
-    val ONESIGNAL_APP_ID = "2c7d72ae-8f09-48ea-a3c8-68d9c913c592"
+    val ONESIGNAL_APP_ID = "2878a3a7-8a9a-4902-b255-72e9af65af29"
+    //    val ONESIGNAL_APP_ID = "2c7d72ae-8f09-48ea-a3c8-68d9c913c592"
     private lateinit var sharedPreferences: SharedPreferences
 
     private var currentActivity: Activity? = null
