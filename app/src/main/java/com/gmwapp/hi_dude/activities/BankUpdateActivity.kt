@@ -1,6 +1,7 @@
 package com.gmwapp.hi_dude.activities
 
 import android.content.Intent
+import android.content.res.ColorStateList
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -10,6 +11,7 @@ import android.widget.EditText
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.widget.NestedScrollView
@@ -105,6 +107,9 @@ class BankUpdateActivity : BaseActivity() {
 
         // Disable button initially
         binding.btnUpdate.isEnabled = false
+        binding.btnUpdate.strokeWidth = 3
+        binding.btnUpdate.strokeColor = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.unselect_grey))
+        binding.btnUpdate.setTextColor(getResources().getColor(R. color. unselect_grey))
 
         // Handle button click
         binding.btnUpdate.setOnClickListener {
@@ -212,6 +217,9 @@ class BankUpdateActivity : BaseActivity() {
 
         // Enable or disable the update button
         binding.btnUpdate.isEnabled = isFieldsValid
+        binding.btnUpdate.strokeWidth = 3
+        binding.btnUpdate.strokeColor = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.primary_blue))
+        binding.btnUpdate.setTextColor(getResources().getColor(R. color. primary_blue))
     }
 
 

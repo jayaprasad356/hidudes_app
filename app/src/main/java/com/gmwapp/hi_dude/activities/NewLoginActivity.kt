@@ -13,6 +13,7 @@ import com.gmwapp.hi_dude.adapters.OnboardingPagerAdapter
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import android.content.Intent
+import android.content.res.ColorStateList
 import android.graphics.Paint
 import android.net.Uri
 import android.os.CountDownTimer
@@ -29,6 +30,7 @@ import android.view.View
 import android.view.inputmethod.InputMethodManager
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
+import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.Observer
@@ -152,10 +154,31 @@ class NewLoginActivity : BaseActivity(), OnItemSelectionListener<Country> {
         binding.cbTermsAndConditions.setOnCheckedChangeListener { buttonView, isChecked ->
             if (isChecked) {
                 //  binding.btnSendOtp.setBackgroundResource(R.drawable.d_button_bg_white)
+                binding.btnSendOtp.strokeWidth = 3
+                binding.btnSendOtp.strokeColor = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.primary_blue))
+                binding.btnSendOtp.setTextColor(getResources().getColor(R. color. primary_blue))
                 binding.btnSendOtp.isEnabled = true
             } else {
 //binding.btnSendOtp.setBackgroundResource(R.drawable.d_button_bg)
+                binding.btnSendOtp.strokeWidth = 3
+                binding.btnSendOtp.strokeColor = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.unselect_grey))
+                binding.btnSendOtp.setTextColor(getResources().getColor(R. color. unselect_grey))
                 binding.btnSendOtp.isEnabled = false
+            }
+        }
+        binding.cbOtpTermsAndConditions.setOnCheckedChangeListener { buttonView, isChecked ->
+            if (isChecked) {
+                //  binding.btnSendOtp.setBackgroundResource(R.drawable.d_button_bg_white)
+                binding.btnVerifyOtp.strokeWidth = 3
+                binding.btnVerifyOtp.strokeColor = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.primary_blue))
+                binding.btnVerifyOtp.setTextColor(getResources().getColor(R. color. primary_blue))
+                binding.btnVerifyOtp.isEnabled = true
+            } else {
+//binding.btnSendOtp.setBackgroundResource(R.drawable.d_button_bg)
+                binding.btnVerifyOtp.strokeWidth = 3
+                binding.btnVerifyOtp.strokeColor = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.unselect_grey))
+                binding.btnVerifyOtp.setTextColor(getResources().getColor(R. color. unselect_grey))
+                binding.btnVerifyOtp.isEnabled = false
             }
         }
         binding.etMobileNumber.addTextChangedListener(object : TextWatcher {
@@ -166,9 +189,15 @@ class NewLoginActivity : BaseActivity(), OnItemSelectionListener<Country> {
                 window.statusBarColor = resources.getColor(R.color.background_color)
                 if (!binding.cbTermsAndConditions.isChecked || TextUtils.isEmpty(s)) {
                     //     binding.btnSendOtp.setBackgroundResource(R.drawable.d_button_bg)
+                    binding.btnSendOtp.strokeWidth = 3
+                    binding.btnSendOtp.strokeColor = ColorStateList.valueOf(ContextCompat.getColor(this@NewLoginActivity, R.color.unselect_grey))
+                    binding.btnSendOtp.setTextColor(getResources().getColor(R. color. unselect_grey))
                     binding.btnSendOtp.isEnabled = false
                 } else {
                     //      binding.btnSendOtp.setBackgroundResource(R.drawable.d_button_bg_white)
+                    binding.btnSendOtp.strokeWidth = 3
+                    binding.btnSendOtp.strokeColor = ColorStateList.valueOf(ContextCompat.getColor(this@NewLoginActivity, R.color.primary_blue))
+                    binding.btnSendOtp.setTextColor(getResources().getColor(R. color. primary_blue))
                     binding.btnSendOtp.isEnabled = true
                 }
             }
@@ -240,6 +269,9 @@ class NewLoginActivity : BaseActivity(), OnItemSelectionListener<Country> {
         otp?.let {
             binding.pbSendOtpLoader.visibility = View.VISIBLE
             binding.btnSendOtp.setText("")
+            binding.btnSendOtp.strokeWidth = 3
+            binding.btnSendOtp.strokeColor = ColorStateList.valueOf(ContextCompat.getColor(this@NewLoginActivity, R.color.unselect_grey))
+            binding.btnSendOtp.setTextColor(getResources().getColor(R. color. unselect_grey))
             loginViewModel.sendOTP(mobile, countryCode, it)
         }
     }
@@ -268,6 +300,9 @@ class NewLoginActivity : BaseActivity(), OnItemSelectionListener<Country> {
         loginViewModel.sendOTPResponseLiveData.observe(this, Observer {
             binding.pbLoader.visibility = View.GONE
             binding.btnResendOtp.setText(getString(R.string.resend_otp))
+            binding.btnResendOtp.strokeWidth = 3
+            binding.btnResendOtp.strokeColor = ColorStateList.valueOf(ContextCompat.getColor(this@NewLoginActivity, R.color.unselect_grey))
+            binding.btnResendOtp.setTextColor(getResources().getColor(R.color.unselect_grey))
             startTimer()
         })
 
@@ -275,11 +310,17 @@ class NewLoginActivity : BaseActivity(), OnItemSelectionListener<Country> {
             binding.pbVerifyOtpLoader.visibility = View.GONE
             binding.btnVerifyOtp.setText(getString(R.string.verify_otp))
             binding.btnVerifyOtp.isEnabled = true
+            binding.btnVerifyOtp.strokeWidth = 3
+            binding.btnVerifyOtp.strokeColor = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.primary_blue))
+            binding.btnVerifyOtp.setTextColor(getResources().getColor(R. color. primary_blue))
         })
         loginViewModel.loginResponseLiveData.observe(this, Observer {
             binding.pbVerifyOtpLoader.visibility = View.GONE
             binding.btnVerifyOtp.setText(getString(R.string.verify_otp))
             binding.btnVerifyOtp.isEnabled = true
+            binding.btnVerifyOtp.strokeWidth = 3
+            binding.btnVerifyOtp.strokeColor = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.primary_blue))
+            binding.btnVerifyOtp.setTextColor(getResources().getColor(R. color. primary_blue))
             if (it.success) {
                 if (it.registered) {
                     it.data?.let { it1 ->
@@ -328,14 +369,34 @@ class NewLoginActivity : BaseActivity(), OnItemSelectionListener<Country> {
             }
 
             override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
+                window.statusBarColor = resources.getColor(R.color.background_color)
+                if (!binding.cbOtpTermsAndConditions.isChecked || TextUtils.isEmpty(s)) {
+                    //     binding.btnSendOtp.setBackgroundResource(R.drawable.d_button_bg)
+                    binding.btnVerifyOtp.strokeWidth = 3
+                    binding.btnVerifyOtp.strokeColor = ColorStateList.valueOf(ContextCompat.getColor(this@NewLoginActivity, R.color.unselect_grey))
+                    binding.btnVerifyOtp.setTextColor(getResources().getColor(R. color. unselect_grey))
+                    binding.btnVerifyOtp.isEnabled = false
+                } else {
+                    //      binding.btnSendOtp.setBackgroundResource(R.drawable.d_button_bg_white)
+                    binding.btnVerifyOtp.strokeWidth = 3
+                    binding.btnVerifyOtp.strokeColor = ColorStateList.valueOf(ContextCompat.getColor(this@NewLoginActivity, R.color.primary_blue))
+                    binding.btnVerifyOtp.setTextColor(getResources().getColor(R. color. primary_blue))
+                    binding.btnVerifyOtp.isEnabled = true
+                }
             }
 
             override fun afterTextChanged(s: Editable) {
                 if(s.toString().length==6){
                     //   binding.btnVerifyOtp.setBackgroundResource(R.drawable.d_button_bg_white)
+                    binding.btnVerifyOtp.strokeWidth = 3
+                    binding.btnVerifyOtp.strokeColor = ColorStateList.valueOf(ContextCompat.getColor(this@NewLoginActivity, R.color.primary_blue))
+                    binding.btnVerifyOtp.setTextColor(getResources().getColor(R. color. primary_blue))
                     binding.btnVerifyOtp.isEnabled = true
                 }else{
                     //    binding.btnVerifyOtp.setBackgroundResource(R.drawable.d_button_bg)
+                    binding.btnVerifyOtp.strokeWidth = 3
+                    binding.btnVerifyOtp.strokeColor = ColorStateList.valueOf(ContextCompat.getColor(this@NewLoginActivity, R.color.unselect_grey))
+                    binding.btnVerifyOtp.setTextColor(getResources().getColor(R. color. unselect_grey))
                     binding.btnVerifyOtp.isEnabled = false
                 }
             }
@@ -372,6 +433,9 @@ class NewLoginActivity : BaseActivity(), OnItemSelectionListener<Country> {
                 binding.btnResendOtp.setText("Resend")
                 binding.btnResendOtp.isEnabled = true
                 binding.btnResendOtp.isEnabled = true
+                binding.btnResendOtp.strokeWidth = 3
+                binding.btnResendOtp.strokeColor = ColorStateList.valueOf(ContextCompat.getColor(this@NewLoginActivity, R.color.primary_grey))
+                binding.btnResendOtp.setTextColor(getResources().getColor(R. color. primary_grey))
             }
         }.start()
     }
@@ -379,6 +443,9 @@ class NewLoginActivity : BaseActivity(), OnItemSelectionListener<Country> {
     private fun stopTimer() {
         timer?.cancel()  // This will stop the countdown and call onFinish()
         binding.btnResendOtp.setText("Resend") // Optionally reset the button text
+        binding.btnResendOtp.strokeWidth = 3
+        binding.btnResendOtp.strokeColor = ColorStateList.valueOf(ContextCompat.getColor(this@NewLoginActivity, R.color.primary_grey))
+        binding.btnResendOtp.setTextColor(getResources().getColor(R. color. primary_grey))
     }
 
 

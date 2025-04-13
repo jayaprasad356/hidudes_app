@@ -63,6 +63,29 @@ class DPreferences(context: Context) {
         return mPrefsRead.getString("selected_plan_id", "0") ?: "0"
     }
 
+    fun setSelectedOrderId(orderId: String) {
+        try {
+            mPrefsWrite.putString("selected_order_id", orderId)
+            mPrefsWrite.apply()
+        } catch (e: Exception) {
+            e.message?.let { Log.e("DPreferences", it) }
+        }
+    }
+
+    fun getSelectedOrderId(): String {
+        return mPrefsRead.getString("selected_order_id", "0") ?: "0"
+    }
+
+    fun clearSelectedOrderId() {
+        try {
+            mPrefsWrite.remove("selected_user_id")
+            mPrefsWrite.remove("selected_plan_id")
+            mPrefsWrite.remove("selected_order_id")
+            mPrefsWrite.apply()
+        } catch (e: Exception) {
+            e.message?.let { Log.e("DPreferences", it) }
+        }
+    }
 
     fun clearUserData() {
         try {

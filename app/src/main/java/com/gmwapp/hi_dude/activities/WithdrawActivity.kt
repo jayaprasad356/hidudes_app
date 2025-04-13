@@ -4,6 +4,7 @@ import android.animation.ObjectAnimator
 import android.animation.ValueAnimator
 import android.content.Context
 import android.content.Intent
+import android.content.res.ColorStateList
 import android.os.Build
 import android.os.Bundle
 import android.text.Editable
@@ -18,6 +19,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
 import androidx.core.animation.addListener
+import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
@@ -312,6 +314,9 @@ class WithdrawActivity : BaseActivity() {
 
         // Initially disable the button
         binding.btnWithdraw.isEnabled = false
+        binding.btnWithdraw.strokeWidth = 3
+        binding.btnWithdraw.strokeColor = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.unselect_grey))
+        binding.btnWithdraw.setTextColor(getResources().getColor(R. color. unselect_grey))
 
         // Check if amount is empty or not a valid number
         if (amount.isEmpty() || !isValidAmount(amount)) {
@@ -328,11 +333,17 @@ class WithdrawActivity : BaseActivity() {
 
             if (amount.isNotEmpty() && isValidAmount(amount) && amount.toDouble() >= 50.0 && upiid) {
                 binding.btnWithdraw.isEnabled = true
+                binding.btnWithdraw.strokeWidth = 3
+                binding.btnWithdraw.strokeColor = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.primary_blue))
+                binding.btnWithdraw.setTextColor(getResources().getColor(R. color. primary_blue))
             }
         }
         else if (payment_method == "bank_transfer") {
             if (amount.isNotEmpty() && isValidAmount(amount) && amount.toDouble() >= 50.0 && bankDetails) {
                 binding.btnWithdraw.isEnabled = true
+                binding.btnWithdraw.strokeWidth = 3
+                binding.btnWithdraw.strokeColor = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.primary_blue))
+                binding.btnWithdraw.setTextColor(getResources().getColor(R. color. primary_blue))
             }
 
         }

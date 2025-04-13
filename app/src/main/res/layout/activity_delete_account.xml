@@ -2,6 +2,7 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_marginBottom="16dp"
@@ -492,16 +493,17 @@
         android:layout_marginBottom="10dp"
         android:padding="8dp"
         android:enabled="false"
+        android:layout_marginVertical="@dimen/_5sdp"
         android:text="@string/delete_account"
         android:textAllCaps="false"
         app:cornerRadius="@dimen/_18sdp"
-        android:textColor="@color/primary_blue"
+        android:textColor="@color/unselect_grey"
         android:backgroundTint="@color/button_background_tint"
         android:textSize="14sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:strokeColor="@color/primary_blue"
+        app:strokeColor="@color/unselect_grey"
         app:strokeWidth="@dimen/_1sdp"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

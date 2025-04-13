@@ -208,7 +208,7 @@ class HomeFragment : BaseFragment() {
 
         initFab()
 
-        askMediaPermissions()
+//        askMediaPermissions()
 
     }
 

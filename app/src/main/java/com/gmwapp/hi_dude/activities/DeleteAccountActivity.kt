@@ -1,6 +1,7 @@
 package com.gmwapp.hi_dude.activities
 
 import android.content.Intent
+import android.content.res.ColorStateList
 import android.graphics.Paint
 import android.net.Uri
 import android.os.Bundle
@@ -11,8 +12,11 @@ import android.text.TextUtils
 import android.text.TextWatcher
 import android.view.View
 import android.widget.Toast
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.Observer
 import com.gmwapp.hi_dude.BaseApplication
 import com.gmwapp.hi_dude.BuildConfig
@@ -45,8 +49,20 @@ class DeleteAccountActivity : BaseActivity(), OnButtonClickListener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // Enable edge-to-edge UI
+        enableEdgeToEdge()
+
         binding = ActivityDeleteAccountBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        // Apply window insets to handle padding for system bars (status + nav)
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
+            insets
+        }
+
         initUI()
     }
 
@@ -156,6 +172,9 @@ class DeleteAccountActivity : BaseActivity(), OnButtonClickListener {
                 if (TextUtils.isEmpty(s)) {
                     // binding.btnDeleteAccount.setBackgroundResource(R.drawable.d_button_bg_disabled)
                     // binding.btnDeleteAccount.setTextColor(getColor(R.color.black))
+                    binding.btnDeleteAccount.strokeWidth = 3
+                    binding.btnDeleteAccount.strokeColor = ColorStateList.valueOf(ContextCompat.getColor(this@DeleteAccountActivity, R.color.unselect_grey))
+                    binding.btnDeleteAccount.setTextColor(getResources().getColor(R. color. unselect_grey))
                     binding.btnDeleteAccount.isEnabled = false
                 } else {
                     binding.tvRemainingText.text = getString(
@@ -164,6 +183,9 @@ class DeleteAccountActivity : BaseActivity(), OnButtonClickListener {
                     )
                     //    binding.btnDeleteAccount.setBackgroundResource(R.drawable.d_button_bg_red)
                     //  binding.btnDeleteAccount.setTextColor(getColor(R.color.white))
+                    binding.btnDeleteAccount.strokeWidth = 3
+                    binding.btnDeleteAccount.strokeColor = ColorStateList.valueOf(ContextCompat.getColor(this@DeleteAccountActivity, R.color.primary_blue))
+                    binding.btnDeleteAccount.setTextColor(getResources().getColor(R. color. primary_blue))
                     binding.btnDeleteAccount.isEnabled = true
                 }
             }
@@ -183,6 +205,9 @@ class DeleteAccountActivity : BaseActivity(), OnButtonClickListener {
                 if (reason.name == "Other") {
                     selectedReasons.clear()
                     binding.btnDeleteAccount.isEnabled = false
+                    binding.btnDeleteAccount.strokeWidth = 3
+                    binding.btnDeleteAccount.strokeColor = ColorStateList.valueOf(ContextCompat.getColor(this@DeleteAccountActivity, R.color.unselect_grey))
+                    binding.btnDeleteAccount.setTextColor(getResources().getColor(R. color. unselect_grey))
                     // binding.btnDeleteAccount.setBackgroundResource(R.drawable.d_button_bg_disabled)
                     binding.etDescription.setText("")
                     if (reason.isSelected == true) {
@@ -204,10 +229,16 @@ class DeleteAccountActivity : BaseActivity(), OnButtonClickListener {
                     }
                     if (selectedReasons.size > 0) {
                         binding.btnDeleteAccount.isEnabled = true
+                        binding.btnDeleteAccount.strokeWidth = 3
+                        binding.btnDeleteAccount.strokeColor = ColorStateList.valueOf(ContextCompat.getColor(this@DeleteAccountActivity, R.color.primary_blue))
+                        binding.btnDeleteAccount.setTextColor(getResources().getColor(R. color. primary_blue))
                         // binding.btnDeleteAccount.setTextColor(getColor(R.color.white))
                         //  binding.btnDeleteAccount.setBackgroundResource(R.drawable.d_button_bg_red)
                     } else {
                         binding.btnDeleteAccount.isEnabled = false
+                        binding.btnDeleteAccount.strokeWidth = 3
+                        binding.btnDeleteAccount.strokeColor = ColorStateList.valueOf(ContextCompat.getColor(this@DeleteAccountActivity, R.color.unselect_grey))
+                        binding.btnDeleteAccount.setTextColor(getResources().getColor(R. color. unselect_grey))
                         // binding.btnDeleteAccount.setTextColor(getColor(R.color.black))
                         //   binding.btnDeleteAccount.setBackgroundResource(R.drawable.d_button_bg_disabled)
                     }

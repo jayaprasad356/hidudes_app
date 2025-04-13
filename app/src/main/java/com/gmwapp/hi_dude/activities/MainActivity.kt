@@ -18,6 +18,8 @@ import android.widget.ImageView
 import android.widget.Toast
 import androidx.activity.addCallback
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
@@ -40,6 +42,7 @@ import com.gmwapp.hi_dude.fragments.RecentFragment
 import com.gmwapp.hi_dude.utils.DPreferences
 import com.gmwapp.hi_dude.viewmodels.AccountViewModel
 import com.gmwapp.hi_dude.viewmodels.FcmTokenViewModel
+import com.gmwapp.hi_dude.viewmodels.LoginViewModel
 import com.gmwapp.hi_dude.viewmodels.OfferViewModel
 import com.gmwapp.hi_dude.viewmodels.ProfileViewModel
 import com.gmwapp.hi_dude.viewmodels.UpiPaymentViewModel
@@ -49,6 +52,14 @@ import com.google.android.material.bottomnavigation.BottomNavigationMenuView
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.navigation.NavigationBarView
+import com.google.android.material.snackbar.Snackbar
+import com.google.android.play.core.appupdate.AppUpdateManager
+import com.google.android.play.core.appupdate.AppUpdateManagerFactory
+import com.google.android.play.core.appupdate.AppUpdateOptions
+import com.google.android.play.core.install.InstallStateUpdatedListener
+import com.google.android.play.core.install.model.AppUpdateType
+import com.google.android.play.core.install.model.InstallStatus
+import com.google.android.play.core.install.model.UpdateAvailability
 import com.google.firebase.messaging.FirebaseMessaging
 import dagger.hilt.android.AndroidEntryPoint
 import retrofit2.Call
@@ -63,7 +74,9 @@ class MainActivity : BaseActivity(), BottomNavigationView.OnNavigationItemSelect
     var userName: String? = null
     var userID: String? = null
     private var billingManager: BillingManager? = null
+    var currentVersion = ""
 
+    val appUpdateViewModel: LoginViewModel by viewModels()
     val offerViewModel: OfferViewModel by viewModels()
     private val profileViewModel: ProfileViewModel by viewModels()
     private val accountViewModel: AccountViewModel by viewModels()
@@ -73,6 +86,9 @@ class MainActivity : BaseActivity(), BottomNavigationView.OnNavigationItemSelect
 
     lateinit var coinId: String
     private lateinit var logger: AppEventsLogger
+
+    private lateinit var activityResultLauncher: ActivityResultLauncher<IntentSenderRequest>
+    private lateinit var appUpdateManager: AppUpdateManager
 
     var PERMISSIONS: Array<String> = arrayOf(
         Manifest.permission.READ_MEDIA_IMAGES,
@@ -108,6 +124,32 @@ class MainActivity : BaseActivity(), BottomNavigationView.OnNavigationItemSelect
             }
         }
 
+        try {
+            val pInfo = packageManager.getPackageInfo(packageName, 0)
+            currentVersion = pInfo.versionCode.toString()
+        } catch (e: PackageManager.NameNotFoundException) {
+            e.printStackTrace()
+        }
+
+        appUpdateManager = AppUpdateManagerFactory.create(applicationContext)
+
+        activityResultLauncher = registerForActivityResult(ActivityResultContracts.StartIntentSenderForResult()) { result ->
+            if (result.resultCode != RESULT_OK) {
+                Log.e("Update", "Update flow failed! Result code: ${result.resultCode}")
+            }
+        }
+        appUpdateViewModel.appUpdate()
+
+
+        appUpdateViewModel.appUpdateResponseLiveData.observe(this, Observer {
+            if (it != null && it.success) {
+
+                val latestVersion = it.data[0].app_version.toString()
+                checkForInAppUpdate(latestVersion)
+
+            }
+        })
+
 
 
 
@@ -115,8 +157,16 @@ class MainActivity : BaseActivity(), BottomNavigationView.OnNavigationItemSelect
         val userData = BaseApplication.getInstance()?.getPrefs()?.getUserData()
         userID = userData?.id.toString()
 
-        billingManager = BillingManager(this)
-        accountViewModel.getSettings()
+        BaseApplication.getInstance()?.getPrefs()?.getUserData()
+            ?.let { WalletViewModel.getCoins(it.id) }
+
+        WalletViewModel.coinsLiveData.observe(this) { coinResponse ->
+            if (coinResponse != null && coinResponse.success && coinResponse.data != null) {
+                val skuList = coinResponse.data.map { coin -> coin.id.toString() }
+                billingManager = BillingManager(this, skuList)
+                accountViewModel.getSettings()
+            }
+        }
 
         initUI()
         addObservers()
@@ -370,16 +420,19 @@ class MainActivity : BaseActivity(), BottomNavigationView.OnNavigationItemSelect
         if (userId != null && pointsId.isNotEmpty()) {
             if (pointsIdInt != null) {
 
+                // Generate 4-digit random number
+                val random4Digit = (1000..9999).random()
+
                 // ✅ Save userId and pointsIdInt BEFORE launching billing
                 val preferences = DPreferences(this)
+                preferences.clearSelectedOrderId()
                 preferences.setSelectedUserId(userId.toString())
                 preferences.setSelectedPlanId(java.lang.String.valueOf(pointsIdInt))
-                WalletViewModel.tryCoins(userId, pointsIdInt)
+                preferences.setSelectedOrderId(java.lang.String.valueOf(random4Digit))
+                WalletViewModel.tryCoins(userId, pointsIdInt, 0, random4Digit, "try")
                 billingManager!!.purchaseProduct(
-//                    "coins_12",
-                        pointsId,
-                    userId,
-                    pointsIdInt
+                    //"coins_12",
+                    pointsId,
                 )
                 WalletViewModel.navigateToMain.observe(this, Observer { shouldNavigate ->
 //                    val intent = Intent(this, MainActivity::class.java)
@@ -592,16 +645,19 @@ class MainActivity : BaseActivity(), BottomNavigationView.OnNavigationItemSelect
             if (userId != null && pointsId.isNotEmpty()) {
                 if (pointsIdInt != null) {
 
+                    // Generate 4-digit random number
+                    val random4Digit = (1000..9999).random()
+
                     // ✅ Save userId and pointsIdInt BEFORE launching billing
                     val preferences = DPreferences(this)
+                    preferences.clearSelectedOrderId()
                     preferences.setSelectedUserId(userId.toString())
                     preferences.setSelectedPlanId(java.lang.String.valueOf(pointsIdInt))
-                    WalletViewModel.tryCoins(userId, pointsIdInt)
+                    preferences.setSelectedOrderId(java.lang.String.valueOf(random4Digit))
+                    WalletViewModel.tryCoins(userId, pointsIdInt, 0, random4Digit, "try")
                     billingManager!!.purchaseProduct(
                         //"coins_12",
                         pointsId,
-                        userId,
-                        pointsIdInt
                     )
                     WalletViewModel.navigateToMain.observe(this, Observer { shouldNavigate ->
 
@@ -733,6 +789,104 @@ class MainActivity : BaseActivity(), BottomNavigationView.OnNavigationItemSelect
     override fun onStart() {
         super.onStart()
         requestPermissions()
+    }
+
+    private fun checkForInAppUpdate(latestVersion:String){
+        Log.d("UpdateCheck", "No update available. " + latestVersion)
+        Log.d("UpdateCheck", "No update available. " + currentVersion)
+
+        if (latestVersion>currentVersion) {
+
+            appUpdateManager = AppUpdateManagerFactory.create(applicationContext)
+            // Before starting an update, register a listener for updates.
+            appUpdateManager.registerListener(listener)
+
+            // Returns an intent object that you use to check for an update.
+            val appUpdateInfoTask = appUpdateManager.appUpdateInfo
+
+            // Checks that the platform will allow the specified type of update.
+            appUpdateInfoTask.addOnSuccessListener { appUpdateInfo ->
+                if (appUpdateInfo.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE
+                    // This example applies an immediate update. To apply a flexible update
+                    // instead, pass in AppUpdateType.FLEXIBLE
+                    && appUpdateInfo.isUpdateTypeAllowed(AppUpdateType.FLEXIBLE)
+                ) {
+                    Log.d("UpdateCheck", "No update available. " + appUpdateInfo.updateAvailability())
+                    Log.d("UpdateCheck", "No update available. " + UpdateAvailability.UPDATE_AVAILABLE)
+                    Log.d("UpdateCheck", "No update available. " + appUpdateInfo.isUpdateTypeAllowed(AppUpdateType.FLEXIBLE))
+                    // Request the update.
+
+                    appUpdateManager.startUpdateFlowForResult(
+                        // Pass the intent that is returned by 'getAppUpdateInfo()'.
+                        appUpdateInfo,
+                        // an activity result launcher registered via registerForActivityResult
+                        activityResultLauncher,
+                        // Or pass 'AppUpdateType.FLEXIBLE' to newBuilder() for
+                        // flexible updates.
+                        AppUpdateOptions.newBuilder(AppUpdateType.FLEXIBLE).build()
+
+                    )
+
+                } else {
+                    Log.d("UpdateCheck", "No update available. " + appUpdateInfo.updateAvailability())
+                    Log.d("UpdateCheck", "No update available. " + UpdateAvailability.UPDATE_AVAILABLE)
+                    Log.d("UpdateCheck", "No update available. " + appUpdateInfo.isUpdateTypeAllowed(AppUpdateType.FLEXIBLE))
+                    Log.d("UpdateCheck", "No update available.")
+                }
+
+
+            }.addOnFailureListener { exception ->
+                Log.e("UpdateCheck", "Failed to check for update: ${exception.message}")
+            }
+
+        }
+
+    }
+
+    val listener = InstallStateUpdatedListener { state ->
+        if (state.installStatus() == InstallStatus.DOWNLOADED) {
+            popupSnackbarForCompleteUpdate()
+        }
+    }
+
+    fun popupSnackbarForCompleteUpdate() {
+        Snackbar.make(
+            binding.root,  // Default root container
+            "An update has just been downloaded.",
+            Snackbar.LENGTH_INDEFINITE
+        ).apply {
+            setAction("RESTART") { appUpdateManager.completeUpdate() }
+            setActionTextColor(getColor(R.color.pink))
+            show()
+        }
+    }
+
+
+    override fun onStop() {
+        super.onStop()
+        appUpdateManager.unregisterListener(listener)
+
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        appUpdateManager.unregisterListener(listener)
+    }
+
+
+
+    override fun onResume() {
+        super.onResume()
+
+        appUpdateManager
+            .appUpdateInfo
+            .addOnSuccessListener { appUpdateInfo ->
+                // If the update is downloaded but not installed,
+                // notify the user to complete the update.
+                if (appUpdateInfo.installStatus() == InstallStatus.DOWNLOADED) {
+                    popupSnackbarForCompleteUpdate()
+                }
+            }
     }
 
 }

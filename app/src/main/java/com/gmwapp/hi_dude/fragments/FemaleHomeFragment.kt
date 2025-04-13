@@ -101,7 +101,7 @@ class FemaleHomeFragment : BaseFragment() {
         isPermissionDenied = sharedPreferences.getBoolean("isTagSet", false)
         initUI()
         askPermissions()
-        askMediaPermissions()
+//        askMediaPermissions()
         return binding.root
     }
 

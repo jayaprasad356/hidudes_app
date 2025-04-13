@@ -102,6 +102,13 @@ class WalletActivity : BaseActivity()  {
             }
 
             if (it != null && it.success && it.data != null) {
+
+                // Dynamically build SKU list
+                val skuList = it.data.map { coin -> coin.id.toString() }
+
+                // Initialize BillingManager with dynamic SKUs
+                billingManager = BillingManager(this, skuList)
+
                 // Create the adapter
                 val coinAdapter =
                     CoinAdapter(this, it.data, object : OnItemSelectionListener<CoinsResponseData> {
@@ -136,7 +143,7 @@ class WalletActivity : BaseActivity()  {
 
         })
 
-        billingManager = BillingManager(this)
+//        billingManager = BillingManager(this)
 
         binding.btnAddCoins.setOnClickListener(View.OnClickListener { view: View? ->
 
@@ -149,16 +156,19 @@ class WalletActivity : BaseActivity()  {
             if (userId != null && pointsId.isNotEmpty()) {
                 if (pointsIdInt != null) {
 
+                    // Generate 4-digit random number
+                    val random4Digit = (1000..9999).random()
+
                     // ✅ Save userId and pointsIdInt BEFORE launching billing
                     val preferences = DPreferences(this)
+                    preferences.clearSelectedOrderId()
                     preferences.setSelectedUserId(userId.toString())
                     preferences.setSelectedPlanId(java.lang.String.valueOf(pointsIdInt))
-                    WalletViewModel.tryCoins(userId, pointsIdInt)
+                    preferences.setSelectedOrderId(java.lang.String.valueOf(random4Digit))
+                    WalletViewModel.tryCoins(userId, pointsIdInt, 0, random4Digit, "try")
                     billingManager!!.purchaseProduct(
-                        //"coins_12",
+//                        "coins_12",
                         pointsId,
-                        userId,
-                        pointsIdInt
                     )
                     WalletViewModel.navigateToMain.observe(this, Observer { shouldNavigate ->
 
@@ -403,16 +413,19 @@ class WalletActivity : BaseActivity()  {
             if (userId != null && pointsId.isNotEmpty()) {
                 if (pointsIdInt != null) {
 
+                    // Generate 4-digit random number
+                    val random4Digit = (1000..9999).random()
+
                     // ✅ Save userId and pointsIdInt BEFORE launching billing
                     val preferences = DPreferences(this)
+                    preferences.clearSelectedOrderId()
                     preferences.setSelectedUserId(userId.toString())
                     preferences.setSelectedPlanId(java.lang.String.valueOf(pointsIdInt))
-                    WalletViewModel.tryCoins(userId, pointsIdInt)
+                    preferences.setSelectedOrderId(java.lang.String.valueOf(random4Digit))
+                    WalletViewModel.tryCoins(userId, pointsIdInt, 0, random4Digit, "try")
                     billingManager!!.purchaseProduct(
                         //"coins_12",
                         pointsId,
-                        userId,
-                        pointsIdInt
                     )
                     WalletViewModel.navigateToMain.observe(this, Observer { shouldNavigate ->
 

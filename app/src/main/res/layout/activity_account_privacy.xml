@@ -12,7 +12,6 @@
         android:id="@+id/iv_back"
         android:layout_width="15dp"
         android:layout_height="15dp"
-        android:layout_marginTop="8dp"
         android:layout_marginStart="4dp"
         android:contentDescription="@string/account_privacy"
         android:src="@drawable/right_arrow"
@@ -20,7 +19,8 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:tint="@color/white"
-        tools:ignore="MissingConstraints" />
+        tools:ignore="MissingConstraints"
+        android:layout_marginTop="@dimen/_30sdp" />
 
     <TextView
         android:id="@+id/tv_account_privacy"
@@ -47,7 +47,8 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/iv_back"
         app:strokeWidth="@dimen/_1sdp"
-        app:strokeColor="@color/primary_blue">
+        app:strokeColor="@color/primary_blue"
+        android:layout_marginHorizontal="@dimen/_10sdp">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -104,7 +105,8 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/cv_privacy_policy"
         app:strokeColor="@color/primary_blue"
-        app:strokeWidth="@dimen/_1sdp">
+        app:strokeWidth="@dimen/_1sdp"
+        android:layout_marginHorizontal="@dimen/_10sdp">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
