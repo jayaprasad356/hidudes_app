@@ -9,6 +9,7 @@ import android.os.Build
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
@@ -32,6 +33,7 @@ import com.gmwapp.hi_dude.R
 import com.gmwapp.hi_dude.adapters.UpiListAdapter
 import com.gmwapp.hi_dude.databinding.ActivityWithdrawBinding
 import com.gmwapp.hi_dude.utils.setOnSingleClickListener
+import com.gmwapp.hi_dude.viewmodels.AccountViewModel
 import com.gmwapp.hi_dude.viewmodels.ProfileViewModel
 import com.gmwapp.hi_dude.viewmodels.UpiViewModel
 import com.gmwapp.hi_dude.viewmodels.WithdrawViewModel
@@ -49,6 +51,9 @@ class WithdrawActivity : BaseActivity() {
 
     var bankDetails: Boolean = false
     var upiid: Boolean = false
+    var minWithdrawAmount :Int?= null
+    private val accountViewModel: AccountViewModel by viewModels()
+
 
     var payment_method = ""
 
@@ -73,6 +78,24 @@ class WithdrawActivity : BaseActivity() {
     }
 
     private fun initUI() {
+
+        accountViewModel.getSettings()
+
+        accountViewModel.settingsLiveData.observe(this, Observer { response ->
+            if (response?.success == true) {
+                response.data?.let { settingsList ->
+                    Log.d("settinglist","$settingsList")
+                    if (settingsList.isNotEmpty()) {
+                        val settingsData = settingsList[0]
+                        settingsData.minimum_withdrawals?.let {
+                            binding.tvMinimumAmount.setText("Minimum withdrawal : Rs $it")
+                            minWithdrawAmount= it
+                        }
+                    }
+                }
+            }
+        })
+
 
         binding.ivBack.setOnClickListener{
             onBackPressed()
@@ -121,8 +144,8 @@ class WithdrawActivity : BaseActivity() {
         val rvUpiTypes = findViewById<RecyclerView>(R.id.rv_upi_types)
         val etUpiId = findViewById<EditText>(R.id.et_upi_id)
 
-         payment_method = intent.getStringExtra("payment_method").toString()
-         val userData = BaseApplication.getInstance()?.getPrefs()?.getUserData()
+        payment_method = intent.getStringExtra("payment_method").toString()
+        val userData = BaseApplication.getInstance()?.getPrefs()?.getUserData()
 
 
         binding.tvCurrentBalance.text = "₹" + userData?.balance.toString()
@@ -321,7 +344,7 @@ class WithdrawActivity : BaseActivity() {
         // Check if amount is empty or not a valid number
         if (amount.isEmpty() || !isValidAmount(amount)) {
             // Optionally, show a message or highlight the field
-            binding.etAmount.error = "Min withdrwal amount Rs.50"
+            binding.etAmount.error = "Min withdrwal amount Rs.$minWithdrawAmount"
         }
 
 
@@ -331,19 +354,40 @@ class WithdrawActivity : BaseActivity() {
                 binding.ivAddUpi.rotation = 0f
             }
 
-            if (amount.isNotEmpty() && isValidAmount(amount) && amount.toDouble() >= 50.0 && upiid) {
-                binding.btnWithdraw.isEnabled = true
-                binding.btnWithdraw.strokeWidth = 3
-                binding.btnWithdraw.strokeColor = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.primary_blue))
-                binding.btnWithdraw.setTextColor(getResources().getColor(R. color. primary_blue))
+
+
+            minWithdrawAmount?.let { min ->
+                if (
+                    amount.isNotEmpty() &&
+                    isValidAmount(amount) &&
+                    amount.toDouble() >= min &&
+                    upiid
+                ) {
+                    binding.btnWithdraw.isEnabled = true
+                    binding.btnWithdraw.strokeWidth = 3
+                    binding.btnWithdraw.strokeColor = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.primary_blue))
+                    binding.btnWithdraw.setTextColor(getResources().getColor(R. color. primary_blue))
+                }
             }
         }
         else if (payment_method == "bank_transfer") {
-            if (amount.isNotEmpty() && isValidAmount(amount) && amount.toDouble() >= 50.0 && bankDetails) {
-                binding.btnWithdraw.isEnabled = true
-                binding.btnWithdraw.strokeWidth = 3
-                binding.btnWithdraw.strokeColor = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.primary_blue))
-                binding.btnWithdraw.setTextColor(getResources().getColor(R. color. primary_blue))
+            //            if (amount.isNotEmpty() && isValidAmount(amount)  && amount.toDouble() >= minWithdrawAmount && bankDetails) {
+//                binding.btnWithdraw.isEnabled = true
+//            }
+
+
+            minWithdrawAmount?.let { min ->
+                if (
+                    amount.isNotEmpty() &&
+                    isValidAmount(amount) &&
+                    amount.toDouble() >= min &&
+                    bankDetails
+                ) {
+                    binding.btnWithdraw.isEnabled = true
+                    binding.btnWithdraw.strokeWidth = 3
+                    binding.btnWithdraw.strokeColor = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.primary_blue))
+                    binding.btnWithdraw.setTextColor(getResources().getColor(R. color. primary_blue))
+                }
             }
 
         }

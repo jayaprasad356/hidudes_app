@@ -1,5 +1,6 @@
 package com.gmwapp.hi_dude.viewmodels
 
+import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -20,14 +21,15 @@ class TransactionsViewModel @Inject constructor(private val transactionsReposito
     val transactionsResponseLiveData = MutableLiveData<TransactionsResponse>()
     val transactionsErrorLiveData = MutableLiveData<String>()
 
-    fun getTransactions(userId: Int) {
+    fun getTransactions(userId: Int,  offset: Int,limit: Int,) {
         viewModelScope.launch {
-            transactionsRepositories.getTransactions(userId, object:NetworkCallback<TransactionsResponse> {
+            transactionsRepositories.getTransactions(userId,offset,limit, object:NetworkCallback<TransactionsResponse> {
                 override fun onResponse(
                     call: Call<TransactionsResponse>,
                     response: Response<TransactionsResponse>
                 ) {
                     transactionsResponseLiveData.postValue(response.body());
+                    Log.d("transactionsResponseLiveData","${response.body()}")
                 }
 
                 override fun onFailure(call: Call<TransactionsResponse>, t: Throwable) {

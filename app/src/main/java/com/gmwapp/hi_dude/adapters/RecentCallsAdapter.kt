@@ -1,6 +1,7 @@
 package com.gmwapp.hi_dude.adapters
 
 import android.app.Activity
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -39,6 +40,27 @@ class RecentCallsAdapter(
         Glide.with(activity).load(call.image).apply(
             RequestOptions().circleCrop()
         ).into(holder.binding.ivImage)
+
+        holder.binding.ivAudioCircle.setOnClickListener(null)
+        holder.binding.ivVideoCircle.setOnClickListener(null)
+        // Reset Views before applying new data
+        holder.binding.ivAudioCircle.visibility = View.GONE
+        holder.binding.ivVideoCircle.visibility = View.GONE
+        holder.binding.ivAudio.visibility = View.GONE
+        holder.binding.ivVideo.visibility = View.GONE
+        holder.binding.tvAmount.visibility = View.GONE
+
+        holder.binding.ivAudio.setColorFilter(ContextCompat.getColor(activity, R.color.white))
+        holder.binding.ivVideo.setColorFilter(ContextCompat.getColor(activity, R.color.white))
+
+        holder.binding.ivAudioCircle.clearColorFilter()
+        holder.binding.ivVideoCircle.clearColorFilter()
+
+        holder.binding.ivAudio.isEnabled = false
+        holder.binding.ivVideo.isEnabled = false
+
+
+
         holder.binding.tvName.text = call.name
         val userData = BaseApplication.getInstance()?.getPrefs()?.getUserData()
         if (userData?.gender == DConstants.MALE) {
@@ -82,6 +104,7 @@ class RecentCallsAdapter(
         }
         holder.binding.tvTime.text = call.started_time + " \u2022" + call.duration
 
+        Log.d("RecentCallUserName","${call.name}")
 
 
 
@@ -91,6 +114,22 @@ class RecentCallsAdapter(
         return callList.size
     }
 
+
+
+    fun addData(newData: List<CallsListResponseData>) {
+        val start = callList.size
+        callList.addAll(newData)
+        notifyItemRangeInserted(start, newData.size)
+    }
+
+    fun clearData() {
+        callList.clear()
+        notifyDataSetChanged()
+    }
+
+
     internal class ItemHolder(val binding: AdapterRecentCallsBinding) :
         RecyclerView.ViewHolder(binding.root)
+
+
 }

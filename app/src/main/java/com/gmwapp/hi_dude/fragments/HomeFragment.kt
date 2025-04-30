@@ -25,6 +25,7 @@ import com.gmwapp.hi_dude.activities.RandomUserActivity
 import com.gmwapp.hi_dude.activities.WalletActivity
 import com.gmwapp.hi_dude.adapters.FemaleUserAdapter
 import com.gmwapp.hi_dude.agora.AgoraRandomCallActivity
+import com.gmwapp.hi_dude.agora.FcmUtils
 import com.gmwapp.hi_dude.agora.male.MaleCallConnectingActivity
 import com.gmwapp.hi_dude.callbacks.OnItemSelectionListener
 import com.gmwapp.hi_dude.constants.DConstants
@@ -119,14 +120,23 @@ class HomeFragment : BaseFragment() {
         }
         userData?.id?.let { profileViewModel.getUsers(it) }
 
-        profileViewModel.getUserLiveData.observe(viewLifecycleOwner, Observer {
-            it.data?.let { it1 ->
-                BaseApplication.getInstance()?.getPrefs()?.setUserData(it1)
-            }
-            binding.tvCoins.text = it.data?.coins.toString()
-            Log.d("coinsvalue","${it.data?.coins}")
-            Log.d("coinsvalue","${it.data?.name}")
+//        profileViewModel.getUserLiveData.observe(viewLifecycleOwner, Observer {
+//            it.data?.let { it1 ->
+//                BaseApplication.getInstance()?.getPrefs()?.setUserData(it1)
+//            }
+//            binding.tvCoins.text = it.data?.coins.toString()
+//            Log.d("coinsvalue","${it.data?.coins}")
+//            Log.d("coinsvalue","${it.data?.name}")
+//
+//        })
 
+        profileViewModel.getUserLiveData.observe(viewLifecycleOwner, Observer { response ->
+            response?.data?.let { userData ->
+                BaseApplication.getInstance()?.getPrefs()?.setUserData(userData)
+                binding.tvCoins.text = userData.coins.toString()
+                Log.d("coinsvalue", "${userData.coins}")
+                Log.d("coinsvalue", "${userData.name}")
+            } ?: Log.e("HomeFragment", "RegisterResponse is null")
         })
 
 
@@ -154,9 +164,9 @@ class HomeFragment : BaseFragment() {
 //                Toast.makeText(activity, "No Data Found", Toast.LENGTH_SHORT).show()
 //            }
 
-            it.data?.firstOrNull()?.audio_status?.let { audioStatus ->
-                Log.d("responsecheck", "Audio Status: $audioStatus")
-            }
+//            it.data?.firstOrNull()?.audio_status?.let { audioStatus ->
+//                Log.d("responsecheck", "Audio Status: $audioStatus")
+//            }
 
             if (it?.data != null) {
                 binding.rvProfiles.layoutManager =
@@ -179,6 +189,7 @@ class HomeFragment : BaseFragment() {
                                     DConstants.TEXT,
                                     getString(R.string.wait_user_hint, data.name)
                                 )
+                                FcmUtils.isUserAvailable=1
                                 startActivity(intent)
                             }
                         },
@@ -195,6 +206,7 @@ class HomeFragment : BaseFragment() {
                                     DConstants.TEXT,
                                     getString(R.string.wait_user_hint, data.name)
                                 )
+                                FcmUtils.isUserAvailable=1
                                 startActivity(intent)
                             }
                         })
@@ -397,16 +409,26 @@ class HomeFragment : BaseFragment() {
         val userData = BaseApplication.getInstance()?.getPrefs()?.getUserData()
         userData?.id?.let { profileViewModel.getUsers(it) }
         observeCoins()
+
+        if (FcmUtils.isUserAvailable==0){
+            userData?.let { loadFemaleUsers(it.id) }
+        }
+
     }
 
-    fun observeCoins(){
-        profileViewModel.getUserLiveData.observe(this, Observer {
-            it.data?.let { it1 ->
-                BaseApplication.getInstance()?.getPrefs()?.setUserData(it1)
+    fun observeCoins() {
+        profileViewModel.getUserLiveData.observe(this, Observer { response ->
+            if (response != null) {  // Check if response is null
+                response.data?.let { userData ->
+                    BaseApplication.getInstance()?.getPrefs()?.setUserData(userData)
+                    Log.d("coinsUpdated_", "$${userData.coins}") // Avoid unnecessary .toString()
+                    binding.tvCoins.text = userData.coins.toString()
+                }
+            } else {
+                Log.e("HomeFragment", "RegisterResponse is null")
             }
-            Log.d("coinsUpdated_","$${it.data?.coins.toString()}")
-            binding.tvCoins.text = it.data?.coins.toString()
         })
     }
+
 
 }

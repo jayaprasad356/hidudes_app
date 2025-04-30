@@ -81,6 +81,8 @@ class MaleAudioCallingActivity : AppCompatActivity() {
 
     private var femaleUserId: String? = null
 
+    private var isSwitchRequestPending = false
+
 
     var isClicked: Boolean = false
     var isAudioCallIdReceived: Boolean = false
@@ -100,6 +102,7 @@ class MaleAudioCallingActivity : AppCompatActivity() {
     var switchCallID = 0
     private var isVideoCallGoing: Boolean = false
 
+    private var switchDialog: AlertDialog? = null  // Track current dialog
 
     private val appId = "846d67df5699400994e29f653050c386"
     private val appCertificate = "29110f27c845422d8474dd24508df317"
@@ -370,7 +373,7 @@ class MaleAudioCallingActivity : AppCompatActivity() {
     private val mRtcEventHandler: IRtcEngineEventHandler = object : IRtcEngineEventHandler() {
         override fun onJoinChannelSuccess(channel: String, uid: Int, elapsed: Int) {
             isJoined = true
-         //   showMessage("Joined Channel $channel")
+            //   showMessage("Joined Channel $channel")
             startTimeoutTracking()
         }
 
@@ -378,7 +381,7 @@ class MaleAudioCallingActivity : AppCompatActivity() {
 
             updateCallEndDetails()
             stopCountdown()
-          //  showMessage("Remote user left")
+            //  showMessage("Remote user left")
 
             val intent = Intent(this@MaleAudioCallingActivity, MainActivity::class.java)
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
@@ -388,7 +391,7 @@ class MaleAudioCallingActivity : AppCompatActivity() {
         }
 
         override fun onUserJoined(uid: Int, elapsed: Int) {
-          //  showMessage("Remote user joined $uid")
+            //  showMessage("Remote user joined $uid")
             isRemoteUserJoined = true
             Log.d("videoUid", "$uid")
             videoUid = uid
@@ -423,7 +426,7 @@ class MaleAudioCallingActivity : AppCompatActivity() {
 
     fun leaveChannel(view: View) {
         if (!isJoined) {
-          //  showMessage("Join a channel first")
+            //  showMessage("Join a channel first")
             val intent = Intent(this@MaleAudioCallingActivity, MainActivity::class.java)
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
             startActivity(intent)
@@ -431,7 +434,7 @@ class MaleAudioCallingActivity : AppCompatActivity() {
         } else {
             stopCountdown()
             agoraEngine?.leaveChannel()
-          //  showMessage("You left the channel")
+            //  showMessage("You left the channel")
             isJoined = false
 
             RtcEngine.destroy()
@@ -718,10 +721,10 @@ class MaleAudioCallingActivity : AppCompatActivity() {
     }
 
     private fun endcallBtn() {
-      binding.btnEndCall.setOnSingleClickListener {
-          leaveChannel(binding.LeaveButton)
+        binding.btnEndCall.setOnSingleClickListener {
+            leaveChannel(binding.LeaveButton)
 
-      }
+        }
     }
 
     private fun handleCallSwitch() {
@@ -731,17 +734,20 @@ class MaleAudioCallingActivity : AppCompatActivity() {
             val audioDrawable = ContextCompat.getDrawable(this, R.drawable.audiocall_img)
             val videoDrawable = ContextCompat.getDrawable(this, R.drawable.videocall_img)
 
-            if (currentDrawable != null && audioDrawable != null && currentDrawable.constantState == audioDrawable.constantState) {
-                // If button image is AUDIO, switch to VIDEO
-                switchToAudio()
-            } else if (currentDrawable != null && videoDrawable != null && currentDrawable.constantState == videoDrawable.constantState) {
-                // If button image is VIDEO, switch to AUDIO
-                switchToVideo()
-            } else {
-                Toast.makeText(this, "Error: Unknown state", Toast.LENGTH_SHORT).show()
+            if (isSwitchRequestPending == false) {
+                if (currentDrawable != null && audioDrawable != null && currentDrawable.constantState == audioDrawable.constantState) {
+                    // If button image is AUDIO, switch to VIDEO
+                    switchToAudio()
+                } else if (currentDrawable != null && videoDrawable != null && currentDrawable.constantState == videoDrawable.constantState) {
+                    // If button image is VIDEO, switch to AUDIO
+                    switchToVideo()
+                } else {
+                    Toast.makeText(this, "Error: Unknown state", Toast.LENGTH_SHORT).show()
+                }
+            }else{
+                Toast.makeText(this,"Already Request Sent", Toast.LENGTH_SHORT).show()
             }
         }
-
 
     }
 
@@ -751,60 +757,60 @@ class MaleAudioCallingActivity : AppCompatActivity() {
 
     private fun switchToVideo() {
 
-         getCallIdforCallSwitch("video")
+        getCallIdforCallSwitch("video")
 
-                val remainingTime =
-                    binding.tvRemainingTime?.text.toString() // Get the current countdown time
-                val timeParts = remainingTime.split(":").map { it.toInt() }
+        val remainingTime =
+            binding.tvRemainingTime?.text.toString() // Get the current countdown time
+        val timeParts = remainingTime.split(":").map { it.toInt() }
 
-                if (timeParts.size == 3) {  // Ensure we have HH:MM:SS format
-                    val hours = timeParts[0]
-                    val minutes = timeParts[1]
-                    val seconds = timeParts[2]
+        if (timeParts.size == 3) {  // Ensure we have HH:MM:SS format
+            val hours = timeParts[0]
+            val minutes = timeParts[1]
+            val seconds = timeParts[2]
 
-                    val totalSeconds = (hours * 3600) + (minutes * 60) + seconds
-
-
-                    AlertDialog.Builder(this)
-                        .setTitle("Want to Switch to Video Call?")
-                        .setPositiveButton("Yes") { _, _ ->
-                            // Show toast message
-                            if (totalSeconds > 360) {
-                                if (switchCallID == 0) {
-                                    Toast.makeText(this, "Try Again", Toast.LENGTH_SHORT).show()
-
-                                } else {
-                                    sendSwitchCallRequestNotification(
-                                        maleUserId,
-                                        receiverId,
-                                        "video",
-                                        "switchToVideo $switchCallID"
-                                    )
-                                    Toast.makeText(
-                                        this,
-                                        "Video call request sent",
-                                        Toast.LENGTH_SHORT
-                                    )
-                                        .show()
-                                }
-
-                            } else {
-                                Toast.makeText(
-                                    this,
-                                    "You don’t have enough coins",
-                                    Toast.LENGTH_SHORT
-                                )
-                                    .show()
-
-                            }
+            val totalSeconds = (hours * 3600) + (minutes * 60) + seconds
 
 
+            AlertDialog.Builder(this)
+                .setTitle("Want to Switch to Video Call?")
+                .setPositiveButton("Yes") { _, _ ->
+                    // Show toast message
+                    if (totalSeconds > 360) {
+                        if (switchCallID == 0) {
+                            Toast.makeText(this, "Try Again", Toast.LENGTH_SHORT).show()
+
+                        } else {
+                            sendSwitchCallRequestNotification(
+                                maleUserId,
+                                receiverId,
+                                "video",
+                                "switchToVideo $switchCallID"
+                            )
+                            Toast.makeText(
+                                this,
+                                "Video call request sent",
+                                Toast.LENGTH_SHORT
+                            )
+                                .show()
                         }
-                        .setNegativeButton("No") { dialog, _ ->
-                            dialog.dismiss()
-                        }
-                        .show()
+
+                    } else {
+                        Toast.makeText(
+                            this,
+                            "You don’t have enough coins",
+                            Toast.LENGTH_SHORT
+                        )
+                            .show()
+
+                    }
+
+
                 }
+                .setNegativeButton("No") { dialog, _ ->
+                    dialog.dismiss()
+                }
+                .show()
+        }
 
 
 
@@ -824,12 +830,32 @@ class MaleAudioCallingActivity : AppCompatActivity() {
             channelName = channelName,
             message = message
         )
-        observeCallSwitchAcceptance()
-
+        observeSwitchCallNotificationSent()
         isSwitchingToAudio = false
         isSwitchingToVideo = false
 
     }
+
+    fun observeSwitchCallNotificationSent(){
+        fcmNotificationViewModel.notificationResponseLiveData.observe(this) { response ->
+            response?.let {
+                if (it.success) {
+                    Log.d("FCMNotification", "Notification sent successfully!")
+                    var message = it.data_sent?.message?: ""
+                    if (message.startsWith("switchToVideo") || message.startsWith("switchToAudio")) {
+
+                        isSwitchRequestPending= true
+                        observeCallSwitchAcceptance()
+
+                    }
+
+                } else {
+                    Log.e("FCMNotification", "Failed to send notification")
+                }
+            }
+        }
+    }
+
 
     fun observeCallSwitchAcceptance() {
         FcmUtils.updatedCallSwitch.observe(this, androidx.lifecycle.Observer { updatedCallSwitch ->
@@ -839,6 +865,7 @@ class MaleAudioCallingActivity : AppCompatActivity() {
                 Log.d("CallswitchID", "$switchCallID")
 
                 if (switchType == "VideoAccepted" && receiverId == this.receiverId) {
+                    isSwitchRequestPending=false
 
                     val remainingTime =
                         binding.tvRemainingTime?.text.toString() // Get the current countdown time
@@ -874,12 +901,25 @@ class MaleAudioCallingActivity : AppCompatActivity() {
 
                 if (switchType == "AudioAccepted" && receiverId == this.receiverId) {
 
+                    isSwitchRequestPending=false
+
                     Toast.makeText(this, "Accepted", Toast.LENGTH_SHORT).show()
-                            stopCountdown()
-                            FcmUtils.clearCallSwitch()
-                            enableAudioCall()
-                        }
-                    }
+                    stopCountdown()
+                    FcmUtils.clearCallSwitch()
+                    enableAudioCall()
+                }
+
+
+                if (switchType == "SwitchDeclined" && receiverId == this.receiverId) {
+
+                    isSwitchRequestPending=false
+                    FcmUtils.clearCallSwitch()
+                    Toast.makeText(this, "Request is rejected", Toast.LENGTH_SHORT).show()
+                }
+
+
+            }
+
 
 
         })
@@ -950,6 +990,8 @@ class MaleAudioCallingActivity : AppCompatActivity() {
                 dateFormat.format(Date()) // Set call end time only if startTime is not empty
 
             binding.btnVideoCall.setImageResource(R.drawable.audiocall_img)
+            binding.btnVideoCall.visibility= View.GONE
+
 
 
         }
@@ -992,103 +1034,141 @@ class MaleAudioCallingActivity : AppCompatActivity() {
                 var userid = userData?.id
 
                 if (switchType == "switchToVideo") {
-                    switchCallID = newCallId
-                    AlertDialog.Builder(this)
-                        .setTitle("Switch to Video Call ?")
-                        .setMessage("$receiverName requested for video call")
-                        .setPositiveButton("Confirm") { _, _ ->
+                    if (isVideoCallGoing==false){
+                        switchCallID = newCallId
+                        switchDialog?.dismiss()
+
+                        switchDialog = AlertDialog.Builder(this)
+                            .setTitle("Switch to Video Call ?")
+                            .setMessage("$receiverName requested for video call")
+                            .setPositiveButton("Confirm") { _, _ ->
 
 
-                            val remainingTime =
-                                binding.tvRemainingTime?.text.toString() // Get the current countdown time
-                            val timeParts = remainingTime.split(":").map { it.toInt() }
+                                val remainingTime =
+                                    binding.tvRemainingTime?.text.toString() // Get the current countdown time
+                                val timeParts = remainingTime.split(":").map { it.toInt() }
 
 
-                            if (timeParts.size == 3) {  // Ensure we have HH:MM:SS format
-                                val hours = timeParts[0]
-                                val minutes = timeParts[1]
-                                val seconds = timeParts[2]
+                                if (timeParts.size == 3) {  // Ensure we have HH:MM:SS format
+                                    val hours = timeParts[0]
+                                    val minutes = timeParts[1]
+                                    val seconds = timeParts[2]
 
-                                val totalSeconds = (hours * 3600) + (minutes * 60) + seconds
+                                    val totalSeconds = (hours * 3600) + (minutes * 60) + seconds
 
 
-                                if (totalSeconds > 360) {
-                                    if (userid != null && switchCallID != 0) {
-                                        Toast.makeText(this, "Accepted", Toast.LENGTH_SHORT).show()
+                                    if (totalSeconds > 360) {
+                                        if (userid != null && switchCallID != 0) {
+                                            Toast.makeText(this, "Accepted", Toast.LENGTH_SHORT).show()
 
-                                        sendCallAcceptNotification(
-                                            userid,
-                                            receiverId,
-                                            "video",
-                                            "VideoAccepted"
-                                        )
+                                            sendCallAcceptNotification(
+                                                userid,
+                                                receiverId,
+                                                "video",
+                                                "VideoAccepted"
+                                            )
+                                            FcmUtils.clearCallSwitch()
+                                            Log.d("NewCallID", "$newCallId")
+                                            stopCountdown()
+                                            isSwitchingToVideo = false
+                                            enableVideoCall()
+                                        }
+                                    } else {
+                                        Toast.makeText(
+                                            this,
+                                            "$receiverName don't have enough coins",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
                                         FcmUtils.clearCallSwitch()
-                                        Log.d("NewCallID", "$newCallId")
-                                        stopCountdown()
-                                        isSwitchingToVideo = false
-                                        enableVideoCall()
+
                                     }
-                                } else {
-                                    Toast.makeText(
-                                        this,
-                                        "$receiverName don't have enough coins",
-                                        Toast.LENGTH_SHORT
-                                    ).show()
-                                    FcmUtils.clearCallSwitch()
+
 
                                 }
 
 
                             }
+                            .setNegativeButton("Decline") { dialog, _ ->
+                                // Dismiss dialog if No is clicked
+
+                                userid?.let {
+                                    sendCallAcceptNotification(
+                                        it,
+                                        receiverId,
+                                        "video",
+                                        "SwitchDeclined"
+                                    )
+                                }
+                                dialog.dismiss()
+                                FcmUtils.clearCallSwitch()
 
 
-                        }
-                        .setNegativeButton("Decline") { dialog, _ ->
-                            // Dismiss dialog if No is clicked
-                            dialog.dismiss()
-                            FcmUtils.clearCallSwitch()
+                            }
+                            .setOnDismissListener { switchDialog = null }  // Reset when dismissed
 
-                        }
-                        .show()
+                            .show()
 
-                }
+                    }}
 
                 if (switchType=="switchToAudio"){
-                    switchCallID = newCallId
+                    if (isVideoCallGoing){
+                        switchCallID = newCallId
 
-                    AlertDialog.Builder(this)
-                        .setTitle("Switch to audio Call ?")
-                        .setMessage("$receiverName requested for audio call")
-                        .setPositiveButton("Confirm") { _, _ ->
+                        switchDialog?.dismiss()
 
-                            if (userid != null && switchCallID !=0) {
-                                Toast.makeText(this, "Accepted", Toast.LENGTH_SHORT).show()
+                        switchDialog = AlertDialog.Builder(this)
+                            .setTitle("Switch to audio Call ?")
+                            .setMessage("$receiverName requested for audio call")
+                            .setPositiveButton("Confirm") { _, _ ->
 
-                                sendCallAcceptNotification(userid,receiverId,"audio","AudioAccepted")
-                                FcmUtils.clearCallSwitch()
-                                Log.d("NewCallID","$newCallId")
-                                stopCountdown()
-                                isSwitchingToAudio = false
+                                if (userid != null && switchCallID !=0) {
+                                    Toast.makeText(this, "Accepted", Toast.LENGTH_SHORT).show()
 
-                                enableAudioCall()
+                                    sendCallAcceptNotification(userid,receiverId,"audio","AudioAccepted")
+                                    FcmUtils.clearCallSwitch()
+                                    Log.d("NewCallID","$newCallId")
+                                    stopCountdown()
+                                    isSwitchingToAudio = false
+
+                                    enableAudioCall()
+                                }
+
                             }
+                            .setNegativeButton("Decline") { dialog, _ ->
+                                // Dismiss dialog if No is clicked
+                                userid?.let {
+                                    sendCallAcceptNotification(
+                                        it,
+                                        receiverId,
+                                        "audio",
+                                        "SwitchDeclined"
+                                    )
+                                }
+                                dialog.dismiss()
+                                FcmUtils.clearCallSwitch()
 
-                        }
-                        .setNegativeButton("Decline") { dialog, _ ->
-                            // Dismiss dialog if No is clicked
-                            dialog.dismiss()
-                            FcmUtils.clearCallSwitch()
+                            }
+                            .setOnDismissListener { switchDialog = null }  // Reset when dismissed
 
-                        }
-                        .show()
+                            .show()
+
+                    }
+
+
+                    FcmUtils.clearCallSwitch()
+
 
                 }
 
-
-                FcmUtils.clearCallSwitch()
 
 
             }
+
+
+
+
+
+
         })
     }
 
@@ -1153,30 +1233,30 @@ class MaleAudioCallingActivity : AppCompatActivity() {
 
     private fun switchToAudio() {
 
-                isAudioCallIdReceived = false
-                getCallIdforCallSwitch("audio")
+        isAudioCallIdReceived = false
+        getCallIdforCallSwitch("audio")
 
-                AlertDialog.Builder(this)
-                    .setTitle("Want to Switch to Audio Call?")
-                    .setPositiveButton("Yes") { _, _ ->
-                        if (isAudioCallIdReceived == false) {
-                            Toast.makeText(this, "Try Again", Toast.LENGTH_SHORT).show()
+        AlertDialog.Builder(this)
+            .setTitle("Want to Switch to Audio Call?")
+            .setPositiveButton("Yes") { _, _ ->
+                if (isAudioCallIdReceived == false) {
+                    Toast.makeText(this, "Try Again", Toast.LENGTH_SHORT).show()
 
-                        } else {
-                            sendSwitchCallRequestNotification(
-                                maleUserId,
-                                receiverId,
-                                "audio",
-                                "switchToAudio $switchCallID"
-                            )
-                            Toast.makeText(this, "Audio call request sent", Toast.LENGTH_SHORT)
-                                .show()
-                        }
-                    }
-                    .setNegativeButton("No") { dialog, _ ->
-                        dialog.dismiss()
-                    }
-                    .show()
+                } else {
+                    sendSwitchCallRequestNotification(
+                        maleUserId,
+                        receiverId,
+                        "audio",
+                        "switchToAudio $switchCallID"
+                    )
+                    Toast.makeText(this, "Audio call request sent", Toast.LENGTH_SHORT)
+                        .show()
+                }
+            }
+            .setNegativeButton("No") { dialog, _ ->
+                dialog.dismiss()
+            }
+            .show()
 
 
     }

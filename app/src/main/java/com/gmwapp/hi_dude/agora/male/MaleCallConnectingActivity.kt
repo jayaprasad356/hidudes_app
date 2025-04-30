@@ -81,39 +81,44 @@ class MaleCallConnectingActivity : AppCompatActivity() {
             insets
         }
 
-         lifecycleScope.launch {
-             FcmUtils.clearCallStatus()
+        FcmUtils.isUserAvailable=1
 
-             Log.d("callStatusValueLog", "${FcmUtils.callStatus.value}")
-             val callStatusValue = FcmUtils.callStatus.value
-             if (callStatusValue?.first == "accepted") {
-
-               //  Toast.makeText(this, "Try again", Toast.LENGTH_LONG).show()
-                 Log.d("NavigationDebug", "Redirecting to MainActivity due to call accepted.")
-
-                 val intent = Intent(this@MaleCallConnectingActivity, MainActivity::class.java)
-                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
-                 startActivity(intent)
-                 finish()
-             }
+        Log.d("FcmUtils.isUserAvailable","${FcmUtils.isUserAvailable}")
 
 
-             val userData = BaseApplication.getInstance()?.getPrefs()?.getUserData()
+        lifecycleScope.launch {
+            FcmUtils.clearCallStatus()
 
-             userData?.id?.let { userId = userData?.id }
+            Log.d("callStatusValueLog", "${FcmUtils.callStatus.value}")
+            val callStatusValue = FcmUtils.callStatus.value
+            if (callStatusValue?.first == "accepted") {
 
-             callType = intent.getStringExtra(DConstants.CALL_TYPE)
-             receiverId = intent.getIntExtra(DConstants.RECEIVER_ID, -1)
-             receiverImg = intent.getStringExtra(DConstants.IMAGE)
-             receiverName = intent.getStringExtra(DConstants.RECEIVER_NAME)
+                //  Toast.makeText(this, "Try again", Toast.LENGTH_LONG).show()
+                Log.d("NavigationDebug", "Redirecting to MainActivity due to call accepted.")
 
-             getCallId()
+                val intent = Intent(this@MaleCallConnectingActivity, MainActivity::class.java)
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
+                startActivity(intent)
+                finish()
+            }
 
 
-             initUI()
-             observeCallAcceptance()
+            val userData = BaseApplication.getInstance()?.getPrefs()?.getUserData()
 
-         }
+            userData?.id?.let { userId = userData?.id }
+
+            callType = intent.getStringExtra(DConstants.CALL_TYPE)
+            receiverId = intent.getIntExtra(DConstants.RECEIVER_ID, -1)
+            receiverImg = intent.getStringExtra(DConstants.IMAGE)
+            receiverName = intent.getStringExtra(DConstants.RECEIVER_NAME)
+
+            getCallId()
+
+
+            initUI()
+            observeCallAcceptance()
+
+        }
 
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
@@ -214,7 +219,7 @@ class MaleCallConnectingActivity : AppCompatActivity() {
 
     }
 
-        fun getCallId(){
+    fun getCallId(){
         receiverId?.let { it1 ->
             userId?.let {
                 femaleUsersViewModel.callFemaleUser(
@@ -234,7 +239,26 @@ class MaleCallConnectingActivity : AppCompatActivity() {
                 callId = it.data?.call_id ?: 0
 
                 Log.d("callid","$callId")
+                val audioStatus = it.data?.audio_status
+                val videoStatus = it.data?.video_status
 
+                Log.d("callid", "$callId")
+
+                // ✅ Check callType against corresponding status
+                val shouldSendNotification = when (callType) {
+                    "audio" -> audioStatus != 0
+                    "video" -> videoStatus != 0
+                    else -> false
+                }
+
+                if (shouldSendNotification) {
+                    Log.d("Notification", "Not sending notification because callType=$callType has status=0")
+                    Toast.makeText(
+                        this@MaleCallConnectingActivity, "User is offline", Toast.LENGTH_LONG
+                    ).show()
+                    navigateToMain()
+                    return@Observer
+                }
 
                 if (userId != null && receiverId != -1 && callType != null) {
                     sendCallNotification(userId!!, receiverId,callType!!,"incoming call $callId $myAvatar $myname")
@@ -259,18 +283,18 @@ class MaleCallConnectingActivity : AppCompatActivity() {
     private fun disconnectCall() {
         var currentActivity = BaseApplication.getInstance()?.getCurrentActivity()
         if (currentActivity is MaleCallConnectingActivity){
-        sendCallNotification(userId!!, receiverId,callType!!,"callDeclined")
-        cancelTimeoutTracking()
-        FcmUtils.clearCallStatus()  // Clear before moving to MainActivity
+            sendCallNotification(userId!!, receiverId,callType!!,"callDeclined")
+            cancelTimeoutTracking()
+            FcmUtils.clearCallStatus()  // Clear before moving to MainActivity
 
 
-        Log.d("NavigationDebug", "Redirecting to MainActivity due to timeout.")
+            Log.d("NavigationDebug", "Redirecting to MainActivity due to timeout.")
 
-        val intent = Intent(this@MaleCallConnectingActivity, MainActivity::class.java)
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
-        startActivity(intent)
-        finish()
-    }}
+            val intent = Intent(this@MaleCallConnectingActivity, MainActivity::class.java)
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
+            startActivity(intent)
+            finish()
+        }}
 
     fun sendCallNotification(senderId:Int, receiverId:Int, callType:String, message:String) {
         fcmNotificationViewModel.sendNotification(
@@ -307,33 +331,33 @@ class MaleCallConnectingActivity : AppCompatActivity() {
                     var currentActivity = BaseApplication.getInstance()?.getCurrentActivity()
                     if (currentActivity !is MainActivity){
 
-                    Log.d("callTypeData","$callType")
-                    if (callType=="audio") {
-                        cancelTimeoutTracking()
+                        Log.d("callTypeData","$callType")
+                        if (callType=="audio") {
+                            cancelTimeoutTracking()
 
-                        val intent = Intent(this, MaleAudioCallingActivity::class.java).apply {
-                            putExtra("CHANNEL_NAME", channelName)
-                            putExtra("RECEIVER_ID", receiverId)
-                            putExtra("CALL_ID", callId)
-                            Log.d("RECEIVER_ID","$receiverId")
-                        }
-                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
-                        startActivity(intent)
-                        finish()
-                    }else{
-                        cancelTimeoutTracking()
-
-                        FcmUtils.clearCallStatus()
-                        val intent = Intent(this, MaleVideoCallingActivity::class.java).apply {
+                            val intent = Intent(this, MaleAudioCallingActivity::class.java).apply {
                                 putExtra("CHANNEL_NAME", channelName)
                                 putExtra("RECEIVER_ID", receiverId)
-                                 putExtra("CALL_ID", callId)
-
-                        }
+                                putExtra("CALL_ID", callId)
+                                Log.d("RECEIVER_ID","$receiverId")
+                            }
                             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
                             startActivity(intent)
                             finish()
-                    }
+                        }else{
+                            cancelTimeoutTracking()
+
+                            FcmUtils.clearCallStatus()
+                            val intent = Intent(this, MaleVideoCallingActivity::class.java).apply {
+                                putExtra("CHANNEL_NAME", channelName)
+                                putExtra("RECEIVER_ID", receiverId)
+                                putExtra("CALL_ID", callId)
+
+                            }
+                            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
+                            startActivity(intent)
+                            finish()
+                        }
                     }
                 } else if (status == "rejected") {
                     FcmUtils.clearCallStatus()  // Clear before moving to MainActivity
@@ -355,15 +379,30 @@ class MaleCallConnectingActivity : AppCompatActivity() {
 
     fun generateUniqueChannelName(senderId: Int): String {
         val timestamp = System.currentTimeMillis() // Get current timestamp in milliseconds
+        Log.d("ChannelnameCheck","${senderId}_$timestamp")
         return "${senderId}_$timestamp"
     }
 
-        override fun onDestroy() {
-            super.onDestroy()
-            isRunning = false
-            cancelTimeoutTracking()
+    override fun onDestroy() {
+        super.onDestroy()
+        isRunning = false
+        cancelTimeoutTracking()
 
-        }
+    }
+
+    fun navigateToMain(){
+        isRunning = false
+        FcmUtils.clearCallStatus()  // Clear before moving to MainActivity
+        FcmUtils.isUserAvailable = 0
+        cancelTimeoutTracking()
+        Log.d("GoinginMain", "${FcmUtils.isUserAvailable}")
+
+        val intent = Intent(this, MainActivity::class.java)
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
+        startActivity(intent)
+
+        finish()
+    }
 
 
 }

@@ -157,7 +157,7 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
                             currentActivity !is BankUpdateActivity) {
 
                             // App is NOT in these activities → Show notification
-                          //  showIncomingCallNotification(callType, senderId, channelName, callId.toIntOrNull() ?: 0, receiverName, receiverImg)
+                            //  showIncomingCallNotification(callType, senderId, channelName, callId.toIntOrNull() ?: 0, receiverName, receiverImg)
                         } else {
                             Log.d("currentActivity", "User is in $currentActivity, skipping notification")
 
@@ -197,7 +197,7 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
                     Toast.makeText(this, "User is busy", Toast.LENGTH_LONG).show()
 
                 }
-                    val mainIntent = Intent(this, MainActivity::class.java).apply {
+                val mainIntent = Intent(this, MainActivity::class.java).apply {
                     flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
                 }
                 startActivity(mainIntent)
@@ -257,7 +257,7 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
 //                                currentActivity.moveTaskToBack(true) // Send app to background
 //                            }
 
-                    }
+                        }
 
 
 
@@ -282,22 +282,22 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
 
 
             if (message.startsWith("switchToVideo") && gender == "female") {
-                    val parts = message.split(" ")
-                    if (parts.size == 2) {
-                        val callId = parts[1]  // Extract callId from the message
-                        val callidInt: Int = callId.toIntOrNull() ?: 0  // Defaults to 0 if conversion fails
-                        Log.d("callIdofSwitch", "$callId")
+                val parts = message.split(" ")
+                if (parts.size == 2) {
+                    val callId = parts[1]  // Extract callId from the message
+                    val callidInt: Int = callId.toIntOrNull() ?: 0  // Defaults to 0 if conversion fails
+                    Log.d("callIdofSwitch", "$callId")
 
 
-                var previousSenderId = BaseApplication.getInstance()?.getSenderId()
-                if (senderId==previousSenderId){
+                    var previousSenderId = BaseApplication.getInstance()?.getSenderId()
+                    if (senderId==previousSenderId){
 
-                    Log.d("switchToVideo","$message")
-                    FcmUtils.UpdateCallSwitch("switchToVideo",callidInt)
+                        Log.d("switchToVideo","$message")
+                        FcmUtils.UpdateCallSwitch("switchToVideo",callidInt)
 
-                }
+                    }
 
-            }}
+                }}
 
             if (message.startsWith("switchToAudio") && gender == "female") {
                 val parts = message.split(" ")
@@ -335,6 +335,15 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
 
             }
 
+            if (message == "SwitchDeclined" && gender == "male") {
+
+                Log.d("SwitchDeclined","$message")
+                FcmUtils.UpdateCallSwitch(message, senderId)
+
+
+
+            }
+
 
             if (message.startsWith("switchToVideo") && gender == "male") {
                 val parts = message.split(" ")
@@ -351,10 +360,8 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
 
 
             if (message == "VideoAccepted" && gender == "female") {
-
                 Log.d("switchToVideo","$message")
                 FcmUtils.UpdateCallSwitch(message, senderId)
-
             }
 
 
@@ -376,6 +383,16 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
                 FcmUtils.UpdateCallSwitch(message, senderId)
 
             }
+
+            if (message == "SwitchDeclined" && gender == "female") {
+
+                Log.d("SwitchDeclined","$message")
+                FcmUtils.UpdateCallSwitch(message, senderId)
+
+            }
+
+
+
 
 
         }

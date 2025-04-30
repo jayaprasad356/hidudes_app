@@ -1,17 +1,20 @@
 package com.gmwapp.hi_dude.adapters
 
 import android.app.Activity
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.gmwapp.hi_dude.R
 import com.gmwapp.hi_dude.databinding.AdapterTransactionBinding
 import com.gmwapp.hi_dude.retrofit.responses.TransactionsResponseData
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 
 class TransactionAdapter(
     val activity: Activity,
-    private val transactions: List<TransactionsResponseData>,
+    private val transactions: MutableList<TransactionsResponseData>,
 ) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
@@ -35,16 +38,48 @@ class TransactionAdapter(
             holder.binding.tvCoins.text = "-"+transaction.coins
             holder.binding.tvCoins.setTextColor(activity.getColor(android.R.color.holo_red_dark))
         }
-        holder.binding.tvTransactionTitle.text = transaction.type
-        holder.binding.tvTransactionDate.text = transaction.datetime
+        var callType = transaction.call_type.orEmpty().replaceFirstChar { it.uppercase() }
+        var call_user_name = transaction.call_user_name
+        if (transaction.type=="add_coins"){
+            holder.binding.tvTransactionTitle.text = "Wallet Recharge"
+            holder.binding.tvTransactionDate.text = "${transaction.date}"
+
+        }else if(transaction.type=="coins_deduction"){
+            holder.binding.tvTransactionTitle.text = "$callType call with $call_user_name"
+            holder.binding.tvTransactionDate.text = "${transaction.date} · ${transaction.duration}"
+
+        }
+
+        //  holder.binding.tvTransactionDate.text = formatTime(transaction.datetime)
+        Log.d("transaction_datetime","$transaction.datetime")
         holder.binding.tvTransactionHint.text = activity.getString(R.string.session_id)+transaction.id
+
     }
 
-     override fun getItemCount(): Int {
+
+    fun addTransactions(newTransactions: List<TransactionsResponseData>) {
+        val startPos = transactions.size
+        transactions.addAll(newTransactions)
+        notifyItemRangeInserted(startPos, newTransactions.size)
+    }
+
+
+
+    override fun getItemCount(): Int {
         return transactions.size
     }
 
     internal class ItemHolder(val binding: AdapterTransactionBinding) :
         RecyclerView.ViewHolder(binding.root) {
+    }
+
+    fun formatTime(datetime: String): String {
+        val inputFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
+        val outputFormat = SimpleDateFormat("hh:mm a", Locale.getDefault()) // 12-hour format
+
+        val date = inputFormat.parse(datetime) // Convert string to Date
+        val formattedTime = outputFormat.format(date!!) // Convert Date to formatted string
+
+        return datetime.substring(0, 10) + " " + formattedTime // Keep original date, change time
     }
 }

@@ -24,12 +24,11 @@ public class BillingManager {
     private final BillingClient billingClient;
     private final Activity activity;
     private List<SkuDetails> skuDetailsList;
-    private List<String> skuList;
     private final Set<String> handledPurchaseTokens = new HashSet<>();
 
-    public BillingManager(Activity activity, List<String> skuList) {
+
+    public BillingManager(Activity activity) {
         this.activity = activity;
-        this.skuList = skuList;
         billingClient = BillingClient.newBuilder(activity)
                 .setListener(purchasesUpdatedListener)
                 .enablePendingPurchases()
@@ -59,9 +58,13 @@ public class BillingManager {
 
     private void queryAvailableProducts() {
 //        List<String> skuList = List.of("coins_11", "coins_12", "2", "3", "4", "5", "6", "7", "8", "9"); // Ensure these match Play Console
+
+        DPreferences preferences = new DPreferences(activity);
+        List<String> skuList = preferences.getSkuList();
+        Log.d("skuListChecks", String.valueOf(skuList));
         SkuDetailsParams params = SkuDetailsParams.newBuilder()
                 .setSkusList(skuList)
-                .setType(BillingClient.SkuType.INAPP)
+                .setType(BillingClient.SkuType.INAPP)  // Use .SkuType.SUBS for subscriptions
                 .build();
 
         billingClient.querySkuDetailsAsync(params, (billingResult, skuDetailsList) -> {
@@ -86,6 +89,8 @@ public class BillingManager {
             Toast.makeText(activity, "No products available!", Toast.LENGTH_SHORT).show();
             return;
         }
+
+        Log.d("productId",productId);
 
         SkuDetails selectedProduct = null;
         for (SkuDetails sku : skuDetailsList) {
@@ -123,11 +128,19 @@ public class BillingManager {
 
     private void handlePurchase(Purchase purchase) {
         String purchaseToken = purchase.getPurchaseToken();
+        String playConsoleOrder = purchase.getOrderId();
+
+        if (playConsoleOrder == null || playConsoleOrder.isEmpty()) {
+            Log.e("Billing", "Order ID is null or empty. Stopping execution.");
+            return;
+        }
 
         if (handledPurchaseTokens.contains(purchaseToken)) {
             Log.d("Billing", "Purchase already handled: " + purchaseToken);
             return;
         }
+
+
 
         handledPurchaseTokens.add(purchaseToken);
         Log.d("Billing", "Handling purchase: " + purchaseToken);
@@ -182,4 +195,6 @@ public class BillingManager {
             });
         }
     }
+
+
 }

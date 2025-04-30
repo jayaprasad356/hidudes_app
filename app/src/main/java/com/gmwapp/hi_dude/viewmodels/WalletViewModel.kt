@@ -1,5 +1,6 @@
 package com.gmwapp.hi_dude.viewmodels
 
+import android.app.Application
 import android.content.Context
 import android.content.Intent
 import android.util.Log
@@ -26,15 +27,19 @@ import javax.inject.Inject
 
 
 @HiltViewModel
-class WalletViewModel @Inject constructor(private val walletRepositories: WalletRepositories,
-                                          @ApplicationContext private val context: Context
+class WalletViewModel @Inject constructor(private val walletRepositories: WalletRepositories,application: Application
 ) : ViewModel() {
+
+    private val appContext = application.applicationContext  // Get application context
 
     val coinsLiveData = MutableLiveData<CoinsResponse>()
     val addCoinsResponse = MutableLiveData<AddCoinsResponse>()
     val afterAddCoinsLiveData = MutableLiveData<String>()
+
     val _navigateToMain = MutableLiveData<Boolean>()
     val navigateToMain: LiveData<Boolean> get() = _navigateToMain
+
+
 
     fun getCoins(userId: Int) {
         viewModelScope.launch {
@@ -55,11 +60,11 @@ class WalletViewModel @Inject constructor(private val walletRepositories: Wallet
         }
     }
 
-    fun addCoins(userId: Int, coinId: Int, status: Int, orderId: Int, massage: String,) {
-        Log.d("addCoins", "Pass value: $userId $coinId $status $orderId $massage")
+    fun addCoins(userId: Int, coinId: Int, status: Int, orderId: Int, message: String,) {
+        Log.d("addCoins", "Pass value: $userId $coinId $status $orderId $message")
         _navigateToMain.postValue(false)
         viewModelScope.launch {
-            walletRepositories.addCoins(userId, coinId, status, orderId, massage, object : NetworkCallback<AddCoinsResponse> {
+            walletRepositories.addCoins(userId, coinId, status, orderId, message, object : NetworkCallback<AddCoinsResponse> {
                 override fun onResponse(call: Call<AddCoinsResponse>, response: Response<AddCoinsResponse>) {
                     Log.d("addCoins", "Raw Response: ${response.body()?.toString()}")
 
@@ -78,7 +83,7 @@ class WalletViewModel @Inject constructor(private val walletRepositories: Wallet
                                 _navigateToMain.postValue(true) // ✅ Notify Activity to navigate
 
                                 // ✅ Save new coin balance to SharedPreferences
-                                DPreferences(context).setAfterAddCoins(it.data.coins)
+                                DPreferences(appContext).setAfterAddCoins(it.data.coins)
 
                                 // ✅ Notify UI via LiveData
                                 afterAddCoinsLiveData.postValue(it.data.coins)
@@ -133,10 +138,10 @@ class WalletViewModel @Inject constructor(private val walletRepositories: Wallet
                             if (it.success) {
                                 Log.d("addCoins", "Coins added successfully! Fetching updated balance...")
 
-                                _navigateToMain.postValue(true) // ✅ Notify Activity to navigate
+                                // _navigateToMain.postValue(true) // ✅ Notify Activity to navigate
 
                                 // ✅ Save new coin balance to SharedPreferences
-                                DPreferences(context).setAfterAddCoins(it.data.coins)
+                                DPreferences(appContext).setAfterAddCoins(it.data.coins)
 
                                 // ✅ Notify UI via LiveData
                                 afterAddCoinsLiveData.postValue(it.data.coins)

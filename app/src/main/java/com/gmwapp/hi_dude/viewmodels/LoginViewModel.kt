@@ -38,7 +38,7 @@ class LoginViewModel @Inject constructor(private val loginRepositories: LoginRep
                 ) {
                     loginResponseLiveData.postValue(response.body());
 
-                    Log.d("VerifyOTP", "Request URL: ${response.body()}")
+                    Log.d("appUpdateCheck", "appUpdate: ${response.body()}")
 
                 }
 

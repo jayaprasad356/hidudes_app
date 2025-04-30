@@ -56,6 +56,7 @@ import java.util.Date
 import java.util.TimeZone
 import com.gmwapp.hi_dude.agora.services.CallingService
 import com.gmwapp.hi_dude.viewmodels.AccountViewModel
+import com.gmwapp.hi_dude.viewmodels.WhatsappLinkViewModel
 
 
 @AndroidEntryPoint
@@ -68,6 +69,7 @@ class FemaleHomeFragment : BaseFragment() {
     lateinit var language : String
     private val femaleUsersViewModel: FemaleUsersViewModel by viewModels()
     private val accountViewModel: AccountViewModel by viewModels()
+    private val whatsappLinkViewModel: WhatsappLinkViewModel by viewModels()
 
     private lateinit var sharedPreferences: SharedPreferences
     private var isPermissionDenied: Boolean = false
@@ -347,6 +349,19 @@ class FemaleHomeFragment : BaseFragment() {
 
         }
 
+        language?.let { whatsappLinkViewModel.fetchLink(it) }
+
+        whatsappLinkViewModel.whatsappResponseLiveData.observe(viewLifecycleOwner) { response ->
+            response?.let {
+                if (it.success && it.data.isNotEmpty()) {
+                    whataspplink = it.data[0].link
+
+                } else {
+                    Log.e("VideoError", "Failed to load video")
+                }
+            }
+        }
+
         accountViewModel.settingsLiveData.observe(viewLifecycleOwner, Observer { response ->
             if (response?.success == true) {
                 response.data?.let { settingsList ->
@@ -393,6 +408,12 @@ class FemaleHomeFragment : BaseFragment() {
             binding.sVideo.isChecked = userData.video_status == 1
         }
 
+        binding.whatsapp.setOnClickListener {
+            if (whataspplink.isNotEmpty() && whataspplink!=null){
+                openWhatsAppGroup(whataspplink)
+            }
+        }
+
         binding.tvCoins.text = "₹" + userData?.balance.toString()
 
         Log.d("femaleuserdata", "${userData?.name} , ${userData?.language}")
@@ -402,6 +423,8 @@ class FemaleHomeFragment : BaseFragment() {
 
         femaleUsersViewModel.reportResponseLiveData.observe(viewLifecycleOwner, Observer {
             if (it.success) {
+
+                Log.d("reportResponseLiveData", "$it")
 
                 binding.tvApproxEarnings.text = it.data[0].today_earnings.toString()
                 binding.tvTotalCalls.text = it.data[0].today_calls.toString()
@@ -443,11 +466,14 @@ class FemaleHomeFragment : BaseFragment() {
             }
         })
 
-        binding.btnFloatingAction.setOnClickListener {
-            val groupLink = "https://whatsapp.com/channel/0029Vb53H0q8PgsDJKx6EN2i" // Replace with your actual WhatsApp group link
-            openWhatsAppGroup(groupLink)
-        }
 
+    }
+
+    override fun onResume() {
+        super.onResume()
+        val prefs = BaseApplication.getInstance()?.getPrefs()
+        val userData = prefs?.getUserData()
+        femaleUsersViewModel.getReports(userData?.id!!)
 
     }
 
@@ -461,6 +487,22 @@ class FemaleHomeFragment : BaseFragment() {
             e.printStackTrace()
 //            Toast.makeText(this, "WhatsApp is not installed", Toast.LENGTH_SHORT).show()
         }
+    }
+
+    private fun getWhatsAppGroupLink(): String {
+        val userlanguage = language
+        language?.let { whatsappLinkViewModel.fetchLink(it) }
+
+        return when (userlanguage) {
+            "Tamil" -> "https://whatsapp.com/channel/0029Vazps3mFsn0p4KSOYF0f"
+            "Hindi" -> "https://whatsapp.com/channel/0029Vazay5MHVvTZuoDKOv1h"
+            "Punjabi" -> "https://whatsapp.com/channel/0029Vb3h23eLCoX5GRLz0y2B"
+            "Telugu" -> "https://whatsapp.com/channel/0029Vb3CXKIFSAt2vcFGUC09"
+            "Malayalam" -> "https://whatsapp.com/channel/0029Vb7tuimFnSzCEAPBgc2U"
+            "Kannada" -> "https://whatsapp.com/channel/0029VauVGRCFi8xeS3Klvl1m"
+            else -> "https://whatsapp.com/channel/0029Vazps3mFsn0p4KSOYF0f"
+        }
+
     }
 
 

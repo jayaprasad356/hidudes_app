@@ -40,6 +40,7 @@ import com.gmwapp.hi_dude.retrofit.responses.UpiUpdateResponse
 import com.gmwapp.hi_dude.retrofit.responses.UserAvatarResponse
 import com.gmwapp.hi_dude.retrofit.responses.UserValidationResponse
 import com.gmwapp.hi_dude.retrofit.responses.VoiceUpdateResponse
+import com.gmwapp.hi_dude.retrofit.responses.WhatsappLinkResponse
 import com.gmwapp.hi_dude.retrofit.responses.WithdrawResponse
 import com.gmwapp.hi_dude.utils.Helper
 import okhttp3.MultipartBody
@@ -109,10 +110,10 @@ class ApiManager @Inject constructor(private val retrofit: Retrofit) {
     }
 
     fun getCallsList(
-        userId: Int, gender: String, callback: NetworkCallback<CallsListResponse>
+        userId: Int, gender: String,limit: Int, currentOffset: Int, callback: NetworkCallback<CallsListResponse>
     ) {
         if (Helper.checkNetworkConnection()) {
-            val apiCall: Call<CallsListResponse> = getApiInterface().getCallsList(userId, gender)
+            val apiCall: Call<CallsListResponse> = getApiInterface().getCallsList(userId, gender,currentOffset,limit)
             apiCall.enqueue(callback)
         } else {
             callback.onNoNetwork()
@@ -174,10 +175,10 @@ class ApiManager @Inject constructor(private val retrofit: Retrofit) {
     }
 
     fun getTransactions(
-        userId: Int, callback: NetworkCallback<TransactionsResponse>
+        userId: Int, offset: Int,limit: Int, callback: NetworkCallback<TransactionsResponse>
     ) {
         if (Helper.checkNetworkConnection()) {
-            val apiCall: Call<TransactionsResponse> = getApiInterface().getTransactions(userId)
+            val apiCall: Call<TransactionsResponse> = getApiInterface().getTransactions(userId,offset,limit)
             apiCall.enqueue(callback)
         } else {
             callback.onNoNetwork()
@@ -406,6 +407,18 @@ class ApiManager @Inject constructor(private val retrofit: Retrofit) {
         }
     }
 
+    fun getWhatsappLink(
+        language: String,
+        callback: NetworkCallback<WhatsappLinkResponse>
+    ) {
+        if (Helper.checkNetworkConnection()) {
+            val apiCall: Call<WhatsappLinkResponse> = getApiInterface().getWhatsappLink(language)
+            apiCall.enqueue(callback)
+        } else {
+            callback.onNoNetwork()
+        }
+    }
+
     fun getGiftImages(callback: NetworkCallback<GiftImageResponse>) {
         if (Helper.checkNetworkConnection()) {
             val apiCall: Call<GiftImageResponse> = getApiInterface().getGiftImages()
@@ -515,12 +528,12 @@ class ApiManager @Inject constructor(private val retrofit: Retrofit) {
         coinsId: Int,
         status: Int,
         orderId: Int,
-        massage: String,
+        message: String,
         callback: NetworkCallback<AddCoinsResponse>
     ) {
 
         if (Helper.checkNetworkConnection()) {
-            val apiCall: Call<AddCoinsResponse> = getApiInterface().addCoins(userId, coinsId, status, orderId, massage)
+            val apiCall: Call<AddCoinsResponse> = getApiInterface().addCoins(userId, coinsId, status, orderId, message)
             apiCall.enqueue(callback)
         } else {
             callback.onNoNetwork()
@@ -645,7 +658,12 @@ interface ApiInterface {
 
     @FormUrlEncoded
     @POST("calls_list")
-    fun getCallsList(@Field("user_id") userId: Int,@Field("gender") gender: String): Call<CallsListResponse>
+    fun getCallsList(
+        @Field("user_id") userId: Int,
+        @Field("gender") gender: String,
+        @Field("offset") offset: Int,
+        @Field("limit") limit: Int,
+    ): Call<CallsListResponse>
 
     @FormUrlEncoded
     @POST("register")
@@ -683,7 +701,15 @@ interface ApiInterface {
 
     @FormUrlEncoded
     @POST("transaction_list")
-    fun getTransactions(@Field("user_id") userId: Int): Call<TransactionsResponse>
+    fun getTransactions(
+
+        @Field("user_id") userId: Int,
+        @Field("offset") offset: Int,
+        @Field("limit") limit: Int,
+
+
+
+        ): Call<TransactionsResponse>
 
     @FormUrlEncoded
     @POST("female_users_list")
@@ -858,6 +884,12 @@ interface ApiInterface {
         @Field("language") language: String
     ): Call<ExplanationVideoResponse>
 
+    @FormUrlEncoded
+    @POST("whatsapplink_list")
+    fun getWhatsappLink(
+        @Field("language") language: String
+    ): Call<WhatsappLinkResponse>
+
 
     @POST("gifts_list")
     fun getGiftImages(): Call<GiftImageResponse>
@@ -885,7 +917,7 @@ interface ApiInterface {
         @Field("coins_id") coinsId: Int,
         @Field("status") status: Int,
         @Field("order_id") orderId: Int,
-        @Field("massage") massage: String,
+        @Field("message") massage: String,
     ): Call<AddCoinsResponse>
 
     @POST("try_coins")

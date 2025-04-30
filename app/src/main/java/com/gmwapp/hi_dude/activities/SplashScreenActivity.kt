@@ -61,11 +61,11 @@ class SplashScreenActivity : BaseActivity() {
         binding = ActivitySplashScreenBinding.inflate(layoutInflater)
         setContentView(binding.root)
         enableEdgeToEdge()
-        activityResultLauncher = registerForActivityResult(ActivityResultContracts.StartIntentSenderForResult()) { result ->
-            if (result.resultCode != RESULT_OK) {
-                Log.e("Update", "Update flow failed! Result code: ${result.resultCode}")
-            }
-        }
+//        activityResultLauncher = registerForActivityResult(ActivityResultContracts.StartIntentSenderForResult()) { result ->
+//            if (result.resultCode != RESULT_OK) {
+//                Log.e("Update", "Update flow failed! Result code: ${result.resultCode}")
+//            }
+//        }
 
         initUI()
         playVideo()

@@ -8,12 +8,14 @@ import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.gmwapp.hi_dude.BaseApplication
 import com.gmwapp.hi_dude.R
 import com.gmwapp.hi_dude.activities.RandomUserActivity
 import com.gmwapp.hi_dude.adapters.CoinAdapter
 import com.gmwapp.hi_dude.adapters.FemaleUserAdapter
 import com.gmwapp.hi_dude.adapters.RecentCallsAdapter
+import com.gmwapp.hi_dude.agora.FcmUtils
 import com.gmwapp.hi_dude.agora.male.MaleCallConnectingActivity
 import com.gmwapp.hi_dude.callbacks.OnItemSelectionListener
 import com.gmwapp.hi_dude.constants.DConstants
@@ -33,88 +35,114 @@ import com.gmwapp.hi_dude.agora.male.MaleVideoCallingActivity
 class RecentFragment : BaseFragment() {
     lateinit var binding: FragmentRecentBinding
     private val recentViewModel: RecentViewModel by viewModels()
+    private lateinit var recentCallsAdapter: RecentCallsAdapter
+    private var isLoading = false
+    private var offset = 0
+    private val limit = 10
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
-        binding = FragmentRecentBinding.inflate(layoutInflater)
-
+        binding = FragmentRecentBinding.inflate(inflater, container, false)
         initUI()
+        observeViewModel()
         return binding.root
     }
 
     private fun initUI() {
         val userData = BaseApplication.getInstance()?.getPrefs()?.getUserData()
-        userData?.let { recentViewModel.getCallsList(userData.id, userData.gender) }
-
-        binding.swipeRefreshLayout.setOnRefreshListener {
-            // Start refreshing the data
-            userData?.let { recentViewModel.getCallsList(userData.id, userData.gender) }
+        if (userData == null) {
+            binding.tlTitle.visibility = View.VISIBLE
+            return
         }
 
+        // Initial call
+        recentViewModel.getCallsList(userData.id, userData.gender, limit, offset)
 
+        // Swipe to refresh
+        binding.swipeRefreshLayout.setOnRefreshListener {
+            offset = 0
+            isLoading = true
+            recentCallsAdapter.clearData()
+            recentViewModel.getCallsList(userData.id, userData.gender, limit, offset)
+        }
 
-
-        recentViewModel.callsListLiveData.observe(viewLifecycleOwner, Observer{
-            if(it!=null && it.success && it.data!=null) {
-                binding.tlTitle.visibility = View.GONE
-            }
-            else {
-                binding.tlTitle.visibility = View.VISIBLE
-            }
-        })
-
-        recentViewModel.callsListLiveData.observe(viewLifecycleOwner, Observer {
-
-            binding.swipeRefreshLayout.isRefreshing = false
-
-            if(it!=null && it.success && it.data!=null) {
-                binding.rvCalls.setLayoutManager(
-                    LinearLayoutManager(
-                        requireActivity(), LinearLayoutManager.VERTICAL, false
-                    )
-                )
-                //  val recentCallsAdapter = RecentCallsAdapter(requireActivity(),it.data)
-
-
-
-                var recentCallsAdapter = activity?.let { it1 ->
-                    RecentCallsAdapter(it1,
-                        it.data,
-                        object : OnItemSelectionListener<CallsListResponseData> {
-                            override fun onItemSelected(data: CallsListResponseData) {
-                                val intent = Intent(context, MaleCallConnectingActivity::class.java)
-                                intent.putExtra(DConstants.CALL_TYPE, "audio")
-                                intent.putExtra(DConstants.RECEIVER_ID, data.id)
-                                intent.putExtra(DConstants.RECEIVER_NAME, data.name)
-                                intent.putExtra(DConstants.CALL_ID, 0)
-                                intent.putExtra(DConstants.IMAGE, data.image)
-                                intent.putExtra(DConstants.IS_RECEIVER_DETAILS_AVAILABLE, true)
-                                intent.putExtra(DConstants.TEXT, getString(R.string.wait_user_hint, data.name))
-                                startActivity(intent)
-                            }
-                        },
-                        object : OnItemSelectionListener<CallsListResponseData> {
-                            override fun onItemSelected(data: CallsListResponseData) {
-                                val intent = Intent(context, MaleCallConnectingActivity::class.java)
-                                intent.putExtra(DConstants.CALL_TYPE, "video")
-                                intent.putExtra(DConstants.RECEIVER_ID, data.id)
-                                intent.putExtra(DConstants.RECEIVER_NAME, data.name)
-                                intent.putExtra(DConstants.CALL_ID, 0)
-                                intent.putExtra(DConstants.IMAGE, data.image)
-                                intent.putExtra(DConstants.IS_RECEIVER_DETAILS_AVAILABLE, true)
-                                intent.putExtra(DConstants.TEXT, getString(R.string.wait_user_hint, data.name))
-                                startActivity(intent)
-                            }
-                        })
+        // Set up RecyclerView
+        binding.rvCalls.layoutManager = LinearLayoutManager(requireContext())
+        recentCallsAdapter = RecentCallsAdapter(
+            requireActivity(),
+            ArrayList(),
+            object : OnItemSelectionListener<CallsListResponseData> {
+                override fun onItemSelected(data: CallsListResponseData) {
+                    startMaleCallConnectingActivity(data, "audio")
                 }
+            },
+            object : OnItemSelectionListener<CallsListResponseData> {
+                override fun onItemSelected(data: CallsListResponseData) {
+                    startMaleCallConnectingActivity(data, "video")
+                }
+            }
+        )
+        binding.rvCalls.adapter = recentCallsAdapter
 
+        // Pagination
+        binding.rvCalls.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                super.onScrolled(recyclerView, dx, dy)
 
-                binding.rvCalls.setAdapter(recentCallsAdapter)
-                binding.rvCalls.visibility = View.VISIBLE
-                binding.tlTitle.visibility = View.GONE
-
+                val layoutManager = recyclerView.layoutManager as LinearLayoutManager
+                if (!isLoading &&
+                    layoutManager.findLastCompletelyVisibleItemPosition() == recentCallsAdapter.itemCount - 1
+                ) {
+                    isLoading = true
+                    offset += limit
+                    userData.let {
+                        recentViewModel.getCallsList(it.id, it.gender, limit, offset)
+                    }
+                }
             }
         })
+    }
+
+    private fun observeViewModel() {
+        recentViewModel.callsListLiveData.observe(viewLifecycleOwner, Observer {
+            binding.swipeRefreshLayout.isRefreshing = false
+            isLoading = false
+
+            if (it != null && it.success && it.data != null && it.data.isNotEmpty()) {
+                binding.tlTitle.visibility = View.GONE
+                binding.rvCalls.visibility = View.VISIBLE
+                recentCallsAdapter.addData(it.data)
+            } else if (recentCallsAdapter.itemCount == 0) {
+                binding.tlTitle.visibility = View.VISIBLE
+                binding.rvCalls.visibility = View.GONE
+            }
+        })
+    }
+
+    private fun startMaleCallConnectingActivity(data: CallsListResponseData, callType: String) {
+        val intent = Intent(requireContext(), MaleCallConnectingActivity::class.java).apply {
+            putExtra(DConstants.CALL_TYPE, callType)
+            putExtra(DConstants.RECEIVER_ID, data.id)
+            putExtra(DConstants.RECEIVER_NAME, data.name)
+            putExtra(DConstants.CALL_ID, 0)
+            putExtra(DConstants.IMAGE, data.image)
+            putExtra(DConstants.IS_RECEIVER_DETAILS_AVAILABLE, true)
+            putExtra(DConstants.TEXT, getString(R.string.wait_user_hint, data.name))
+        }
+        FcmUtils.isUserAvailable=1
+        startActivity(intent)
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        if (FcmUtils.isUserAvailable==0){
+            val userData = BaseApplication.getInstance()?.getPrefs()?.getUserData()
+            offset = 0
+            isLoading = true
+            recentCallsAdapter.clearData()
+            userData?.let { recentViewModel.getCallsList(it.id, userData.gender, limit, offset) }        }
+
     }
 }

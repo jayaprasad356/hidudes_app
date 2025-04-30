@@ -33,6 +33,26 @@
         android:orientation="horizontal"
         app:layout_constraintGuide_percent="0.97" />
 
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/whatsapp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="@dimen/_10sdp"
+        android:backgroundTint="@color/button_background"
+        android:contentDescription="@string/video"
+        android:elevation="0dp"
+        app:backgroundTint="@color/green"
+
+        app:borderWidth="2dp"
+        app:fabSize="auto"
+        app:layout_constraintEnd_toEndOf="@id/gl_right_margin"
+
+        app:layout_constraintBottom_toTopOf="@id/gl_bottom_margin"
+
+        app:srcCompat="@drawable/whatsapp"
+        app:tint="@color/green"
+        />
+
     <ImageView
         android:id="@+id/iv_logo"
         android:layout_width="@dimen/_28sdp"
@@ -301,24 +321,6 @@
 
 
         </androidx.constraintlayout.widget.ConstraintLayout>
-    </androidx.cardview.widget.CardView>
-
-    <androidx.cardview.widget.CardView
-        android:id="@+id/btnFloatingAction"
-        android:layout_width="@dimen/_45sdp"
-        android:layout_height="@dimen/_45sdp"
-        android:layout_marginTop="15dp"
-        app:cardCornerRadius="@dimen/_200sdp"
-        app:cardBackgroundColor="@color/button_background"
-        app:layout_constraintEnd_toStartOf="@+id/gl_right_margin"
-        app:layout_constraintBottom_toBottomOf="@+id/gl_bottom_margin">
-
-        <ImageView
-            android:layout_gravity="center"
-            android:layout_width="@dimen/_30sdp"
-            android:layout_height="@dimen/_30sdp"
-            android:src="@drawable/whatsapp"/>
-
     </androidx.cardview.widget.CardView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

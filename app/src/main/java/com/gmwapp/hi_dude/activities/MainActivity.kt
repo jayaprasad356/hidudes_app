@@ -60,6 +60,7 @@ import com.google.android.play.core.install.InstallStateUpdatedListener
 import com.google.android.play.core.install.model.AppUpdateType
 import com.google.android.play.core.install.model.InstallStatus
 import com.google.android.play.core.install.model.UpdateAvailability
+import com.google.androidbrowserhelper.trusted.LauncherActivity
 import com.google.firebase.messaging.FirebaseMessaging
 import dagger.hilt.android.AndroidEntryPoint
 import retrofit2.Call
@@ -73,7 +74,6 @@ class MainActivity : BaseActivity(), BottomNavigationView.OnNavigationItemSelect
     var isBackPressedAlready = false
     var userName: String? = null
     var userID: String? = null
-    private var billingManager: BillingManager? = null
     var currentVersion = ""
 
     val appUpdateViewModel: LoginViewModel by viewModels()
@@ -83,6 +83,8 @@ class MainActivity : BaseActivity(), BottomNavigationView.OnNavigationItemSelect
     private val fcmTokenViewModel: FcmTokenViewModel by viewModels()
     private val upiPaymentViewModel: UpiPaymentViewModel by viewModels()
     private val WalletViewModel: WalletViewModel by viewModels()
+    private val fetchedSkuList: MutableList<String> = mutableListOf()
+    private var billingManager: BillingManager? = null
 
     lateinit var coinId: String
     private lateinit var logger: AppEventsLogger
@@ -157,18 +159,11 @@ class MainActivity : BaseActivity(), BottomNavigationView.OnNavigationItemSelect
         val userData = BaseApplication.getInstance()?.getPrefs()?.getUserData()
         userID = userData?.id.toString()
 
-        BaseApplication.getInstance()?.getPrefs()?.getUserData()
-            ?.let { WalletViewModel.getCoins(it.id) }
-
-        WalletViewModel.coinsLiveData.observe(this) { coinResponse ->
-            if (coinResponse != null && coinResponse.success && coinResponse.data != null) {
-                val skuList = coinResponse.data.map { coin -> coin.id.toString() }
-                billingManager = BillingManager(this, skuList)
-                accountViewModel.getSettings()
-            }
-        }
+        billingManager = BillingManager(this)
+        accountViewModel.getSettings()
 
         initUI()
+        getSkuListID()
         addObservers()
 
         updateFcmToken(userData?.id)
@@ -434,12 +429,17 @@ class MainActivity : BaseActivity(), BottomNavigationView.OnNavigationItemSelect
                     //"coins_12",
                     pointsId,
                 )
-                WalletViewModel.navigateToMain.observe(this, Observer { shouldNavigate ->
-//                    val intent = Intent(this, MainActivity::class.java)
-//                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-//                    startActivity(intent)
-//                    finish() // ✅ Now this works because we are in an Activity
-                })
+                WalletViewModel.navigateToMain.observe(
+                    this,
+                    Observer { shouldNavigate ->
+                        Log.d("shouldNavigateFromMain","$shouldNavigate")
+                        if (shouldNavigate){
+                            val intent = Intent(this, MainActivity::class.java)
+                            intent.flags =
+                                Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                            startActivity(intent)
+                            finish() // ✅ Now this works because we are in an Activity
+                        }})
             }
         } else {
             Toast.makeText(this, "Invalid input data", Toast.LENGTH_SHORT).show()
@@ -603,138 +603,138 @@ class MainActivity : BaseActivity(), BottomNavigationView.OnNavigationItemSelect
 //        }
 //    }
 
-    private fun showEditProfileDialog(amount: String, id: Int, pointsIdInt: Int) {
-        val dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_edit_profile, null)
-        val builder = AlertDialog.Builder(this, R.style.MaterialAlertDialogTheme)
-            .setView(dialogView)
-
-        val dialog = builder.create()
-        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-        dialog.show()
-
-
-        val userData = BaseApplication.getInstance()?.getPrefs()?.getUserData()
-
-        val userId = userData?.id
-        val name = userData?.name ?: ""
-        val email = "test@gmail.com"
-        val mobile = userData?.mobile ?: ""
-        var pointsId = "$id"
-
-        // get 2 percentage of amount
-        val twoPercentage = amount.toDouble() * 0.02
-        val roundedAmount = Math.round(twoPercentage)
-        val total_amount = (amount.toDouble() + roundedAmount).toString()
-
-        dialogView.findViewById<MaterialButton>(R.id.btn_upload_photo).setText("Default Pay")
-
-        dialogView.findViewById<MaterialButton>(R.id.btn_upload_photo).apply {
-            setText("QR Scanner") // Set button text
-            setIconResource(0) // Removes the icon
-            // or
-            // icon = null
-        }
-
-        dialogView.findViewById<MaterialButton>(R.id.btn_edit_profile).apply {
-            setText("Direct Pay") // Set button text
-            setIconResource(0) // Removes the icon
-        }
-
-        // Set up button click listeners
-        dialogView.findViewById<MaterialButton>(R.id.btn_edit_profile).setOnClickListener {
-            if (userId != null && pointsId.isNotEmpty()) {
-                if (pointsIdInt != null) {
-
-                    // Generate 4-digit random number
-                    val random4Digit = (1000..9999).random()
-
-                    // ✅ Save userId and pointsIdInt BEFORE launching billing
-                    val preferences = DPreferences(this)
-                    preferences.clearSelectedOrderId()
-                    preferences.setSelectedUserId(userId.toString())
-                    preferences.setSelectedPlanId(java.lang.String.valueOf(pointsIdInt))
-                    preferences.setSelectedOrderId(java.lang.String.valueOf(random4Digit))
-                    WalletViewModel.tryCoins(userId, pointsIdInt, 0, random4Digit, "try")
-                    billingManager!!.purchaseProduct(
-                        //"coins_12",
-                        pointsId,
-                    )
-                    WalletViewModel.navigateToMain.observe(this, Observer { shouldNavigate ->
-
-                        if (shouldNavigate) {
-                            Toast.makeText(this, "Coin updated successfully", Toast.LENGTH_SHORT)
-                                .show()
-                            userData.id.let { profileViewModel.getUsers(it) }
-
-
-                            val intent = Intent(this, MainActivity::class.java)
-                            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                            startActivity(intent)
-                            finish() // ✅ Now this works because we are in an Activity
-                        }
-//                        val intent = Intent(this, MainActivity::class.java)
-//                        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-//                        startActivity(intent)
-//                        finish() // ✅ Now this works because we are in an Activity
-                    })
-                }
-            } else {
-                Toast.makeText(this, "Invalid input data", Toast.LENGTH_SHORT).show()
-            }
-            dialog.dismiss()
-        }
-
-        dialogView.findViewById<MaterialButton>(R.id.btn_upload_photo).setOnClickListener {
-            if (userId != null && pointsId.isNotEmpty() && total_amount.isNotEmpty()) {
-                val userIdWithPoints = "$userId-$pointsId"
-
-                val apiService = RetrofitClient.instance
-                val call = apiService.addCoins(name, total_amount, email, mobile, userIdWithPoints)
-                val callRazor = apiService.addCoinsRazorPay(userIdWithPoints,name,total_amount,email,mobile)
-
-                accountViewModel.getSettings()
-
-                accountViewModel.settingsLiveData.observe(this, Observer { response ->
-                    if (response != null && response.success) {
-                        response.data?.let { settingsList ->
-                            if (settingsList.isNotEmpty()) {
-                                val settingsData = settingsList[0]
-
-                                when ("upigateway") {
-
-                                    "upigateway" ->{
-                                        Log.d("useing", "upigateway")
-                                        val userData = BaseApplication.getInstance()?.getPrefs()?.getUserData()
-                                        var userid = userData?.id
-                                        Log.d("useing", "upigateway")
-                                        userid?.let {
-                                            val clientTxnId = generateRandomTxnId(it, pointsId) // Generate a new transaction ID
-                                            upiPaymentViewModel.createUpiPayment(it, clientTxnId, total_amount)
-                                            Log.d("upigateway", "upigateway: " + it + " + " + clientTxnId + " + " + total_amount)
-                                        }
-                                    }
-                                    else -> {
-                                        Toast.makeText(this, "Invalid Payment Gateway", Toast.LENGTH_SHORT).show()
-                                    }
-                                }
-                            }
-                        }
-                    }
-                })
-            } else {
-                Toast.makeText(this, "Invalid input data", Toast.LENGTH_SHORT).show()
-            }
-
-            dialog.dismiss()
-        }
-
-        dialogView.findViewById<ImageView>(R.id.iv_close).setOnClickListener {
-            dialog.dismiss()
-        }
-
-        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT)) // Removes default dialog background
-        dialog.show()
-    }
+//    private fun showEditProfileDialog(amount: String, id: Int, pointsIdInt: Int) {
+//        val dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_edit_profile, null)
+//        val builder = AlertDialog.Builder(this, R.style.MaterialAlertDialogTheme)
+//            .setView(dialogView)
+//
+//        val dialog = builder.create()
+//        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+//        dialog.show()
+//
+//
+//        val userData = BaseApplication.getInstance()?.getPrefs()?.getUserData()
+//
+//        val userId = userData?.id
+//        val name = userData?.name ?: ""
+//        val email = "test@gmail.com"
+//        val mobile = userData?.mobile ?: ""
+//        var pointsId = "$id"
+//
+//        // get 2 percentage of amount
+//        val twoPercentage = amount.toDouble() * 0.02
+//        val roundedAmount = Math.round(twoPercentage)
+//        val total_amount = (amount.toDouble() + roundedAmount).toString()
+//
+//        dialogView.findViewById<MaterialButton>(R.id.btn_upload_photo).setText("Default Pay")
+//
+//        dialogView.findViewById<MaterialButton>(R.id.btn_upload_photo).apply {
+//            setText("QR Scanner") // Set button text
+//            setIconResource(0) // Removes the icon
+//            // or
+//            // icon = null
+//        }
+//
+//        dialogView.findViewById<MaterialButton>(R.id.btn_edit_profile).apply {
+//            setText("Direct Pay") // Set button text
+//            setIconResource(0) // Removes the icon
+//        }
+//
+//        // Set up button click listeners
+//        dialogView.findViewById<MaterialButton>(R.id.btn_edit_profile).setOnClickListener {
+//            if (userId != null && pointsId.isNotEmpty()) {
+//                if (pointsIdInt != null) {
+//
+//                    // Generate 4-digit random number
+//                    val random4Digit = (1000..9999).random()
+//
+//                    // ✅ Save userId and pointsIdInt BEFORE launching billing
+//                    val preferences = DPreferences(this)
+//                    preferences.clearSelectedOrderId()
+//                    preferences.setSelectedUserId(userId.toString())
+//                    preferences.setSelectedPlanId(java.lang.String.valueOf(pointsIdInt))
+//                    preferences.setSelectedOrderId(java.lang.String.valueOf(random4Digit))
+//                    WalletViewModel.tryCoins(userId, pointsIdInt, 0, random4Digit, "try")
+//                    billingManager!!.purchaseProduct(
+//                        //"coins_12",
+//                        pointsId,
+//                    )
+//                    WalletViewModel.navigateToMain.observe(this, Observer { shouldNavigate ->
+//
+//                        if (shouldNavigate) {
+//                            Toast.makeText(this, "Coin updated successfully", Toast.LENGTH_SHORT)
+//                                .show()
+//                            userData.id.let { profileViewModel.getUsers(it) }
+//
+//
+//                            val intent = Intent(this, MainActivity::class.java)
+//                            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+//                            startActivity(intent)
+//                            finish() // ✅ Now this works because we are in an Activity
+//                        }
+////                        val intent = Intent(this, MainActivity::class.java)
+////                        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+////                        startActivity(intent)
+////                        finish() // ✅ Now this works because we are in an Activity
+//                    })
+//                }
+//            } else {
+//                Toast.makeText(this, "Invalid input data", Toast.LENGTH_SHORT).show()
+//            }
+//            dialog.dismiss()
+//        }
+//
+//        dialogView.findViewById<MaterialButton>(R.id.btn_upload_photo).setOnClickListener {
+//            if (userId != null && pointsId.isNotEmpty() && total_amount.isNotEmpty()) {
+//                val userIdWithPoints = "$userId-$pointsId"
+//
+//                val apiService = RetrofitClient.instance
+//                val call = apiService.addCoins(name, total_amount, email, mobile, userIdWithPoints)
+//                val callRazor = apiService.addCoinsRazorPay(userIdWithPoints,name,total_amount,email,mobile)
+//
+//                accountViewModel.getSettings()
+//
+//                accountViewModel.settingsLiveData.observe(this, Observer { response ->
+//                    if (response != null && response.success) {
+//                        response.data?.let { settingsList ->
+//                            if (settingsList.isNotEmpty()) {
+//                                val settingsData = settingsList[0]
+//
+//                                when ("upigateway") {
+//
+//                                    "upigateway" ->{
+//                                        Log.d("useing", "upigateway")
+//                                        val userData = BaseApplication.getInstance()?.getPrefs()?.getUserData()
+//                                        var userid = userData?.id
+//                                        Log.d("useing", "upigateway")
+//                                        userid?.let {
+//                                            val clientTxnId = generateRandomTxnId(it, pointsId) // Generate a new transaction ID
+//                                            upiPaymentViewModel.createUpiPayment(it, clientTxnId, total_amount)
+//                                            Log.d("upigateway", "upigateway: " + it + " + " + clientTxnId + " + " + total_amount)
+//                                        }
+//                                    }
+//                                    else -> {
+//                                        Toast.makeText(this, "Invalid Payment Gateway", Toast.LENGTH_SHORT).show()
+//                                    }
+//                                }
+//                            }
+//                        }
+//                    }
+//                })
+//            } else {
+//                Toast.makeText(this, "Invalid input data", Toast.LENGTH_SHORT).show()
+//            }
+//
+//            dialog.dismiss()
+//        }
+//
+//        dialogView.findViewById<ImageView>(R.id.iv_close).setOnClickListener {
+//            dialog.dismiss()
+//        }
+//
+//        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT)) // Removes default dialog background
+//        dialog.show()
+//    }
 
     fun calculateOriginalPrice(price: Int, savePercentage: Int): Int {
         val originalPrice = price / (1 - (savePercentage / 100.0)) // Use Double for division
@@ -856,7 +856,7 @@ class MainActivity : BaseActivity(), BottomNavigationView.OnNavigationItemSelect
             Snackbar.LENGTH_INDEFINITE
         ).apply {
             setAction("RESTART") { appUpdateManager.completeUpdate() }
-            setActionTextColor(getColor(R.color.pink))
+            setActionTextColor(getColor(R.color.white))
             show()
         }
     }
@@ -887,6 +887,29 @@ class MainActivity : BaseActivity(), BottomNavigationView.OnNavigationItemSelect
                     popupSnackbarForCompleteUpdate()
                 }
             }
+    }
+
+    fun getSkuListID() {
+        BaseApplication.getInstance()?.getPrefs()?.getUserData()
+            ?.let { WalletViewModel.getCoins(it.id) }
+
+        WalletViewModel.coinsLiveData.observe(this, Observer {
+
+
+            if (it != null && it.success && it.data != null) {
+
+                fetchedSkuList.clear() // Clear old SKUs to avoid duplicates
+                it.data.forEach { coinItem ->
+                    val sku = "${coinItem.id}"
+                    fetchedSkuList.add(sku)
+
+                    val preferences = DPreferences(this)
+                    preferences.setSkuList(fetchedSkuList)
+                }
+
+            }
+
+        })
     }
 
 }
